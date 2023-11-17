@@ -192,7 +192,7 @@ export default function MiniDrawer() {
                 <List style={{ marginTop: '-7px' }}>
                     <CustomList icon={dashboardIcon} whiteIcon={dashboardIconWhite} text="Dashboard" link="dashboard" pathText={pathText} />
                     <CustomList icon={generalIcon} whiteIcon={generalIconWhite} text="General Settings" link="generalSettings" pathText={pathText} />
-                    <CustomList icon={countryIcon} whiteIcon={countryIconWhite} text="Country" link="country" pathText={pathText} />
+                    <CustomList icon={countryIcon} whiteIcon={countryIconWhite} text="Countries" link="countries" pathText={pathText} />
                     <CustomList icon={usersIcon} whiteIcon={usersIconWhite} text="Senders" link="senders" pathText={pathText} />
                     <CustomList icon={pendingIcon} whiteIcon={pendingIconWhite} text="Receivers" link="receivers" pathText={pathText} />
                     <CustomList icon={revenueIcon} whiteIcon={revenueIconWhite} text="Revenue" link="revenue" pathText={pathText} />
@@ -219,7 +219,7 @@ export default function MiniDrawer() {
                     </ListItemButton>
                 </List>
             </Drawer>
-            <Box component="main" sx={{ flexGrow: 1, p:1 }}>
+            <Box component="main" sx={{ flexGrow: 1, background: '#F7F8FA' }}>
                 <Outlet />
             </Box>
         </Box>

@@ -37,7 +37,7 @@ const routes = createBrowserRouter([
                 errorElement: <ErrorPage />,
             },
             {
-                path: 'country',
+                path: 'countries',
                 element: <Country />,
                 errorElement: <ErrorPage />,
             },
