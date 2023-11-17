@@ -9,38 +9,36 @@ import { buttonClasses } from "@mui/base/Button";
 import { Tab as BaseTab, tabClasses } from "@mui/base/Tab";
 import { DataGrid } from "@mui/x-data-grid";
 
-const CountriesMainContent = () => {
+const RevenueMainContent = () => {
   const columns = [
     { field: "id", headerName: "ID", width: 70 },
     {
-      field: "name",
-      headerName: "Country name",
+      field: "TransferNumber",
+      headerName: "Transfer Number",
       width: 130,
     },
-    { field: "code", headerName: "Code", width: 130 },
     {
-      field: "image",
-      headerName: "Icon",
-      width: 90,
-      sortable: false,
-      filterable: false,
-      disableColumnMenu: true,
-
-      renderCell: (params) => (
-        <img
-          style={{
-            height: 35,
-            width: 35,
-            borderRadius: "50%",
-            marginRight: 10,
-          }}
-          src={`${params.row.image}`}
-          // alt="user-image"
-        />
-      ),
+      field: "BaseAmount",
+      headerName: "Base Amount",
+      width: 130,
     },
     {
-      field: "enabled",
+      field: "TransactionFees",
+      headerName: "Transaction Fees",
+      width: 150,
+    },
+    {
+      field: "Totalamount",
+      headerName: "Total amount",
+      width: 200,
+    },
+    {
+      field: "PartnerAmount",
+      headerName: "Partner Amount",
+      width: 200,
+    },
+    {
+      field: "status",
       headerName: "Status",
       // description: 'This column has a value getter and is not sortable.',
       // sortable: false,
@@ -56,17 +54,50 @@ const CountriesMainContent = () => {
             height: "25px",
             width: "75px",
             backgroundColor: `${
-              params.row.enabled == true ? "#DCFDD4" : "#FDD4D4"
+              params.row.status == true ? "#DCFDD4" : "#FAFDD4"
             }`,
             borderRadius: "15px",
             // border: `${params.row.enabled == true ? '1px solid #007FFF' : '1px solid #FFA800'}`,
-            color: `${params.row.enabled == true ? "#4FAC16" : "#AC1616"}`,
+            color: `${params.row.status == true ? "#4FAC16" : "#AC9D16"}`,
             fontFamily: "Open Sans",
             fontSize: "14px",
             fontStyle: "normal",
           }}
         >
-          {params.row.enabled == true ? "Enabled" : "Disabled"}
+          {params.row.status == true ? "Paid" : "Pending"}
+        </div>
+      ),
+    },
+    {
+      field: "paymentstatus",
+      headerName: "Parter Payout Status",
+      // description: 'This column has a value getter and is not sortable.',
+      // sortable: false,
+      width: 160,
+      // disable sorting
+      sortable: false,
+      renderCell: (params) => (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "25px",
+            width: "75px",
+            backgroundColor: `${
+              params.row.paymentstatus == true ? "#DCFDD4" : "#FAFDD4"
+            }`,
+            borderRadius: "15px",
+            // border: `${params.row.enabled == true ? '1px solid #007FFF' : '1px solid #FFA800'}`,
+            color: `${
+              params.row.paymentstatus == true ? "#4FAC16" : "#AC9D16"
+            }`,
+            fontFamily: "Open Sans",
+            fontSize: "14px",
+            fontStyle: "normal",
+          }}
+        >
+          {params.row.paymentstatus == true ? "Paid" : "Pending"}
         </div>
       ),
     },
@@ -124,67 +155,13 @@ const CountriesMainContent = () => {
   const rows = [
     {
       id: 1,
-      name: "Australia",
-      code: "AU",
-      image:
-        "https://upload.wikimedia.org/wikipedia/commons/b/b9/Flag_of_Australia.svg",
-      enabled: true,
-    },
-    {
-      id: 2,
-      name: "Lannister",
-      code: "LI",
-      image:
-        "https://upload.wikimedia.org/wikipedia/commons/b/b9/Flag_of_Australia.svg",
-      enabled: true,
-    },
-    {
-      id: 4,
-      name: "Stark",
-      code: "SN",
-      image:
-        "https://upload.wikimedia.org/wikipedia/commons/b/b9/Flag_of_Australia.svg",
-      enabled: true,
-    },
-    {
-      id: 5,
-      name: "Targaryen",
-      code: "SN",
-      image:
-        "https://upload.wikimedia.org/wikipedia/commons/b/b9/Flag_of_Australia.svg",
-      enabled: true,
-    },
-    {
-      id: 6,
-      name: "Melisandre",
-      code: "SN",
-      image:
-        "https://upload.wikimedia.org/wikipedia/commons/b/b9/Flag_of_Australia.svg",
-      enabled: true,
-    },
-    {
-      id: 7,
-      name: "Clifford",
-      code: "SN",
-      image:
-        "https://upload.wikimedia.org/wikipedia/commons/b/b9/Flag_of_Australia.svg",
-      enabled: true,
-    },
-    {
-      id: 8,
-      name: "Frances",
-      code: "SN",
-      image:
-        "https://upload.wikimedia.org/wikipedia/commons/b/b9/Flag_of_Australia.svg",
-      enabled: true,
-    },
-    {
-      id: 9,
-      name: "Roxie",
-      code: "SN",
-      image:
-        "https://upload.wikimedia.org/wikipedia/commons/b/b9/Flag_of_Australia.svg",
-      enabled: true,
+      TransferNumber: 200,
+      BaseAmount: 20,
+      TransactionFees: 4,
+      Totalamount: 204,
+      PartnerAmount: 20,
+      status: true,
+      paymentstatus: true,
     },
   ];
 
@@ -311,4 +288,4 @@ const TabsList = styled(BaseTabsList)(
     };
     `
 );
-export default CountriesMainContent;
+export default RevenueMainContent;

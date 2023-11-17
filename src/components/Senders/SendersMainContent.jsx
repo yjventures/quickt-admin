@@ -9,38 +9,67 @@ import { buttonClasses } from "@mui/base/Button";
 import { Tab as BaseTab, tabClasses } from "@mui/base/Tab";
 import { DataGrid } from "@mui/x-data-grid";
 
-const CountriesMainContent = () => {
+const SendersMainContent = () => {
   const columns = [
     { field: "id", headerName: "ID", width: 70 },
     {
-      field: "name",
-      headerName: "Country name",
+      field: "firstName",
+      headerName: "First Name",
       width: 130,
     },
-    { field: "code", headerName: "Code", width: 130 },
     {
-      field: "image",
-      headerName: "Icon",
-      width: 90,
+      field: "lastName",
+      headerName: "Last Name",
+      width: 130,
+    },
+    {
+      field: "email",
+      headerName: "Email",
+      width: 150,
+    },
+    {
+      field: "phone",
+      headerName: "Phone",
+      width: 130,
+    },
+    {
+      field: "DOB",
+      headerName: "DOB",
+      width: 150,
+    },
+    {
+      field: "kyc",
+      headerName: "KYC",
+      // description: 'This column has a value getter and is not sortable.',
+      // sortable: false,
+      width: 160,
+      // disable sorting
       sortable: false,
-      filterable: false,
-      disableColumnMenu: true,
-
       renderCell: (params) => (
-        <img
+        <div
           style={{
-            height: 35,
-            width: 35,
-            borderRadius: "50%",
-            marginRight: 10,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "25px",
+            width: "75px",
+            backgroundColor: `${
+              params.row.kyc == true ? "#DCFDD4" : "#FDD4D4"
+            }`,
+            borderRadius: "15px",
+            // border: `${params.row.enabled == true ? '1px solid #007FFF' : '1px solid #FFA800'}`,
+            color: `${params.row.kyc == true ? "#4FAC16" : "#AC1616"}`,
+            fontFamily: "Open Sans",
+            fontSize: "14px",
+            fontStyle: "normal",
           }}
-          src={`${params.row.image}`}
-          // alt="user-image"
-        />
+        >
+          {params.row.kyc == true ? "Enabled" : "Disabled"}
+        </div>
       ),
     },
     {
-      field: "enabled",
+      field: "status",
       headerName: "Status",
       // description: 'This column has a value getter and is not sortable.',
       // sortable: false,
@@ -56,17 +85,17 @@ const CountriesMainContent = () => {
             height: "25px",
             width: "75px",
             backgroundColor: `${
-              params.row.enabled == true ? "#DCFDD4" : "#FDD4D4"
+              params.row.status == true ? "#DCFDD4" : "#FDD4D4"
             }`,
             borderRadius: "15px",
             // border: `${params.row.enabled == true ? '1px solid #007FFF' : '1px solid #FFA800'}`,
-            color: `${params.row.enabled == true ? "#4FAC16" : "#AC1616"}`,
+            color: `${params.row.status == true ? "#4FAC16" : "#AC1616"}`,
             fontFamily: "Open Sans",
             fontSize: "14px",
             fontStyle: "normal",
           }}
         >
-          {params.row.enabled == true ? "Enabled" : "Disabled"}
+          {params.row.status == true ? "Enabled" : "Disabled"}
         </div>
       ),
     },
@@ -124,67 +153,13 @@ const CountriesMainContent = () => {
   const rows = [
     {
       id: 1,
-      name: "Australia",
-      code: "AU",
-      image:
-        "https://upload.wikimedia.org/wikipedia/commons/b/b9/Flag_of_Australia.svg",
-      enabled: true,
-    },
-    {
-      id: 2,
-      name: "Lannister",
-      code: "LI",
-      image:
-        "https://upload.wikimedia.org/wikipedia/commons/b/b9/Flag_of_Australia.svg",
-      enabled: true,
-    },
-    {
-      id: 4,
-      name: "Stark",
-      code: "SN",
-      image:
-        "https://upload.wikimedia.org/wikipedia/commons/b/b9/Flag_of_Australia.svg",
-      enabled: true,
-    },
-    {
-      id: 5,
-      name: "Targaryen",
-      code: "SN",
-      image:
-        "https://upload.wikimedia.org/wikipedia/commons/b/b9/Flag_of_Australia.svg",
-      enabled: true,
-    },
-    {
-      id: 6,
-      name: "Melisandre",
-      code: "SN",
-      image:
-        "https://upload.wikimedia.org/wikipedia/commons/b/b9/Flag_of_Australia.svg",
-      enabled: true,
-    },
-    {
-      id: 7,
-      name: "Clifford",
-      code: "SN",
-      image:
-        "https://upload.wikimedia.org/wikipedia/commons/b/b9/Flag_of_Australia.svg",
-      enabled: true,
-    },
-    {
-      id: 8,
-      name: "Frances",
-      code: "SN",
-      image:
-        "https://upload.wikimedia.org/wikipedia/commons/b/b9/Flag_of_Australia.svg",
-      enabled: true,
-    },
-    {
-      id: 9,
-      name: "Roxie",
-      code: "SN",
-      image:
-        "https://upload.wikimedia.org/wikipedia/commons/b/b9/Flag_of_Australia.svg",
-      enabled: true,
+      firstName: "ahad ",
+      lastName: "chowdhury",
+      email: "ahadalichowdhury@gmail.com",
+      phone: "01700000000",
+      DOB: "28/09/2001",
+      kyc: true,
+      status: false
     },
   ];
 
@@ -311,4 +286,4 @@ const TabsList = styled(BaseTabsList)(
     };
     `
 );
-export default CountriesMainContent;
+export default SendersMainContent;
