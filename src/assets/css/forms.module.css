@@ -1,0 +1,36 @@
+.parent {
+    /* background-color: #ccc; */
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: 100%;
+    padding: 5rem 0;
+}
+
+.text{
+    font-size: 16px;
+    font-weight: 400;
+    color: #000;
+    /* margin: 20px 0; */
+    margin-bottom: 70px;
+}
+
+.toggleParent{
+    width: 60%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.toggleBtn{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.successBtn{
+    background-color: #0732DE;
+    color: aliceblue;
+}

@@ -1,0 +1,63 @@
+.formParent {
+    border-radius: 5px;
+    border: 1px solid #C9C9C9;
+    background: #F1F1F1;
+    width: 70%;
+    border-radius: 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    border-radius: 5px;
+    margin-bottom: 30px;
+    padding: 20px 0;
+    height: 78vh;
+}
+
+.formImage {
+    margin-top: 34px;
+    position: relative;
+}
+
+.addButton {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background: #F1F1F1;
+    border-radius: 50%;
+    padding: 2px;
+    cursor: pointer;
+}
+
+.formTitle {
+    color: #343434;
+    font-family: Roboto;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 700;
+    margin-top: 10px;
+    margin-bottom: 50px;
+}
+
+.formData {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    border-top: 0.2px solid #C9C9C9;
+    border-bottom: 0.2px solid #C9C9C9;
+    padding: 10px 60px;
+    font-size: 12px;
+    color: #000;
+}
+
+.locationAndLink {
+    width: 80%;
+    padding: 10px;
+    font-size: 12px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid #C9C9C9;
+}
