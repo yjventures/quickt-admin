@@ -115,8 +115,7 @@ const SendersMainContent = () => {
             justifyContent: "space-around",
             flexDirection: "column",
             alignItems: "center",
-            height: "25px",
-            width: "75px",
+            width: "105px",
             backgroundColor: "#fff",
             borderRadius: "15px",
             border: "1px solid #E9E9EA",
@@ -124,26 +123,35 @@ const SendersMainContent = () => {
             fontFamily: "Open Sans",
             fontSize: "14px",
             fontStyle: "normal",
+            padding: "7px",
           }}
         >
           <option value="view" selected>
             Action
           </option>
           <option
-            value="edit"
+            value="block"
             onClick={() => {
-              alert("Edit");
+              alert("block");
             }}
           >
-            Edit
+            Block
           </option>
           <option
-            value="delete"
+            value="viewKyc"
             onClick={() => {
-              alert("Delete");
+              alert("view kyc");
             }}
           >
-            Delete
+            View KYC
+          </option>
+          <option
+            value="details"
+            onClick={() => {
+              alert("details");
+            }}
+          >
+            Details
           </option>
         </select>
       ),
@@ -159,7 +167,7 @@ const SendersMainContent = () => {
       phone: "01700000000",
       DOB: "28/09/2001",
       kyc: true,
-      status: false
+      status: false,
     },
   ];
 

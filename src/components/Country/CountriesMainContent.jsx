@@ -73,7 +73,7 @@ const CountriesMainContent = () => {
     {
       field: "action",
       headerName: "Action",
-      width: 150,
+      width: 100,
       type: "number",
       sortable: false,
       filterable: false,
@@ -86,8 +86,7 @@ const CountriesMainContent = () => {
             justifyContent: "space-around",
             flexDirection: "column",
             alignItems: "center",
-            height: "25px",
-            width: "75px",
+            width: "105px",
             backgroundColor: "#fff",
             borderRadius: "15px",
             border: "1px solid #E9E9EA",
@@ -95,6 +94,7 @@ const CountriesMainContent = () => {
             fontFamily: "Open Sans",
             fontSize: "14px",
             fontStyle: "normal",
+            padding: "7px",
           }}
         >
           <option value="view" selected>

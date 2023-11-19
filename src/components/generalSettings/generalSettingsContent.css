@@ -84,3 +84,12 @@
   justify-content: center;
   gap: 10px;
 }
+
+.css-ptkaw2-MuiDataGrid-root .MuiDataGrid-columnHeader:focus,
+.css-ptkaw2-MuiDataGrid-root .MuiDataGrid-cell:focus {
+  outline: none !important;
+}
+.css-ptkaw2-MuiDataGrid-root .MuiDataGrid-columnHeader:focus-within,
+.css-ptkaw2-MuiDataGrid-root .MuiDataGrid-cell:focus-within {
+  outline: none !important;
+}

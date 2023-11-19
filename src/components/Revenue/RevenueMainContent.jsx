@@ -117,8 +117,7 @@ const RevenueMainContent = () => {
             justifyContent: "space-around",
             flexDirection: "column",
             alignItems: "center",
-            height: "25px",
-            width: "75px",
+            width: "105px",
             backgroundColor: "#fff",
             borderRadius: "15px",
             border: "1px solid #E9E9EA",
@@ -126,6 +125,7 @@ const RevenueMainContent = () => {
             fontFamily: "Open Sans",
             fontSize: "14px",
             fontStyle: "normal",
+            padding: "7px",
           }}
         >
           <option value="view" selected>
