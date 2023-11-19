@@ -21,7 +21,6 @@
   color: #fff;
   border: none;
   cursor: pointer;
-  
 }
 
 .generalSettings_TextHeading {
@@ -45,7 +44,6 @@
   font-size: 20px;
   margin-right: 30px;
   outline: none;
-
 }
 
 .generalSettings_MainBanner textarea {
@@ -70,7 +68,7 @@
 
 .generalSettings_MainServices {
   display: flex;
-  
+
   justify-content: space-between;
   align-items: center;
 }
@@ -79,4 +77,10 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+.generalSettings__serviceButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
 }

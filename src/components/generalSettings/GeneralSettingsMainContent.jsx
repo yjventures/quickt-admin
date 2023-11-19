@@ -8,10 +8,17 @@ import { TabsList as BaseTabsList } from "@mui/base/TabsList";
 import { TabPanel as BaseTabPanel } from "@mui/base/TabPanel";
 import { buttonClasses } from "@mui/base/Button";
 import { Tab as BaseTab, tabClasses } from "@mui/base/Tab";
-import { Autocomplete, Box, FormControl, InputLabel, MenuItem, Select } from "@mui/material";
+import {
+  Autocomplete,
+  Box,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+} from "@mui/material";
 import quickStyle from "../../assets/css/quickTransfer.module.css";
-import updateIcon from '../../assets/img/generalSettings/update.svg';
-import plusIcon from '../../assets/img/generalSettings/plus.svg';
+import updateIcon from "../../assets/img/generalSettings/update.svg";
+import plusIcon from "../../assets/img/generalSettings/plus.svg";
 
 const GeneralSettingsMainContent = () => {
   const [box, setBox] = React.useState("");
@@ -33,14 +40,22 @@ const GeneralSettingsMainContent = () => {
               Custom ammount Transfer Percentage
             </p>
             <div className="generalSettings_CustomAmmount">
-              <input type="text" placeholder="Enter amount (current amount is 100)" style={{ border: '1px solid #999' }} />
+              <input
+                type="text"
+                placeholder="Enter amount (current amount is 100)"
+                style={{ border: "1px solid #999" }}
+              />
               <button>Update</button>
             </div>
 
             <div className="generalSettings_MainBanner">
               <p className="generalSettings_TextHeading">Main Banner info</p>
               <p className="generalSettings_SubTextHeading">Title</p>
-              <input type="text" placeholder="Enter title" style={{ border: '1px solid #999' }} />
+              <input
+                type="text"
+                placeholder="Enter title"
+                style={{ border: "1px solid #999" }}
+              />
               <p className="generalSettings_SubTextHeading">Description</p>
               <textarea
                 placeholder="Enter description"
@@ -69,9 +84,9 @@ const GeneralSettingsMainContent = () => {
                       label="Select Box No"
                       onChange={handleChange}
                     >
-                      <MenuItem value={10}>Box 1</MenuItem>
-                      <MenuItem value={20}>Box 2</MenuItem>
-                      <MenuItem value={30}>Box 3</MenuItem>
+                      <MenuItem value={"Box 1"}>Box 1</MenuItem>
+                      <MenuItem value={"Box 2"}>Box 2</MenuItem>
+                      <MenuItem value={"Box 3"}>Box 3</MenuItem>
                     </Select>
                   </FormControl>
                 </div>
@@ -80,7 +95,7 @@ const GeneralSettingsMainContent = () => {
               <input
                 type="text"
                 placeholder="Enter title here (We recommend title length less than 10)"
-                style={{ border: '1px solid #999' }}
+                style={{ border: "1px solid #999" }}
               />
               <div className="generalSettings_MainServices">
                 <div>
@@ -100,7 +115,9 @@ const GeneralSettingsMainContent = () => {
                   ></textarea>
                 </div>
               </div>
-              <button>Update Service Box 1</button>
+              <button className="generalSettings__serviceButton">
+                Update Service {box} <img src={plusIcon} alt="icon" />
+              </button>
             </div>
           </div>
         </TabPanel>
@@ -108,23 +125,26 @@ const GeneralSettingsMainContent = () => {
         <TabPanel value={2}>
           {/* header */}
           <div className={quickStyle.headerBox}>
-            <p className={quickStyle.header}>
-              Update Quick Transfers
-            </p>
+            <p className={quickStyle.header}>Update Quick Transfers</p>
             <div className="generalSettings_serviceBox">
-
-              <div style={{ width: "230px", }}>
-                <FormControl fullWidth style={{
-                  height: '40px',
-                }}>
-                  <InputLabel id="demo-simple-select-label" style={{
-                    marginTop: '-7px',
-                  }}>
+              <div style={{ width: "230px" }}>
+                <FormControl
+                  fullWidth
+                  style={{
+                    height: "40px",
+                  }}
+                >
+                  <InputLabel
+                    id="demo-simple-select-label"
+                    style={{
+                      marginTop: "-7px",
+                    }}
+                  >
                     Select existing transfers
                   </InputLabel>
                   <Select
                     style={{
-                      height: '40px',
+                      height: "40px",
                     }}
                     labelId="demo-simple-select-label"
                     id="demo-simple-select"
@@ -156,16 +176,17 @@ const GeneralSettingsMainContent = () => {
             </Box>
             {/* lower inputs */}
             <Box className={quickStyle.inputParent} sx={{ mt: 3 }}>
-              <div className={quickStyle.inputBox} style={{ width: '50%', position: 'relative' }}>
+              <div
+                className={quickStyle.inputBox}
+                style={{ width: "50%", position: "relative" }}
+              >
                 <label htmlFor="amount">User Visibility</label>
                 {/* <input type="text" className={quickStyle.textInput} /> */}
                 <select name="visibility" className={quickStyle.textInput}>
                   <option value="public">Visible</option>
                   <option value="private">Invisible</option>
                 </select>
-                <div className={quickStyle.absDiv}>
-                  {/* asd */}
-                </div>
+                <div className={quickStyle.absDiv}>{/* asd */}</div>
               </div>
               {/* update button */}
               <button className={quickStyle.updateButton}>
@@ -178,11 +199,9 @@ const GeneralSettingsMainContent = () => {
             <button className={quickStyle.updateButton}>
               <span> Create another transfer</span>
               <img src={plusIcon} alt="icon" />
-
             </button>
-
           }
-          <Box className={quickStyle.body} style={{marginTop: '20px'}}>
+          <Box className={quickStyle.body} style={{ marginTop: "20px" }}>
             {/* upper inputs */}
             <Box className={quickStyle.inputParent}>
               <div className={quickStyle.inputBox}>
@@ -196,19 +215,23 @@ const GeneralSettingsMainContent = () => {
             </Box>
             {/* lower inputs */}
             <Box className={quickStyle.inputParent} sx={{ mt: 3 }}>
-              <div className={quickStyle.inputBox} style={{ width: '50%', position: 'relative' }}>
+              <div
+                className={quickStyle.inputBox}
+                style={{ width: "50%", position: "relative" }}
+              >
                 <label htmlFor="amount">User Visibility</label>
                 {/* <input type="text" className={quickStyle.textInput} /> */}
                 <select name="visibility" className={quickStyle.textInput}>
                   <option value="public">Visible</option>
                   <option value="private">Invisible</option>
                 </select>
-                <div className={quickStyle.absDiv}>
-                  {/* asd */}
-                </div>
+                <div className={quickStyle.absDiv}>{/* asd */}</div>
               </div>
               {/* update button */}
-              <button className={quickStyle.updateButton} style={{ width: '200px' }}>
+              <button
+                className={quickStyle.updateButton}
+                style={{ width: "200px" }}
+              >
                 <span> Confirm Creation</span>
                 <img src={plusIcon} alt="icon" />
               </button>
@@ -292,7 +315,8 @@ const TabPanel = styled(BaseTabPanel)(
     padding: 20px 12px;
     text-align: start;
     // background: ${theme.palette.mode === "dark" ? grey[900] : "#fff"};
-    // border: 1px solid ${theme.palette.mode === "dark" ? grey[700] : grey[200]
+    // border: 1px solid ${
+      theme.palette.mode === "dark" ? grey[700] : grey[200]
     };
     border-radius: 12px;
     `
@@ -308,7 +332,8 @@ const TabsList = styled(BaseTabsList)(
     align-items: center;
     justify-content: center;
     align-content: space-between;
-    // box-shadow: 0px 4px 30px ${theme.palette.mode === "dark" ? grey[900] : grey[200]
+    // box-shadow: 0px 4px 30px ${
+      theme.palette.mode === "dark" ? grey[900] : grey[200]
     };
     `
 );
