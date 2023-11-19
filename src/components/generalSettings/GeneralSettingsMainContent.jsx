@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import "./generalSettingsContent.css";
 import imageTemplate from "../../assets/img/generalSettings/imageIcon.png";
 import styles from "../../assets/css/country.module.css";
@@ -19,6 +19,7 @@ import {
 import quickStyle from "../../assets/css/quickTransfer.module.css";
 import updateIcon from "../../assets/img/generalSettings/update.svg";
 import plusIcon from "../../assets/img/generalSettings/plus.svg";
+import axios from "axios";
 
 const GeneralSettingsMainContent = () => {
   const [box, setBox] = React.useState("");
@@ -26,6 +27,44 @@ const GeneralSettingsMainContent = () => {
   const handleChange = (event) => {
     setBox(event.target.value);
   };
+
+  /////////////////////////////
+  //image uploading
+  /////////////////////////////
+  const [selectedImage, setSelectedImage] = useState(imageTemplate);
+  const [strapiImage, setStrapiImage] = useState(null);
+  // console.log(selectedImage);
+  // console.log(strapiImage);
+  const handleImageClick = () => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.onchange = (e) => {
+      const file = e.target.files[0];
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setSelectedImage(event.target.result);
+
+        const formData = new FormData();
+        formData.append("files", file);
+
+        axios
+          .post("https://api.quickt.com.au/api/upload", formData)
+          .then((response) => {
+            console.log("File uploaded successfully: ", response.data);
+            // showSuccessAlert("Image uploaded successfully");
+            console.log(response.data[0].url);
+            setStrapiImage(response.data[0].url);
+          })
+          .catch((error) => {
+            console.error("Error uploading file: ", error.message);
+          });
+      };
+      reader.readAsDataURL(file);
+    };
+    input.click();
+  };
+
 
   return (
     <div className={styles.parent}>
@@ -101,16 +140,22 @@ const GeneralSettingsMainContent = () => {
                 <div>
                   <p className="generalSettings_SubTextHeading">Icon</p>
                   <img
-                    src={imageTemplate}
-                    style={{ width: "283px", height: "193px" }}
+                    src={selectedImage}
+                    style={{
+                      width: "283px",
+                      height: "193px",
+                      borderRadius: "10px",
+                    }}
                     alt=""
+                    onClick={handleImageClick}
                   />
+                 
                 </div>
                 <div>
                   <p className="generalSettings_SubTextHeading">Description</p>
                   <textarea
                     placeholder="Enter description"
-                    rows={6}
+                    rows={7}
                     cols={60}
                   ></textarea>
                 </div>

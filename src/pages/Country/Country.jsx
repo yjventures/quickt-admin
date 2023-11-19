@@ -1,6 +1,7 @@
+import React, { useState } from "react";
 import { Box } from "@mui/material";
 import { light } from "@mui/material/styles/createPalette";
-import React, { useState } from "react";
+
 import PathName from "../../components/PathName/PathName";
 import ExportButton from "../../components/ExportButton/ExportButton";
 import PrintButton from "../../components/PrintButton/PrintButton";
@@ -12,6 +13,7 @@ import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
 import IconImage from "../../assets/img/country/iconImage.png";
 import Switch from "react-switch";
+import axios from "axios";
 const style = {
   position: "absolute",
   top: "50%",
@@ -35,6 +37,44 @@ const Country = () => {
   const handleChange = (isChecked) => {
     setChecked(isChecked);
   };
+
+  ////////////////////////////////////////////////////////////////////////
+  //upload image and show preview
+  ////////////////////////////////////////////////////////////////////////
+  const [selectedImage, setSelectedImage] = useState(IconImage);
+  const [strapiImage, setStrapiImage] = useState(null);
+  // console.log(selectedImage);
+  // console.log(strapiImage);
+  const handleImageClick = () => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.onchange = (e) => {
+      const file = e.target.files[0];
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setSelectedImage(event.target.result);
+
+        const formData = new FormData();
+        formData.append("files", file);
+
+        axios
+          .post("https://api.quickt.com.au/api/upload", formData)
+          .then((response) => {
+            console.log("File uploaded successfully: ", response.data);
+            // showSuccessAlert("Image uploaded successfully");
+            console.log(response.data[0].url);
+            setStrapiImage(response.data[0].url);
+          })
+          .catch((error) => {
+            console.error("Error uploading file: ", error.message);
+          });
+      };
+      reader.readAsDataURL(file);
+    };
+    input.click();
+  };
+
   return (
     <Box sx={{ height: "100vh", px: 3, overflow: "scroll" }}>
       {/* pathname */}
@@ -131,9 +171,10 @@ const Country = () => {
               <Typography id="modal-modal-description" sx={{ mt: 2 }}>
                 <p className="generalSettings_SubTextHeading">Icon</p>
                 <img
-                  src={IconImage}
+                  src={selectedImage}
                   style={{ width: "270px", height: "180px" }}
                   alt=""
+                  onClick={handleImageClick}
                 />
                 <p className="generalSettings_SubTextHeading">
                   Country Name <span style={{ color: "red" }}>*</span>
