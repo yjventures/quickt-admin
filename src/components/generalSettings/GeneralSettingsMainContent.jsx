@@ -31,7 +31,7 @@ const GeneralSettingsMainContent = () => {
     <div className={styles.parent}>
       <Tabs defaultValue={1}>
         <TabsList>
-          <Tab value={1}>Basic</Tab>
+          <Tab value={1}>Basic information</Tab>
           <Tab value={2}>Quick Transfers</Tab>
         </TabsList>
         <TabPanel value={1}>
@@ -324,7 +324,7 @@ const TabPanel = styled(BaseTabPanel)(
 
 const TabsList = styled(BaseTabsList)(
   ({ theme }) => `
-    max-width: 300px;
+    max-width: 320px;
     // background-color: ${blue[500]};
     border-radius: 12px;
     margin-bottom: 16px;
