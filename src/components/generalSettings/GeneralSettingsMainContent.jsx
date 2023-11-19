@@ -8,7 +8,10 @@ import { TabsList as BaseTabsList } from "@mui/base/TabsList";
 import { TabPanel as BaseTabPanel } from "@mui/base/TabPanel";
 import { buttonClasses } from "@mui/base/Button";
 import { Tab as BaseTab, tabClasses } from "@mui/base/Tab";
-import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
+import { Autocomplete, Box, FormControl, InputLabel, MenuItem, Select } from "@mui/material";
+import quickStyle from "../../assets/css/quickTransfer.module.css";
+import updateIcon from '../../assets/img/generalSettings/update.svg';
+import plusIcon from '../../assets/img/generalSettings/plus.svg';
 
 const GeneralSettingsMainContent = () => {
   const [box, setBox] = React.useState("");
@@ -30,14 +33,14 @@ const GeneralSettingsMainContent = () => {
               Custom ammount Transfer Percentage
             </p>
             <div className="generalSettings_CustomAmmount">
-              <input type="text" placeholder="Enter percentage" />
+              <input type="text" placeholder="Enter amount (current amount is 100)" style={{ border: '1px solid #999' }} />
               <button>Update</button>
             </div>
 
             <div className="generalSettings_MainBanner">
               <p className="generalSettings_TextHeading">Main Banner info</p>
               <p className="generalSettings_SubTextHeading">Title</p>
-              <input type="text" placeholder="Enter title" />
+              <input type="text" placeholder="Enter title" style={{ border: '1px solid #999' }} />
               <p className="generalSettings_SubTextHeading">Description</p>
               <textarea
                 placeholder="Enter description"
@@ -77,6 +80,7 @@ const GeneralSettingsMainContent = () => {
               <input
                 type="text"
                 placeholder="Enter title here (We recommend title length less than 10)"
+                style={{ border: '1px solid #999' }}
               />
               <div className="generalSettings_MainServices">
                 <div>
@@ -100,7 +104,117 @@ const GeneralSettingsMainContent = () => {
             </div>
           </div>
         </TabPanel>
-        <TabPanel value={2}>quick transfer page</TabPanel>
+        {/* quick transfer */}
+        <TabPanel value={2}>
+          {/* header */}
+          <div className={quickStyle.headerBox}>
+            <p className={quickStyle.header}>
+              Update Quick Transfers
+            </p>
+            <div className="generalSettings_serviceBox">
+
+              <div style={{ width: "230px", }}>
+                <FormControl fullWidth style={{
+                  height: '40px',
+                }}>
+                  <InputLabel id="demo-simple-select-label" style={{
+                    marginTop: '-7px',
+                  }}>
+                    Select existing transfers
+                  </InputLabel>
+                  <Select
+                    style={{
+                      height: '40px',
+                    }}
+                    labelId="demo-simple-select-label"
+                    id="demo-simple-select"
+                    value={box}
+                    label="Select existing transfers"
+                    onChange={handleChange}
+                  >
+                    <MenuItem value={10}>Transfer No 1</MenuItem>
+                    <MenuItem value={20}>Transfer No 2</MenuItem>
+                    <MenuItem value={30}>Transfer No 3</MenuItem>
+                    <MenuItem value={30}>Transfer No 4</MenuItem>
+                  </Select>
+                </FormControl>
+              </div>
+            </div>
+          </div>
+          {/* update quickTransfer body */}
+          <Box className={quickStyle.body}>
+            {/* upper inputs */}
+            <Box className={quickStyle.inputParent}>
+              <div className={quickStyle.inputBox}>
+                <label htmlFor="amount">Amount</label>
+                <input type="text" className={quickStyle.textInput} />
+              </div>
+              <div className={quickStyle.inputBox}>
+                <label htmlFor="amount">Fee</label>
+                <input type="text" className={quickStyle.textInput} />
+              </div>
+            </Box>
+            {/* lower inputs */}
+            <Box className={quickStyle.inputParent} sx={{ mt: 3 }}>
+              <div className={quickStyle.inputBox} style={{ width: '50%', position: 'relative' }}>
+                <label htmlFor="amount">User Visibility</label>
+                {/* <input type="text" className={quickStyle.textInput} /> */}
+                <select name="visibility" className={quickStyle.textInput}>
+                  <option value="public">Visible</option>
+                  <option value="private">Invisible</option>
+                </select>
+                <div className={quickStyle.absDiv}>
+                  {/* asd */}
+                </div>
+              </div>
+              {/* update button */}
+              <button className={quickStyle.updateButton}>
+                <span> Update quick transfer 1</span>
+                <img src={updateIcon} alt="icon" />
+              </button>
+            </Box>
+          </Box>
+          {
+            <button className={quickStyle.updateButton}>
+              <span> Create another transfer</span>
+              <img src={plusIcon} alt="icon" />
+
+            </button>
+
+          }
+          <Box className={quickStyle.body} style={{marginTop: '20px'}}>
+            {/* upper inputs */}
+            <Box className={quickStyle.inputParent}>
+              <div className={quickStyle.inputBox}>
+                <label htmlFor="amount">Amount</label>
+                <input type="text" className={quickStyle.textInput} />
+              </div>
+              <div className={quickStyle.inputBox}>
+                <label htmlFor="amount">Fee</label>
+                <input type="text" className={quickStyle.textInput} />
+              </div>
+            </Box>
+            {/* lower inputs */}
+            <Box className={quickStyle.inputParent} sx={{ mt: 3 }}>
+              <div className={quickStyle.inputBox} style={{ width: '50%', position: 'relative' }}>
+                <label htmlFor="amount">User Visibility</label>
+                {/* <input type="text" className={quickStyle.textInput} /> */}
+                <select name="visibility" className={quickStyle.textInput}>
+                  <option value="public">Visible</option>
+                  <option value="private">Invisible</option>
+                </select>
+                <div className={quickStyle.absDiv}>
+                  {/* asd */}
+                </div>
+              </div>
+              {/* update button */}
+              <button className={quickStyle.updateButton} style={{ width: '200px' }}>
+                <span> Confirm Creation</span>
+                <img src={plusIcon} alt="icon" />
+              </button>
+            </Box>
+          </Box>
+        </TabPanel>
       </Tabs>
     </div>
   );
@@ -145,7 +259,7 @@ const Tab = styled(BaseTab)`
   border: none;
   border-radius: 7px;
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
 
   &:hover {
     //   background-color: ${blue[400]};
@@ -176,9 +290,9 @@ const TabPanel = styled(BaseTabPanel)(
     font-family: IBM Plex Sans, sans-serif;
     font-size: 0.875rem;
     padding: 20px 12px;
+    text-align: start;
     // background: ${theme.palette.mode === "dark" ? grey[900] : "#fff"};
-    // border: 1px solid ${
-      theme.palette.mode === "dark" ? grey[700] : grey[200]
+    // border: 1px solid ${theme.palette.mode === "dark" ? grey[700] : grey[200]
     };
     border-radius: 12px;
     `
@@ -186,7 +300,7 @@ const TabPanel = styled(BaseTabPanel)(
 
 const TabsList = styled(BaseTabsList)(
   ({ theme }) => `
-    max-width: 500px;
+    max-width: 300px;
     // background-color: ${blue[500]};
     border-radius: 12px;
     margin-bottom: 16px;
@@ -194,8 +308,7 @@ const TabsList = styled(BaseTabsList)(
     align-items: center;
     justify-content: center;
     align-content: space-between;
-    // box-shadow: 0px 4px 30px ${
-      theme.palette.mode === "dark" ? grey[900] : grey[200]
+    // box-shadow: 0px 4px 30px ${theme.palette.mode === "dark" ? grey[900] : grey[200]
     };
     `
 );
