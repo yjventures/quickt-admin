@@ -8,8 +8,53 @@ import { TabPanel as BaseTabPanel } from "@mui/base/TabPanel";
 import { buttonClasses } from "@mui/base/Button";
 import { Tab as BaseTab, tabClasses } from "@mui/base/Tab";
 import { DataGrid } from "@mui/x-data-grid";
+import { Button, Menu, MenuItem } from "@mui/material";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+import ArrowIcon from "../../assets/img/country/arrow.svg";
+import disableIcon from "../../assets/img/country/disable.svg";
+import editIcon from "../../assets/img/country/edit.svg";
+import deleteIcon from "../../assets/img/country/delete.svg";
+import Dialog from "@mui/material/Dialog";
+import ListItemText from "@mui/material/ListItemText";
+import ListItem from "@mui/material/ListItem";
+import List from "@mui/material/List";
+import Divider from "@mui/material/Divider";
+import AppBar from "@mui/material/AppBar";
+import Toolbar from "@mui/material/Toolbar";
+import IconButton from "@mui/material/IconButton";
+import Typography from "@mui/material/Typography";
+import CloseIcon from "@mui/icons-material/Close";
+import Slide from "@mui/material/Slide";
+import { useState } from "react";
+import Switch from "react-switch";
+import IconImage from "../../assets/img/country/iconImage.png";
+import plusIcon from "../../assets/img/generalSettings/plus.svg";
 
+const Transition = React.forwardRef(function Transition(props, ref) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
 const SendersMainContent = () => {
+  ////////////////////////////////////////////////////////////////////////
+  //action buttons
+  ////////////////////////////////////////////////////////////////////////
+  const [open, setOpen] = React.useState(false);
+  const handleOpen = () => setOpen(true);
+  const [selectedAction, setSelectedAction] = React.useState("");
+  const handleClickOpen = (action) => {
+    setSelectedAction(action);
+    console.log(action);
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const [checked, setChecked] = useState(false);
+
+  const handleChange = (isChecked) => {
+    setChecked(isChecked);
+  };
   const columns = [
     { field: "id", headerName: "ID", width: 70 },
     {
@@ -104,57 +149,77 @@ const SendersMainContent = () => {
       headerName: "Action",
       width: 150,
       type: "number",
-      sortable: false,
-      filterable: false,
-      disableColumnMenu: true,
-      renderCell: (params) => (
-        <select
-          // onClick={() => alert('Show action popup')}
-          style={{
-            display: "flex",
-            justifyContent: "space-around",
-            flexDirection: "column",
-            alignItems: "center",
-            width: "105px",
-            backgroundColor: "#fff",
-            borderRadius: "15px",
-            border: "1px solid #E9E9EA",
-            color: "#1D1929",
-            fontFamily: "Open Sans",
-            fontSize: "14px",
-            fontStyle: "normal",
-            padding: "7px",
-          }}
-        >
-          <option value="view" selected>
-            Action
-          </option>
-          <option
-            value="block"
-            onClick={() => {
-              alert("block");
-            }}
-          >
-            Block
-          </option>
-          <option
-            value="viewKyc"
-            onClick={() => {
-              alert("view kyc");
-            }}
-          >
-            View KYC
-          </option>
-          <option
-            value="details"
-            onClick={() => {
-              alert("details");
-            }}
-          >
-            Details
-          </option>
-        </select>
-      ),
+      renderCell: (params) => {
+        const [anchorEl, setAnchorEl] = React.useState(null);
+
+        const handleClick = (event) => {
+          setAnchorEl(event.currentTarget);
+        };
+
+        const handleClose = () => {
+          setAnchorEl(null);
+        };
+
+        return (
+          <div>
+            <div
+              style={{
+                background: "transparent",
+                border: "1px solid #999",
+                borderRadius: "25px",
+                outline: "none",
+                cursor: "pointer",
+                width: "100px",
+                fontSize: "12px",
+                color: "#000",
+                fontFamily: "Open Sans",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                padding: "5px 10px",
+              }}
+              onClick={handleClick}
+            >
+              Action
+              <img src={ArrowIcon} alt="icon" style={{ marginLeft: "10px" }} />
+            </div>
+            <Menu
+              anchorEl={anchorEl}
+              open={Boolean(anchorEl)}
+              onClose={handleClose}
+              style={{
+                marginLeft: "-20px",
+                boxShadow: "none",
+              }}
+            >
+              <MenuItem onClick={() => handleClickOpen("disable")}>
+                <img
+                  style={{ marginRight: "10px" }}
+                  src={disableIcon}
+                  alt="icon"
+                />
+                Disable
+              </MenuItem>
+              <MenuItem onClick={() => handleClickOpen("edit")}>
+                <img
+                  style={{ marginRight: "10px" }}
+                  src={editIcon}
+                  alt="icon"
+                />
+                View KYC
+              </MenuItem>
+              <MenuItem onClick={() => handleClickOpen("delete")}>
+                <img
+                  style={{ marginRight: "10px" }}
+                  src={deleteIcon}
+                  alt="icon"
+                />
+                Delete
+              </MenuItem>
+            </Menu>
+          </div>
+        );
+      },
     },
   ];
 
@@ -197,6 +262,146 @@ const SendersMainContent = () => {
         <TabPanel value={2}>Second page</TabPanel>
         <TabPanel value={3}>Third page</TabPanel>
       </Tabs>
+      <Dialog
+        maxWidth="md"
+        fullWidth
+        open={open}
+        onClose={handleClose}
+        TransitionComponent={Transition}
+      >
+        <Box
+          style={{
+            height: "100%",
+            padding: "10px",
+          }}
+        >
+          <IconButton
+            style={{ position: "absolute", right: "5px", top: "5px" }}
+            edge="start"
+            color="inherit"
+            onClick={handleClose}
+            aria-label="close"
+          >
+            <CloseIcon />
+          </IconButton>
+          <Box sx={{ ml: 1 }}>
+            {selectedAction === "disable" && (
+              <Box>
+                <h2>Are you sure you want to DISABLE this?</h2>
+                <Box sx={{ mt: 3 }}>
+                  <Button
+                    variant="contained"
+                    color="error"
+                    onClick={() => alert("Call disbale api here")}
+                  >
+                    Confim Disable
+                  </Button>
+                  <Button
+                    variant="contained"
+                    color="success"
+                    sx={{ ml: 2 }}
+                    onClick={handleClose}
+                  >
+                    Do not disable
+                  </Button>
+                </Box>
+              </Box>
+            )}
+            {selectedAction === "edit" && (
+              <Box sx={{ ml: 2 }}>
+                <h2>View KYC</h2>
+                {/* <Box sx={{ mt: 3 }}>
+                  <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                    <p className="generalSettings_SubTextHeading">Icon</p>
+                    <img
+                      src={selectedImage}
+                      style={{
+                        width: "270px",
+                        height: "180px",
+                        cursor: "pointer",
+                      }}
+                      alt=""
+                      onClick={handleImageClick}
+                    />
+                    <p className="generalSettings_SubTextHeading">
+                      Country Name <span style={{ color: "red" }}>*</span>
+                    </p>
+                    <input
+                      type="text"
+                      placeholder="ex: United States of America"
+                      style={{
+                        padding: "16px 20px",
+                        width: "100%",
+                        fontSize: "20px",
+                        borderRadius: "16px",
+                        border: "1px solid #E9E9EA",
+                        outline: "none",
+                      }}
+                    />
+
+                    <p className="generalSettings_SubTextHeading">
+                      Country Code <span style={{ color: "red" }}>*</span>
+                    </p>
+
+                    <input
+                      type="text"
+                      placeholder="ex: USA"
+                      style={{
+                        padding: "16px 20px",
+                        width: "100%",
+                        fontSize: "20px",
+                        borderRadius: "16px",
+                        border: "1px solid #E9E9EA",
+                        outline: "none",
+                      }}
+                    />
+                    <p className="generalSettings_SubTextHeading">Enabled</p>
+                    <Switch onChange={handleChange} checked={checked} />
+                  </Typography>
+                  <Box sx={{ mt: 3 }}>
+                    <Button
+                      variant="contained"
+                      color="success"
+                      onClick={() => alert("Call edit api here")}
+                    >
+                      Confim Update
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      sx={{ ml: 2 }}
+                      onClick={handleClose}
+                    >
+                      Cancel
+                    </Button>
+                  </Box>
+                </Box> */}
+              </Box>
+            )}
+            {selectedAction === "delete" && (
+              <Box>
+                <h2>Are you sure you want to DELETE this?</h2>
+                <Box sx={{ mt: 3 }}>
+                  <Button
+                    variant="contained"
+                    color="error"
+                    onClick={() => alert("Call disbale api here")}
+                  >
+                    Confim delete
+                  </Button>
+                  <Button
+                    variant="contained"
+                    color="success"
+                    sx={{ ml: 2 }}
+                    onClick={handleClose}
+                  >
+                    Do not delete
+                  </Button>
+                </Box>
+              </Box>
+            )}
+          </Box>
+        </Box>
+      </Dialog>
     </div>
   );
 };
