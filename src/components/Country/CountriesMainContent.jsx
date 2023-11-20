@@ -376,7 +376,7 @@ const CountriesMainContent = () => {
             {
               selectedAction === 'disable' && <Box>
                 <h2>
-                  Are you sure you want to disable this country?
+                  Are you sure you want to DISABLE this country?
                 </h2>
                 <Box sx={{ mt: 3 }}>
                   <Button variant="contained" color="error" onClick={() => alert('Call disbale api here')} >
