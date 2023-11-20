@@ -8,6 +8,12 @@ import { TabPanel as BaseTabPanel } from "@mui/base/TabPanel";
 import { buttonClasses } from "@mui/base/Button";
 import { Tab as BaseTab, tabClasses } from "@mui/base/Tab";
 import { DataGrid } from "@mui/x-data-grid";
+import { Button, Menu, MenuItem } from '@mui/material';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import ArrowIcon from '../../assets/img/country/arrow.svg';
+import disableIcon from '../../assets/img/country/disable.svg';
+import editIcon from '../../assets/img/country/edit.svg';
+import deleteIcon from '../../assets/img/country/delete.svg';
 
 const CountriesMainContent = () => {
   const columns = [
@@ -35,7 +41,7 @@ const CountriesMainContent = () => {
             marginRight: 10,
           }}
           src={`${params.row.image}`}
-          // alt="user-image"
+        // alt="user-image"
         />
       ),
     },
@@ -55,9 +61,8 @@ const CountriesMainContent = () => {
             alignItems: "center",
             height: "25px",
             width: "75px",
-            backgroundColor: `${
-              params.row.enabled == true ? "#DCFDD4" : "#FDD4D4"
-            }`,
+            backgroundColor: `${params.row.enabled == true ? "#DCFDD4" : "#FDD4D4"
+              }`,
             borderRadius: "15px",
             // border: `${params.row.enabled == true ? '1px solid #007FFF' : '1px solid #FFA800'}`,
             color: `${params.row.enabled == true ? "#4FAC16" : "#AC1616"}`,
@@ -71,54 +76,119 @@ const CountriesMainContent = () => {
       ),
     },
     {
-      field: "action",
-      headerName: "Action",
-      width: 100,
-      type: "number",
-      sortable: false,
-      filterable: false,
-      disableColumnMenu: true,
-      renderCell: (params) => (
-        <select
-          // onClick={() => alert('Show action popup')}
-          style={{
-            display: "flex",
-            justifyContent: "space-around",
-            flexDirection: "column",
-            alignItems: "center",
-            width: "105px",
-            backgroundColor: "#fff",
-            borderRadius: "15px",
-            border: "1px solid #E9E9EA",
-            color: "#1D1929",
-            fontFamily: "Open Sans",
-            fontSize: "14px",
-            fontStyle: "normal",
-            padding: "7px",
-          }}
-        >
-          <option value="view" selected>
-            Action
-          </option>
-          <option
-            value="edit"
-            onClick={() => {
-              alert("Edit");
-            }}
-          >
-            Edit
-          </option>
-          <option
-            value="delete"
-            onClick={() => {
-              alert("Delete");
-            }}
-          >
-            Delete
-          </option>
-        </select>
-      ),
+      field: 'action',
+      headerName: 'Action',
+      width: 150,
+      type: 'number',
+      renderCell: (params) => {
+        const [anchorEl, setAnchorEl] = React.useState(null);
+
+        const handleClick = (event) => {
+          setAnchorEl(event.currentTarget);
+        };
+
+        const handleClose = () => {
+          setAnchorEl(null);
+        };
+
+        return (
+          <div>
+            <div
+              style={{
+                background: 'transparent',
+                border: '1px solid #999',
+                borderRadius: '25px',
+                outline: 'none',
+                cursor: 'pointer',
+                width: '100px',
+                fontSize: '12px',
+                color: '#000',
+                fontFamily: 'Open Sans',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                padding: '5px 10px',
+              }}
+              onClick={handleClick}
+            >
+              Action
+              <img src={ArrowIcon} alt="icon" style={{ marginLeft: '10px' }} />
+            </div>
+            <Menu
+              anchorEl={anchorEl}
+              open={Boolean(anchorEl)}
+              onClose={handleClose}
+              style={{
+                marginLeft: '-20px',
+                boxShadow: 'none',
+              }}
+            >
+              <MenuItem onClick={() => alert('Disable user')}>
+                <img style={{marginRight: "10px"}} src={disableIcon} alt="icon" />
+                Disable
+              </MenuItem>
+              <MenuItem onClick={() => alert('Edit user')}>
+                <img style={{marginRight: "10px"}} src={editIcon} alt="icon" />
+                Edit
+              </MenuItem>
+              <MenuItem onClick={() => alert('Delete user')}>
+                <img style={{marginRight: "10px"}} src={deleteIcon} alt="icon" />
+                Delete
+              </MenuItem>
+            </Menu>
+          </div>
+        );
+      },
     },
+    // {
+    // field: "action",
+    // headerName: "Action",
+    // width: 100,
+    // type: "number",
+    // sortable: false,
+    // filterable: false,
+    // disableColumnMenu: true,
+    // renderCell: (params) => (
+    //   <select
+    //     // onClick={() => alert('Show action popup')}
+    //     style={{
+    //       display: "flex",
+    //       justifyContent: "space-around",
+    //       flexDirection: "column",
+    //       alignItems: "center",
+    //       width: "105px",
+    //       backgroundColor: "#fff",
+    //       borderRadius: "15px",
+    //       border: "1px solid #E9E9EA",
+    //       color: "#1D1929",
+    //       fontFamily: "Open Sans",
+    //       fontSize: "14px",
+    //       fontStyle: "normal",
+    //       padding: "7px",
+    //     }}
+    //   >
+    //     <option value="view" selected>
+    //       Action
+    //     </option>
+    //     <option
+    //       value="edit"
+    //       onClick={() => {
+    //         alert("Edit");
+    //       }}
+    //     >
+    //       Edit
+    //     </option>
+    //     <option
+    //       value="delete"
+    //       onClick={() => {
+    //         alert("Delete");
+    //       }}
+    //     >
+    //       Delete
+    //     </option>
+    //   </select>
+    // ),
+    // },
   ];
 
   const rows = [
@@ -289,8 +359,7 @@ const TabPanel = styled(BaseTabPanel)(
     font-size: 0.875rem;
     padding: 20px 12px;
     // background: ${theme.palette.mode === "dark" ? grey[900] : "#fff"};
-    // border: 1px solid ${
-      theme.palette.mode === "dark" ? grey[700] : grey[200]
+    // border: 1px solid ${theme.palette.mode === "dark" ? grey[700] : grey[200]
     };
     border-radius: 12px;
     `
@@ -306,8 +375,7 @@ const TabsList = styled(BaseTabsList)(
     align-items: center;
     justify-content: center;
     align-content: space-between;
-    // box-shadow: 0px 4px 30px ${
-      theme.palette.mode === "dark" ? grey[900] : grey[200]
+    // box-shadow: 0px 4px 30px ${theme.palette.mode === "dark" ? grey[900] : grey[200]
     };
     `
 );
