@@ -61,8 +61,7 @@ const CountriesMainContent = () => {
             alignItems: "center",
             height: "25px",
             width: "75px",
-            backgroundColor: `${params.row.enabled == true ? "#DCFDD4" : "#FDD4D4"
-              }`,
+            backgroundColor: `${params.row.enabled == true ? "#DCFDD4" : "#FDD4D4"}`,
             borderRadius: "15px",
             // border: `${params.row.enabled == true ? '1px solid #007FFF' : '1px solid #FFA800'}`,
             color: `${params.row.enabled == true ? "#4FAC16" : "#AC1616"}`,
@@ -214,7 +213,7 @@ const CountriesMainContent = () => {
       code: "SN",
       image:
         "https://upload.wikimedia.org/wikipedia/commons/b/b9/Flag_of_Australia.svg",
-      enabled: true,
+      enabled: false,
     },
     {
       id: 5,
@@ -254,7 +253,7 @@ const CountriesMainContent = () => {
       code: "SN",
       image:
         "https://upload.wikimedia.org/wikipedia/commons/b/b9/Flag_of_Australia.svg",
-      enabled: true,
+      enabled: false,
     },
   ];
 
