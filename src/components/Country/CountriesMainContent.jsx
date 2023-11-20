@@ -25,14 +25,19 @@ import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import CloseIcon from '@mui/icons-material/Close';
 import Slide from '@mui/material/Slide';
+import { useState } from "react";
+import Switch from "react-switch";
+import IconImage from "../../assets/img/country/iconImage.png";
+import plusIcon from "../../assets/img/generalSettings/plus.svg";
+
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
 const CountriesMainContent = () => {
-
   const [open, setOpen] = React.useState(false);
+  const handleOpen = () => setOpen(true);
   const [selectedAction, setSelectedAction] = React.useState('');
   const handleClickOpen = (action) => {
     setSelectedAction(action);
@@ -44,7 +49,42 @@ const CountriesMainContent = () => {
     setOpen(false);
   };
 
+  const [checked, setChecked] = useState(false);
 
+  const handleChange = (isChecked) => {
+    setChecked(isChecked);
+  };
+
+  const [selectedImage, setSelectedImage] = useState(IconImage);
+  const handleImageClick = () => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.onchange = (e) => {
+      const file = e.target.files[0];
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setSelectedImage(event.target.result);
+
+        const formData = new FormData();
+        formData.append("files", file);
+
+        axios
+          .post("https://api.quickt.com.au/api/upload", formData)
+          .then((response) => {
+            console.log("File uploaded successfully: ", response.data);
+            // showSuccessAlert("Image uploaded successfully");
+            console.log(response.data[0].url);
+            setStrapiImage(response.data[0].url);
+          })
+          .catch((error) => {
+            console.error("Error uploading file: ", error.message);
+          });
+      };
+      reader.readAsDataURL(file);
+    };
+    input.click();
+  };
   const columns = [
     { field: "id", headerName: "ID", width: 70 },
     {
@@ -313,41 +353,120 @@ const CountriesMainContent = () => {
         <TabPanel value={3}>Third page</TabPanel>
       </Tabs>
       <Dialog
-        fullScreen
+        maxWidth="md"
+        fullWidth
         open={open}
         onClose={handleClose}
         TransitionComponent={Transition}
       >
-        <AppBar sx={{ position: 'relative' }}>
-          <Toolbar>
-            <IconButton
-              edge="start"
-              color="inherit"
-              onClick={handleClose}
-              aria-label="close"
-            >
-              <CloseIcon />
-            </IconButton>
-            <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
-              {selectedAction}
-            </Typography>
-            <Button autoFocus color="inherit" onClick={handleClose}>
-              save
-            </Button>
-          </Toolbar>
-        </AppBar>
-        <List>
-          <ListItem button>
-            <ListItemText primary="Phone ringtone" secondary="Titania" />
-          </ListItem>
-          <Divider />
-          <ListItem button>
-            <ListItemText
-              primary="Default notification ringtone"
-              secondary="Tethys"
-            />
-          </ListItem>
-        </List>
+        <Box style={{
+          height: '100%',
+          padding: '10px',
+        }}>
+          <IconButton
+            style={{ position: 'absolute', right: '5px', top: '5px' }}
+            edge="start"
+            color="inherit"
+            onClick={handleClose}
+            aria-label="close"
+          >
+            <CloseIcon />
+          </IconButton>
+          <Box sx={{ml:1}}>
+            {
+              selectedAction === 'disable' && <Box>
+                <h2>
+                  Are you sure you want to disable this country?
+                </h2>
+                <Box sx={{ mt: 3 }}>
+                  <Button variant="contained" color="error" onClick={() => alert('Call disbale api here')} >
+                    Confim Disable
+                  </Button>
+                  <Button variant="contained" color="success" sx={{ ml: 2 }} onClick={handleClose} >
+                    Do not disable
+                  </Button>
+                </Box>
+              </Box>
+            }
+            {
+              selectedAction === 'edit' && <Box sx={{ ml: 2 }}>
+                <h2>
+                  Edit country
+                </h2>
+                <Box sx={{ mt: 3 }}>
+                  <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                    <p className="generalSettings_SubTextHeading">Icon</p>
+                    <img
+                      src={selectedImage}
+                      style={{ width: "270px", height: "180px", cursor: "pointer" }}
+                      alt=""
+                      onClick={handleImageClick}
+                    />
+                    <p className="generalSettings_SubTextHeading">
+                      Country Name <span style={{ color: "red" }}>*</span>
+                    </p>
+                    <input
+                      type="text"
+                      placeholder="ex: United States of America"
+                      style={{
+                        padding: "16px 20px",
+                        width: "100%",
+                        fontSize: "20px",
+                        borderRadius: "16px",
+                        border: "1px solid #E9E9EA",
+                        outline: 'none'
+                      }}
+                    />
+
+                    <p className="generalSettings_SubTextHeading">
+                      Country Code <span style={{ color: "red" }}>*</span>
+                    </p>
+
+                    <input
+                      type="text"
+                      placeholder="ex: USA"
+                      style={{
+                        padding: "16px 20px",
+                        width: "100%",
+                        fontSize: "20px",
+                        borderRadius: "16px",
+                        border: "1px solid #E9E9EA",
+                        outline: 'none'
+                      }}
+                    />
+                    <p className="generalSettings_SubTextHeading">Enabled</p>
+                    <Switch onChange={handleChange} checked={checked} />
+
+                  </Typography>
+                  <Box sx={{ mt: 3 }}>
+                    <Button variant="contained" color="success" onClick={() => alert('Call edit api here')} >
+                      Confim Update
+                    </Button>
+                    <Button variant="outlined" sx={{ ml: 2 }} onClick={handleClose} >
+                      Cancel
+                    </Button>
+                  </Box>
+
+                </Box>
+              </Box>
+            }
+            {
+              selectedAction === 'delete' && <Box>
+                <h2>
+                  Are you sure you want to DELETE this country?
+                </h2>
+                <Box sx={{ mt: 3 }}>
+                  <Button variant="contained" color="error" onClick={() => alert('Call disbale api here')} >
+                    Confim delete
+                  </Button>
+                  <Button variant="contained" color="success" sx={{ ml: 2 }} onClick={handleClose} >
+                    Do not delete
+                  </Button>
+                </Box>
+              </Box>
+            }
+          </Box>
+        </Box>
       </Dialog>
     </div>
   );

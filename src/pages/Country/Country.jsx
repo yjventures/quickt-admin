@@ -20,10 +20,12 @@ const style = {
   left: "50%",
   transform: "translate(-50%, -50%)",
   width: 900,
+  height: 600,
   bgcolor: "background.paper",
   boxShadow: 24,
   p: 4,
   borderRadius: "12px",
+  overflowY: "scroll",
 };
 
 const Country = () => {
@@ -172,7 +174,7 @@ const Country = () => {
                 <p className="generalSettings_SubTextHeading">Icon</p>
                 <img
                   src={selectedImage}
-                  style={{ width: "270px", height: "180px" }}
+                  style={{ width: "270px", height: "180px", cursor: "pointer"}}
                   alt=""
                   onClick={handleImageClick}
                 />
@@ -184,9 +186,11 @@ const Country = () => {
                   placeholder="ex: United States of America"
                   style={{
                     padding: "16px 20px",
-                    width: "80%",
+                    width: "100%",
                     fontSize: "20px",
                     borderRadius: "16px",
+                    border: "1px solid #E9E9EA",  
+                    outline: 'none'
                   }}
                 />
 
@@ -199,9 +203,11 @@ const Country = () => {
                   placeholder="ex: USA"
                   style={{
                     padding: "16px 20px",
-                    width: "80%",
+                    width: "100%",
                     fontSize: "20px",
                     borderRadius: "16px",
+                    border: "1px solid #E9E9EA",
+                    outline: 'none'
                   }}
                 />
                 <p className="generalSettings_SubTextHeading">Enabled</p>
@@ -210,7 +216,9 @@ const Country = () => {
                 <button
                   onClick={handleOpen}
                   style={{
-                    padding: "16px 18px",
+                    // padding: "16px 18px",
+                    width: '140px',
+                    height: '45px',
                     border: "none",
                     borderRadius: "25px",
                     backgroundColor: "#003CFF",
