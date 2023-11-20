@@ -2,7 +2,6 @@ import React from 'react';
 import { createBrowserRouter } from 'react-router-dom';
 import Login from '../pages/Login/Login';
 import Dashboard from '../layout/Dashboard';
-import DashboardPage from '../pages/Dashboard/DashboardPage';
 import TotalRevenue from '../pages/TotalRevenue/TotalRevenue';
 import PrivateRoute from './PrivateRoute';
 import ErrorPage from '../pages/ErrorPage/ErrorPage';
@@ -10,6 +9,7 @@ import Country from '../pages/Country/Country';
 import Senders from '../pages/Senders/Senders';
 import GeneralSettings from '../pages/GenSettings/GeneralSettings';
 import Receivers from '../pages/Receivers/Receivers';
+import Partners from '../pages/Partners/Partners';
 // import ProtectedRoute from './ProtectedRoute';
 
 const routes = createBrowserRouter([
@@ -32,8 +32,8 @@ const routes = createBrowserRouter([
                 errorElement: <ErrorPage />,
             },
             {
-                path: 'dashboard',
-                element: <DashboardPage />,
+                path: 'partners',
+                element: <Partners />,
                 errorElement: <ErrorPage />,
             },
             {

@@ -190,12 +190,12 @@ export default function MiniDrawer() {
                 </DrawerHeader>
                 {/* here is icon and text for sidebar */}
                 <List style={{ marginTop: '-7px' }}>
-                    <CustomList icon={dashboardIcon} whiteIcon={dashboardIconWhite} text="Dashboard" link="dashboard" pathText={pathText} />
                     <CustomList icon={generalIcon} whiteIcon={generalIconWhite} text="General Settings" link="generalSettings" pathText={pathText} />
                     <CustomList icon={countryIcon} whiteIcon={countryIconWhite} text="Countries" link="countries" pathText={pathText} />
                     <CustomList icon={usersIcon} whiteIcon={usersIconWhite} text="Senders" link="senders" pathText={pathText} />
                     <CustomList icon={pendingIcon} whiteIcon={pendingIconWhite} text="Receivers" link="receivers" pathText={pathText} />
                     <CustomList icon={revenueIcon} whiteIcon={revenueIconWhite} text="Revenue" link="revenue" pathText={pathText} />
+                    <CustomList icon={revenueIcon} whiteIcon={revenueIconWhite} text="Partners" link="partners" pathText={pathText} />
                 </List>
                 {/* logout button */}
                 <List sx={{ position: 'absolute', bottom: 0, left: 10, width: '100%' }}>

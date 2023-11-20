@@ -14,8 +14,37 @@ import ArrowIcon from '../../assets/img/country/arrow.svg';
 import disableIcon from '../../assets/img/country/disable.svg';
 import editIcon from '../../assets/img/country/edit.svg';
 import deleteIcon from '../../assets/img/country/delete.svg';
+import Dialog from '@mui/material/Dialog';
+import ListItemText from '@mui/material/ListItemText';
+import ListItem from '@mui/material/ListItem';
+import List from '@mui/material/List';
+import Divider from '@mui/material/Divider';
+import AppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
+import IconButton from '@mui/material/IconButton';
+import Typography from '@mui/material/Typography';
+import CloseIcon from '@mui/icons-material/Close';
+import Slide from '@mui/material/Slide';
+
+const Transition = React.forwardRef(function Transition(props, ref) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
 
 const CountriesMainContent = () => {
+
+  const [open, setOpen] = React.useState(false);
+  const [selectedAction, setSelectedAction] = React.useState('');
+  const handleClickOpen = (action) => {
+    setSelectedAction(action);
+    console.log(action);
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+
   const columns = [
     { field: "id", headerName: "ID", width: 70 },
     {
@@ -122,16 +151,16 @@ const CountriesMainContent = () => {
                 boxShadow: 'none',
               }}
             >
-              <MenuItem onClick={() => alert('Disable user')}>
-                <img style={{marginRight: "10px"}} src={disableIcon} alt="icon" />
+              <MenuItem onClick={() => handleClickOpen('disable')}>
+                <img style={{ marginRight: "10px" }} src={disableIcon} alt="icon" />
                 Disable
               </MenuItem>
-              <MenuItem onClick={() => alert('Edit user')}>
-                <img style={{marginRight: "10px"}} src={editIcon} alt="icon" />
+              <MenuItem onClick={() => handleClickOpen('edit')}>
+                <img style={{ marginRight: "10px" }} src={editIcon} alt="icon" />
                 Edit
               </MenuItem>
-              <MenuItem onClick={() => alert('Delete user')}>
-                <img style={{marginRight: "10px"}} src={deleteIcon} alt="icon" />
+              <MenuItem onClick={() => handleClickOpen('delete')}>
+                <img style={{ marginRight: "10px" }} src={deleteIcon} alt="icon" />
                 Delete
               </MenuItem>
             </Menu>
@@ -283,6 +312,43 @@ const CountriesMainContent = () => {
         <TabPanel value={2}>Second page</TabPanel>
         <TabPanel value={3}>Third page</TabPanel>
       </Tabs>
+      <Dialog
+        fullScreen
+        open={open}
+        onClose={handleClose}
+        TransitionComponent={Transition}
+      >
+        <AppBar sx={{ position: 'relative' }}>
+          <Toolbar>
+            <IconButton
+              edge="start"
+              color="inherit"
+              onClick={handleClose}
+              aria-label="close"
+            >
+              <CloseIcon />
+            </IconButton>
+            <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
+              {selectedAction}
+            </Typography>
+            <Button autoFocus color="inherit" onClick={handleClose}>
+              save
+            </Button>
+          </Toolbar>
+        </AppBar>
+        <List>
+          <ListItem button>
+            <ListItemText primary="Phone ringtone" secondary="Titania" />
+          </ListItem>
+          <Divider />
+          <ListItem button>
+            <ListItemText
+              primary="Default notification ringtone"
+              secondary="Tethys"
+            />
+          </ListItem>
+        </List>
+      </Dialog>
     </div>
   );
 };
