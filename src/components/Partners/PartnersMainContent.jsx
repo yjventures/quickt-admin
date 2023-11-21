@@ -49,7 +49,7 @@ const PartnersMainContent = () => {
     setOpen(false);
   };
 
-  const [checked, setChecked] = useState(false);
+  const [checked, setChecked] = useState(true);
 
   const handleChange = (isChecked) => {
     setChecked(isChecked);
