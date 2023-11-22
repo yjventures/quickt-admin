@@ -6,10 +6,6 @@ import ExportButton from "../../components/ExportButton/ExportButton";
 import PrintButton from "../../components/PrintButton/PrintButton";
 import searchIcon from "../../assets/img/country/search.svg";
 import filterIcon from "../../assets/img/country/filter.svg";
-import CreateNewButton from "../../components/CreateNewButton/CreateNewButton";
-import CountriesMainContent from "../../components/Country/CountriesMainContent";
-import SendersMainContent from "../../components/Senders/SendersMainContent";
-import ReceiversMainContent from "../../components/Receivers/ReceiversMainContext";
 import RevenueMainContent from "../../components/Revenue/RevenueMainContent";
 
 const TotalRevenue = () => {

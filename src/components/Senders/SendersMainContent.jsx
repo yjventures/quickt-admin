@@ -249,10 +249,60 @@ const SendersMainContent = () => {
       kyc: true,
       status: true,
     },
+    {
+      id: 3,
+      firstName: "ahad ",
+      lastName: "chowdhury",
+      email: "ahadalichowdhury@gmail.com",
+      phone: "01700000000",
+      DOB: "28/09/2001",
+      kyc: true,
+      status: false,
+    },
+    {
+      id: 4,
+      firstName: "ahad ",
+      lastName: "chowdhury",
+      email: "ahadalichowdhury@gmail.com",
+      phone: "01700000000",
+      DOB: "28/09/2001",
+      kyc: true,
+      status: true,
+    },
+    {
+      id: 5,
+      firstName: "ahad ",
+      lastName: "chowdhury",
+      email: "ahadalichowdhury@gmail.com",
+      phone: "01700000000",
+      DOB: "28/09/2001",
+      kyc: true,
+      status: true,
+    },
   ];
   const rows2 = [
     {
       id: 2,
+      firstName: "ahad ",
+      lastName: "chowdhury",
+      email: "ahadalichowdhury@gmail.com",
+      phone: "01700000000",
+      DOB: "28/09/2001",
+      kyc: true,
+      status: true,
+    },
+    {
+      id: 4,
+      firstName: "ahad ",
+      lastName: "chowdhury",
+      email: "ahadalichowdhury@gmail.com",
+      phone: "01700000000",
+      DOB: "28/09/2001",
+      kyc: true,
+      status: true,
+    },
+    {
+      id: 5,
       firstName: "ahad ",
       lastName: "chowdhury",
       email: "ahadalichowdhury@gmail.com",
@@ -277,7 +327,7 @@ const SendersMainContent = () => {
   ];
 
   return (
-    <div className={styles.parent} style={{position: "relative"}}>
+    <div className={styles.parent} style={{ position: "relative" }}>
       <Tabs defaultValue={1}>
         <TabsList>
           <Tab value={1} onClick={handleClearRows}>

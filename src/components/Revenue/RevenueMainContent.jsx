@@ -38,6 +38,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 const RevenueMainContent = () => {
   /////////////////////////  for handling action  /////////////////////////////
   const [open, setOpen] = React.useState(false);
+  const [selectedRows, setSelectedRows] = useState([]);
   const handleOpen = () => setOpen(true);
   const [selectedAction, setSelectedAction] = React.useState("");
   const handleClickOpen = (action) => {
@@ -48,6 +49,9 @@ const RevenueMainContent = () => {
 
   const handleClose = () => {
     setOpen(false);
+  };
+  const handleClearRows = () => {
+    setSelectedRows([]);
   };
   const columns = [
     { field: "id", headerName: "ID", width: 70 },
@@ -222,16 +226,151 @@ const RevenueMainContent = () => {
       status: true,
       paymentstatus: true,
     },
+    {
+      id: 2,
+      TransferNumber: 200,
+      BaseAmount: 20,
+      TransactionFees: 4,
+      Totalamount: 204,
+      PartnerAmount: 20,
+      status: false,
+      paymentstatus: true,
+    },
+    {
+      id: 3,
+      TransferNumber: 200,
+      BaseAmount: 20,
+      TransactionFees: 4,
+      Totalamount: 204,
+      PartnerAmount: 20,
+      status: true,
+      paymentstatus: true,
+    },
+    {
+      id: 4,
+      TransferNumber: 200,
+      BaseAmount: 20,
+      TransactionFees: 4,
+      Totalamount: 204,
+      PartnerAmount: 20,
+      status: false,
+      paymentstatus: true,
+    },
+  ];
+  const rows2 = [
+    {
+      id: 1,
+      TransferNumber: 200,
+      BaseAmount: 20,
+      TransactionFees: 4,
+      Totalamount: 204,
+      PartnerAmount: 20,
+      status: true,
+      paymentstatus: true,
+    },
+    {
+      id: 3,
+      TransferNumber: 200,
+      BaseAmount: 20,
+      TransactionFees: 4,
+      Totalamount: 204,
+      PartnerAmount: 20,
+      status: true,
+      paymentstatus: true,
+    },
+  ];
+  const rows3 = [
+    {
+      id: 2,
+      TransferNumber: 200,
+      BaseAmount: 20,
+      TransactionFees: 4,
+      Totalamount: 204,
+      PartnerAmount: 20,
+      status: false,
+      paymentstatus: true,
+    },
+
+    {
+      id: 4,
+      TransferNumber: 200,
+      BaseAmount: 20,
+      TransactionFees: 4,
+      Totalamount: 204,
+      PartnerAmount: 20,
+      status: false,
+      paymentstatus: true,
+    },
   ];
 
   return (
-    <div className={styles.parent}>
+    <div className={styles.parent} style={{ position: "relative" }}>
       <Tabs defaultValue={1}>
         <TabsList>
-          <Tab value={1}>All - 30</Tab>
-          <Tab value={2}>Enabled - 10</Tab>
-          <Tab value={3}>Disabled - 5</Tab>
+          <Tab value={1} onClick={handleClearRows}>
+            All - 30
+          </Tab>
+          <Tab value={2}>Paid - 10</Tab>
+          <Tab value={3}>Pending - 5</Tab>
         </TabsList>
+        {selectedRows.length > 1 && (
+          <Box
+            sx={{
+              display: "flex",
+              gap: 1,
+              position: "absolute",
+              top: "15px",
+              right: "35px",
+            }}
+          >
+            <button
+              onClick={() => {
+                alert("Call disable api here");
+                setSelectedRows([]);
+              }}
+              style={{
+                padding: "12px 20px",
+                width: "170px",
+                border: "none",
+                borderRadius: "20px",
+                backgroundColor: "#FDD4D4",
+                color: "#AC1616",
+                fontSize: "16px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                gap: "15px",
+              }}
+            >
+              Disable Revenues
+              {/* <img src={plusIcon} alt="icon" /> */}
+            </button>
+            <button
+              onClick={() => {
+                alert("Call delete api here");
+                setSelectedRows([]);
+              }}
+              style={{
+                padding: "12px 20px",
+                width: "170px",
+                border: "none",
+                borderRadius: "20px",
+                backgroundColor: "#BE3144",
+                color: "#fff",
+                fontSize: "16px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                gap: "15px",
+              }}
+            >
+              Delete Revenues
+              {/* <img src={plusIcon} alt="icon" /> */}
+            </button>
+          </Box>
+        )}
         <TabPanel value={1}>
           <div style={{ height: "auto", width: "100%" }}>
             <DataGrid
@@ -244,147 +383,61 @@ const RevenueMainContent = () => {
               }}
               pageSizeOptions={[10, 20]}
               checkboxSelection
+              // by default seleted row is first row
+              onRowSelectionModelChange={(ids) => {
+                const selectedIDs = new Set(ids);
+                const selectedRowData = rows.filter((row) =>
+                  // selectedIDs.has(row.id.toString())
+                  selectedIDs.has(row.id)
+                );
+                setSelectedRows(selectedRowData);
+              }}
             />
           </div>
-          <Dialog
-            maxWidth="md"
-            fullWidth
-            open={open}
-            onClose={handleClose}
-            TransitionComponent={Transition}
-          >
-            <Box
-              style={{
-                height: "100%",
-                padding: "10px",
-              }}
-            >
-              <IconButton
-                style={{ position: "absolute", right: "5px", top: "5px" }}
-                edge="start"
-                color="inherit"
-                onClick={handleClose}
-                aria-label="close"
-              >
-                <CloseIcon />
-              </IconButton>
-              <Box sx={{ ml: 1 }}>
-                {/* {selectedAction === "edit" && (
-                  <Box sx={{ ml: 2 }}>
-                    <h2>Update Partner Details</h2>
-                    <Box sx={{ mt: 3 }}>
-                      <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-                        <p className="generalSettings_SubTextHeading">Image</p>
-                        <img
-                          src={IconImage}
-                          style={{
-                            width: "270px",
-                            height: "180px",
-                            cursor: "pointer",
-                          }}
-                          alt=""
-                          onClick={handleImageClick}
-                        />
-                        <p className="generalSettings_SubTextHeading">
-                          Partner Name <span style={{ color: "red" }}>*</span>
-                        </p>
-                        <input
-                          type="text"
-                          placeholder="Enter the Partner Name"
-                          style={{
-                            padding: "16px 20px",
-                            width: "100%",
-                            fontSize: "20px",
-                            borderRadius: "16px",
-                            border: "1px solid #E9E9EA",
-                            outline: "none",
-                          }}
-                        />
-
-                        <p className="generalSettings_SubTextHeading">
-                          Partner Location{" "}
-                          <span style={{ color: "red" }}>*</span>
-                        </p>
-
-                        <input
-                          type="text"
-                          placeholder="ex: USA"
-                          style={{
-                            padding: "16px 20px",
-                            width: "100%",
-                            fontSize: "20px",
-                            borderRadius: "16px",
-                            border: "1px solid #E9E9EA",
-                            outline: "none",
-                          }}
-                        />
-                        <p className="generalSettings_SubTextHeading">
-                          Percentage <span style={{ color: "red" }}>*</span>
-                        </p>
-
-                        <input
-                          type="text"
-                          placeholder="Percentage"
-                          style={{
-                            padding: "16px 20px",
-                            width: "50%",
-                            fontSize: "20px",
-                            borderRadius: "16px",
-                            border: "1px solid #E9E9EA",
-                            outline: "none",
-                          }}
-                        />
-                      </Typography>
-                      <Box sx={{ mt: 3 }}>
-                        <Button
-                          variant="contained"
-                          color="success"
-                          onClick={() => alert("Call edit api here")}
-                        >
-                          Confim Update
-                        </Button>
-                        <Button
-                          variant="outlined"
-                          sx={{ ml: 2 }}
-                          onClick={handleClose}
-                        >
-                          Cancel
-                        </Button>
-                      </Box>
-                    </Box>
-                  </Box>
-                )} */}
-                {selectedAction === "delete" && (
-                  <Box>
-                    <h2>
-                      Are you sure you want to DELETE this Revenue Details?
-                    </h2>
-                    <Box sx={{ mt: 3 }}>
-                      <Button
-                        variant="contained"
-                        color="error"
-                        onClick={() => alert("Call disbale api here")}
-                      >
-                        Confim delete
-                      </Button>
-                      <Button
-                        variant="contained"
-                        color="success"
-                        sx={{ ml: 2 }}
-                        onClick={handleClose}
-                      >
-                        Do not delete
-                      </Button>
-                    </Box>
-                  </Box>
-                )}
-              </Box>
-            </Box>
-          </Dialog>
         </TabPanel>
 
-        <TabPanel value={2}>Second page</TabPanel>
-        <TabPanel value={3}>Third page</TabPanel>
+        <TabPanel value={2}>
+          <DataGrid
+            rows={rows2}
+            columns={columns}
+            initialState={{
+              pagination: {
+                paginationModel: { page: 0, pageSize: 10 },
+              },
+            }}
+            pageSizeOptions={[10, 20]}
+            checkboxSelection
+            onRowSelectionModelChange={(ids) => {
+              const selectedIDs = new Set(ids);
+              const selectedRowData = rows.filter((row) =>
+                // selectedIDs.has(row.id.toString())
+                selectedIDs.has(row.id)
+              );
+              setSelectedRows(selectedRowData);
+            }}
+          />
+        </TabPanel>
+        <TabPanel value={3}>
+          <DataGrid
+            rows={rows3}
+            columns={columns}
+            initialState={{
+              pagination: {
+                paginationModel: { page: 0, pageSize: 10 },
+              },
+            }}
+            pageSizeOptions={[10, 20]}
+            checkboxSelection
+            onRowSelectionModelChange={(ids) => {
+              const selectedIDs = new Set(ids);
+              const selectedRowData = rows.filter((row) =>
+                // selectedIDs.has(row.id.toString())
+                selectedIDs.has(row.id)
+              );
+              setSelectedRows(selectedRowData);
+            }}
+          />
+        </TabPanel>
       </Tabs>
     </div>
   );
