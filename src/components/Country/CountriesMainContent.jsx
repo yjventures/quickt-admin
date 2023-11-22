@@ -36,6 +36,8 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 });
 
 const CountriesMainContent = () => {
+  const [selectedRows, setSelectedRows] = useState([]);
+  console.log(selectedRows);
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const [selectedAction, setSelectedAction] = React.useState('');
@@ -54,7 +56,9 @@ const CountriesMainContent = () => {
   const handleChange = (isChecked) => {
     setChecked(isChecked);
   };
-
+  const handleClearRows = () => {
+    setSelectedRows([]);
+  }
   const [selectedImage, setSelectedImage] = useState(IconImage);
   const handleImageClick = () => {
     const input = document.createElement("input");
@@ -325,15 +329,133 @@ const CountriesMainContent = () => {
       enabled: false,
     },
   ];
-
+  const rows2 = [
+    {
+      id: 1,
+      name: "Australia",
+      code: "AU",
+      image:
+        "https://upload.wikimedia.org/wikipedia/commons/b/b9/Flag_of_Australia.svg",
+      enabled: true,
+    },
+    {
+      id: 2,
+      name: "Lannister",
+      code: "LI",
+      image:
+        "https://upload.wikimedia.org/wikipedia/commons/b/b9/Flag_of_Australia.svg",
+      enabled: true,
+    },
+    {
+      id: 5,
+      name: "Targaryen",
+      code: "SN",
+      image:
+        "https://upload.wikimedia.org/wikipedia/commons/b/b9/Flag_of_Australia.svg",
+      enabled: true,
+    },
+    {
+      id: 6,
+      name: "Melisandre",
+      code: "SN",
+      image:
+        "https://upload.wikimedia.org/wikipedia/commons/b/b9/Flag_of_Australia.svg",
+      enabled: true,
+    },
+    {
+      id: 7,
+      name: "Clifford",
+      code: "SN",
+      image:
+        "https://upload.wikimedia.org/wikipedia/commons/b/b9/Flag_of_Australia.svg",
+      enabled: true,
+    },
+    {
+      id: 8,
+      name: "Frances",
+      code: "SN",
+      image:
+        "https://upload.wikimedia.org/wikipedia/commons/b/b9/Flag_of_Australia.svg",
+      enabled: true,
+    }
+  ];
+  const rows3 = [
+    {
+      id: 4,
+      name: "Stark",
+      code: "SN",
+      image:
+        "https://upload.wikimedia.org/wikipedia/commons/b/b9/Flag_of_Australia.svg",
+      enabled: false,
+    },
+    {
+      id: 9,
+      name: "Roxie",
+      code: "SN",
+      image:
+        "https://upload.wikimedia.org/wikipedia/commons/b/b9/Flag_of_Australia.svg",
+      enabled: false,
+    },
+  ];
   return (
-    <div className={styles.parent}>
+    <div className={styles.parent} style={{ position: "relative" }}>
       <Tabs defaultValue={1}>
         <TabsList>
-          <Tab value={1}>All - 30</Tab>
+          <Tab onClick={handleClearRows} value={1} >All- 30</Tab>
           <Tab value={2}>Enabled - 10</Tab>
           <Tab value={3}>Disabled - 5</Tab>
         </TabsList>
+        {
+          selectedRows.length > 1 && <Box sx={{ display: 'flex', gap: 1, position: "absolute", top: "15px", right: '35px' }}>
+            <button
+              onClick={() => {
+                alert('Call disable api here')
+                setSelectedRows([])
+              }}
+              style={{
+                padding: "12px 20px",
+                width: '170px',
+                border: "none",
+                borderRadius: "20px",
+                backgroundColor: "#FDD4D4",
+                color: "#AC1616",
+                fontSize: "16px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                gap: "15px",
+              }}
+            >
+              Disable countries
+              {/* <img src={plusIcon} alt="icon" /> */}
+            </button>
+            <button
+              onClick={() => {
+                alert('Call delete api here')
+                setSelectedRows([])
+              }}
+              style={{
+                padding: "12px 20px",
+                width: '170px',
+                border: "none",
+                borderRadius: "20px",
+                backgroundColor: "#BE3144",
+                color: "#fff",
+                fontSize: "16px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                gap: "15px",
+              }}
+            >
+              Delete countries
+              {/* <img src={plusIcon} alt="icon" /> */}
+            </button>
+          </Box>
+        }
+        {/* all countries */}
         <TabPanel value={1}>
           <div style={{ height: "auto", width: "100%" }}>
             <DataGrid
@@ -346,11 +468,62 @@ const CountriesMainContent = () => {
               }}
               pageSizeOptions={[10, 20]}
               checkboxSelection
+              // by default seleted row is first row
+              onRowSelectionModelChange={(ids) => {
+                const selectedIDs = new Set(ids);
+                const selectedRowData = rows.filter((row) =>
+                  // selectedIDs.has(row.id.toString())
+                  selectedIDs.has(row.id)
+                )
+                setSelectedRows(selectedRowData);
+              }}
             />
           </div>
         </TabPanel>
-        <TabPanel value={2}>Second page</TabPanel>
-        <TabPanel value={3}>Third page</TabPanel>
+        {/* for enabled countries */}
+        <TabPanel value={2}>
+          <DataGrid
+            rows={rows2}
+            columns={columns}
+            initialState={{
+              pagination: {
+                paginationModel: { page: 0, pageSize: 10 },
+              },
+            }}
+            pageSizeOptions={[10, 20]}
+            checkboxSelection
+            onRowSelectionModelChange={(ids) => {
+              const selectedIDs = new Set(ids);
+              const selectedRowData = rows.filter((row) =>
+                // selectedIDs.has(row.id.toString())
+                selectedIDs.has(row.id)
+              )
+              setSelectedRows(selectedRowData);
+            }}
+          />
+        </TabPanel>
+        {/* for enabled country */}
+        <TabPanel value={3}>
+          <DataGrid
+            rows={rows3}
+            columns={columns}
+            initialState={{
+              pagination: {
+                paginationModel: { page: 0, pageSize: 10 },
+              },
+            }}
+            pageSizeOptions={[10, 20]}
+            checkboxSelection
+            onRowSelectionModelChange={(ids) => {
+              const selectedIDs = new Set(ids);
+              const selectedRowData = rows.filter((row) =>
+                // selectedIDs.has(row.id.toString())
+                selectedIDs.has(row.id)
+              )
+              setSelectedRows(selectedRowData);
+            }}
+          />
+        </TabPanel>
       </Tabs>
       <Dialog
         maxWidth="md"
@@ -372,7 +545,7 @@ const CountriesMainContent = () => {
           >
             <CloseIcon />
           </IconButton>
-          <Box sx={{ml:1}}>
+          <Box sx={{ ml: 1 }}>
             {
               selectedAction === 'disable' && <Box>
                 <h2>
@@ -511,7 +684,7 @@ const Tab = styled(BaseTab)`
   border: none;
   border-radius: 7px;
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
 
   &:hover {
     //   background-color: ${blue[400]};
@@ -542,6 +715,7 @@ const TabPanel = styled(BaseTabPanel)(
     font-family: IBM Plex Sans, sans-serif;
     font-size: 0.875rem;
     padding: 20px 12px;
+    text-align: start;
     // background: ${theme.palette.mode === "dark" ? grey[900] : "#fff"};
     // border: 1px solid ${theme.palette.mode === "dark" ? grey[700] : grey[200]
     };
@@ -551,7 +725,7 @@ const TabPanel = styled(BaseTabPanel)(
 
 const TabsList = styled(BaseTabsList)(
   ({ theme }) => `
-    max-width: 500px;
+    max-width: 400px;
     // background-color: ${blue[500]};
     border-radius: 12px;
     margin-bottom: 16px;
