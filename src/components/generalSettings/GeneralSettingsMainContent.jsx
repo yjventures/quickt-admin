@@ -22,8 +22,8 @@ import plusIcon from "../../assets/img/generalSettings/plus.svg";
 import axios from "axios";
 
 const GeneralSettingsMainContent = () => {
-  const [box, setBox] = React.useState("");
-
+  const [box, setBox] = React.useState(1);
+  const [newTransfer, setNewTransfer] = useState(false);
   const handleChange = (event) => {
     setBox(event.target.value);
   };
@@ -149,7 +149,7 @@ const GeneralSettingsMainContent = () => {
                     alt=""
                     onClick={handleImageClick}
                   />
-                 
+
                 </div>
                 <div>
                   <p className="generalSettings_SubTextHeading">Description</p>
@@ -197,10 +197,10 @@ const GeneralSettingsMainContent = () => {
                     label="Select existing transfers"
                     onChange={handleChange}
                   >
-                    <MenuItem value={10}>Transfer No 1</MenuItem>
-                    <MenuItem value={20}>Transfer No 2</MenuItem>
-                    <MenuItem value={30}>Transfer No 3</MenuItem>
-                    <MenuItem value={30}>Transfer No 4</MenuItem>
+                    <MenuItem value={1}>Transfer No 1</MenuItem>
+                    <MenuItem value={2}>Transfer No 2</MenuItem>
+                    <MenuItem value={3}>Transfer No 3</MenuItem>
+                    <MenuItem value={4}>Transfer No 4</MenuItem>
                   </Select>
                 </FormControl>
               </div>
@@ -235,53 +235,62 @@ const GeneralSettingsMainContent = () => {
               </div>
               {/* update button */}
               <button className={quickStyle.updateButton}>
-                <span> Update quick transfer 1</span>
+                <span> Update quick transfer {box}</span>
                 <img src={updateIcon} alt="icon" />
               </button>
             </Box>
           </Box>
           {
-            <button className={quickStyle.updateButton}>
-              <span> Create another transfer</span>
+            <button className={quickStyle.updateButton} onClick={() => {
+              setNewTransfer(!newTransfer)
+            }}>
+              <span>
+                {
+                  newTransfer ? 'Hide making transfer' : 'Create another transfer'
+                }
+              </span>
               <img src={plusIcon} alt="icon" />
             </button>
           }
-          <Box className={quickStyle.body} style={{ marginTop: "20px" }}>
-            {/* upper inputs */}
-            <Box className={quickStyle.inputParent}>
-              <div className={quickStyle.inputBox}>
-                <label htmlFor="amount">Amount</label>
-                <input type="text" className={quickStyle.textInput} />
-              </div>
-              <div className={quickStyle.inputBox}>
-                <label htmlFor="amount">Fee</label>
-                <input type="text" className={quickStyle.textInput} />
-              </div>
+          {
+            newTransfer && <Box className={quickStyle.body} style={{ marginTop: "20px" }}>
+              {/* upper inputs */}
+              <Box className={quickStyle.inputParent}>
+                <div className={quickStyle.inputBox}>
+                  <label htmlFor="amount">Amount</label>
+                  <input type="text" className={quickStyle.textInput} />
+                </div>
+                <div className={quickStyle.inputBox}>
+                  <label htmlFor="amount">Fee</label>
+                  <input type="text" className={quickStyle.textInput} />
+                </div>
+              </Box>
+              {/* lower inputs */}
+              <Box className={quickStyle.inputParent} sx={{ mt: 3 }}>
+                <div
+                  className={quickStyle.inputBox}
+                  style={{ width: "50%", position: "relative" }}
+                >
+                  <label htmlFor="amount">User Visibility</label>
+                  {/* <input type="text" className={quickStyle.textInput} /> */}
+                  <select name="visibility" className={quickStyle.textInput}>
+                    <option value="public">Visible</option>
+                    <option value="private">Invisible</option>
+                  </select>
+                  <div className={quickStyle.absDiv}>{/* asd */}</div>
+                </div>
+                {/* update button */}
+                <button
+                  className={quickStyle.updateButton}
+                  style={{ width: "200px" }}
+                >
+                  <span> Confirm Creation</span>
+                  <img src={plusIcon} alt="icon" />
+                </button>
+              </Box>
             </Box>
-            {/* lower inputs */}
-            <Box className={quickStyle.inputParent} sx={{ mt: 3 }}>
-              <div
-                className={quickStyle.inputBox}
-                style={{ width: "50%", position: "relative" }}
-              >
-                <label htmlFor="amount">User Visibility</label>
-                {/* <input type="text" className={quickStyle.textInput} /> */}
-                <select name="visibility" className={quickStyle.textInput}>
-                  <option value="public">Visible</option>
-                  <option value="private">Invisible</option>
-                </select>
-                <div className={quickStyle.absDiv}>{/* asd */}</div>
-              </div>
-              {/* update button */}
-              <button
-                className={quickStyle.updateButton}
-                style={{ width: "200px" }}
-              >
-                <span> Confirm Creation</span>
-                <img src={plusIcon} alt="icon" />
-              </button>
-            </Box>
-          </Box>
+          }
+
         </TabPanel>
       </Tabs>
     </div>
@@ -360,8 +369,7 @@ const TabPanel = styled(BaseTabPanel)(
     padding: 20px 12px;
     text-align: start;
     // background: ${theme.palette.mode === "dark" ? grey[900] : "#fff"};
-    // border: 1px solid ${
-      theme.palette.mode === "dark" ? grey[700] : grey[200]
+    // border: 1px solid ${theme.palette.mode === "dark" ? grey[700] : grey[200]
     };
     border-radius: 12px;
     `
@@ -377,8 +385,7 @@ const TabsList = styled(BaseTabsList)(
     align-items: center;
     justify-content: center;
     align-content: space-between;
-    // box-shadow: 0px 4px 30px ${
-      theme.palette.mode === "dark" ? grey[900] : grey[200]
+    // box-shadow: 0px 4px 30px ${theme.palette.mode === "dark" ? grey[900] : grey[200]
     };
     `
 );
