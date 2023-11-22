@@ -37,6 +37,7 @@ const SendersMainContent = () => {
   ////////////////////////////////////////////////////////////////////////
   //action buttons
   ////////////////////////////////////////////////////////////////////////
+  const [selectedRows, setSelectedRows] = useState([]);
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const [selectedAction, setSelectedAction] = React.useState("");
@@ -54,6 +55,10 @@ const SendersMainContent = () => {
 
   const handleChange = (isChecked) => {
     setChecked(isChecked);
+  };
+
+  const handleClearRows = () => {
+    setSelectedRows([]);
   };
   const columns = [
     { field: "id", headerName: "ID", width: 70 },
@@ -234,16 +239,111 @@ const SendersMainContent = () => {
       kyc: true,
       status: false,
     },
+    {
+      id: 2,
+      firstName: "ahad ",
+      lastName: "chowdhury",
+      email: "ahadalichowdhury@gmail.com",
+      phone: "01700000000",
+      DOB: "28/09/2001",
+      kyc: true,
+      status: true,
+    },
+  ];
+  const rows2 = [
+    {
+      id: 2,
+      firstName: "ahad ",
+      lastName: "chowdhury",
+      email: "ahadalichowdhury@gmail.com",
+      phone: "01700000000",
+      DOB: "28/09/2001",
+      kyc: true,
+      status: true,
+    },
+  ];
+
+  const rows3 = [
+    {
+      id: 1,
+      firstName: "ahad ",
+      lastName: "chowdhury",
+      email: "ahadalichowdhury@gmail.com",
+      phone: "01700000000",
+      DOB: "28/09/2001",
+      kyc: true,
+      status: false,
+    },
   ];
 
   return (
     <div className={styles.parent}>
       <Tabs defaultValue={1}>
         <TabsList>
-          <Tab value={1}>All - 30</Tab>
+          <Tab value={1} onClick={handleClearRows}>
+            All - 30
+          </Tab>
           <Tab value={2}>Enabled - 10</Tab>
           <Tab value={3}>Disabled - 5</Tab>
         </TabsList>
+        {selectedRows.length > 1 && (
+          <Box
+            sx={{
+              display: "flex",
+              gap: 1,
+              position: "absolute",
+              top: "15px",
+              right: "35px",
+            }}
+          >
+            <button
+              onClick={() => {
+                alert("Call disable api here");
+                setSelectedRows([]);
+              }}
+              style={{
+                padding: "12px 20px",
+                width: "170px",
+                border: "none",
+                borderRadius: "20px",
+                backgroundColor: "#FDD4D4",
+                color: "#AC1616",
+                fontSize: "16px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                gap: "15px",
+              }}
+            >
+              Disable Senders
+              {/* <img src={plusIcon} alt="icon" /> */}
+            </button>
+            <button
+              onClick={() => {
+                alert("Call delete api here");
+                setSelectedRows([]);
+              }}
+              style={{
+                padding: "12px 20px",
+                width: "170px",
+                border: "none",
+                borderRadius: "20px",
+                backgroundColor: "#BE3144",
+                color: "#fff",
+                fontSize: "16px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                gap: "15px",
+              }}
+            >
+              Delete Senders
+              {/* <img src={plusIcon} alt="icon" /> */}
+            </button>
+          </Box>
+        )}
         <TabPanel value={1}>
           <div style={{ height: "auto", width: "100%" }}>
             <DataGrid
@@ -256,11 +356,60 @@ const SendersMainContent = () => {
               }}
               pageSizeOptions={[10, 20]}
               checkboxSelection
+              // by default seleted row is first row
+              onRowSelectionModelChange={(ids) => {
+                const selectedIDs = new Set(ids);
+                const selectedRowData = rows.filter((row) =>
+                  // selectedIDs.has(row.id.toString())
+                  selectedIDs.has(row.id)
+                );
+                setSelectedRows(selectedRowData);
+              }}
             />
           </div>
         </TabPanel>
-        <TabPanel value={2}>Second page</TabPanel>
-        <TabPanel value={3}>Third page</TabPanel>
+        <TabPanel value={2}>
+          <DataGrid
+            rows={rows2}
+            columns={columns}
+            initialState={{
+              pagination: {
+                paginationModel: { page: 0, pageSize: 10 },
+              },
+            }}
+            pageSizeOptions={[10, 20]}
+            checkboxSelection
+            onRowSelectionModelChange={(ids) => {
+              const selectedIDs = new Set(ids);
+              const selectedRowData = rows.filter((row) =>
+                // selectedIDs.has(row.id.toString())
+                selectedIDs.has(row.id)
+              );
+              setSelectedRows(selectedRowData);
+            }}
+          />
+        </TabPanel>
+        <TabPanel value={3}>
+          <DataGrid
+            rows={rows3}
+            columns={columns}
+            initialState={{
+              pagination: {
+                paginationModel: { page: 0, pageSize: 10 },
+              },
+            }}
+            pageSizeOptions={[10, 20]}
+            checkboxSelection
+            onRowSelectionModelChange={(ids) => {
+              const selectedIDs = new Set(ids);
+              const selectedRowData = rows.filter((row) =>
+                // selectedIDs.has(row.id.toString())
+                selectedIDs.has(row.id)
+              );
+              setSelectedRows(selectedRowData);
+            }}
+          />
+        </TabPanel>
       </Tabs>
       <Dialog
         maxWidth="md"
