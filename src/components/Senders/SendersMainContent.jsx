@@ -277,7 +277,7 @@ const SendersMainContent = () => {
   ];
 
   return (
-    <div className={styles.parent}>
+    <div className={styles.parent} style={{position: "relative"}}>
       <Tabs defaultValue={1}>
         <TabsList>
           <Tab value={1} onClick={handleClearRows}>
