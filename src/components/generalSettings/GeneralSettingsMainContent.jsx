@@ -20,6 +20,7 @@ import quickStyle from "../../assets/css/quickTransfer.module.css";
 import updateIcon from "../../assets/img/generalSettings/update.svg";
 import plusIcon from "../../assets/img/generalSettings/plus.svg";
 import axios from "axios";
+import { useQuery } from "react-query";
 
 const GeneralSettingsMainContent = () => {
   const [box, setBox] = React.useState(1);
@@ -27,7 +28,26 @@ const GeneralSettingsMainContent = () => {
   const handleChange = (event) => {
     setBox(event.target.value);
   };
+  const [fee, setFee] = useState('');
+  const [mainTitle, setMainTitle] = useState('');
+  const [mainDescription, setMainDescription] = useState('');
+  const [serviceTitle, setServiceTitle] = useState('');
+  const [serviceDescription, setServiceDescription] = useState('');
+  const [serviceIcon, setServiceIcon] = useState('');
 
+  // const [generalSettings, setGeneralSettings] = useState(null);
+
+  const { data: generalSettings, isLoading, isError } = useQuery("generalSettings", async () => {
+    const res = await axios.get(`https://api.quickt.com.au/api/general-settings/1`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+      },
+    });
+    console.log(res.data.data.attributes)
+    return res.data.data.attributes;
+
+  })
+  console.log(generalSettings?.transfer_percentage)
   /////////////////////////////
   //image uploading
   /////////////////////////////
@@ -64,8 +84,74 @@ const GeneralSettingsMainContent = () => {
     };
     input.click();
   };
+  // update transfer fee percentage
+  const handleFeeUpdate = async () => {
+    if (fee === "") {
+      alert("Please enter fee");
+      return;
+    }
+    // /api/general-settings/:id
+    const res = await axios.put(`https://api.quickt.com.au/api/general-settings/1`, {
+      "data": {
+        "transfer_percentage": Number(fee)
+      }
+    }, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+      },
+    });
+    console.log(res.data?.data?.id)
+    if (res.data?.data?.id) {
+      setFee('');
+      alert("Fee updated successfully");
+    } else {
+      alert("Something went wrong");
+    }
+  };
 
+  // update main banner
+  const handleMainBannerUpdate = async () => {
+    if (mainTitle === "" || mainDescription === "") {
+      alert("Please enter title and description");
+      return;
+    }
+    // if title is empty then remove title from object
+    // if (mainTitle === "") {
+    //   mainBannerData.data.main_banner_description = mainDescription;
+    // }
+    // // if description is empty then remove description from object
+    // if (mainDescription === "") {
+    //   mainBannerData.data.main_banner_title = mainTitle;
+    // }
+    // // if both are not empty then add both in object
+    // if (mainTitle !== "" && mainDescription !== "") {
+    //   mainBannerData.data.main_banner_title = mainTitle;
+    //   mainBannerData.data.main_banner_description = mainDescription;
+    // }else if(mainTitle === "" && mainDescription === ""){
+    //   alert("Please enter title or description");
+    //   return;
+    // }
 
+    const res = await axios.put(`https://api.quickt.com.au/api/general-settings/1`, {
+      "data": {
+        "main_banner_title": mainTitle,
+        "main_banner_description": mainDescription
+      }
+      
+    }, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+      },
+    });
+    console.log(res.data?.data?.id)
+    if (res.data?.data?.id) {
+      setMainTitle('');
+      setMainDescription('');
+      alert("Main banner updated successfully");
+    } else {
+      alert("Something went wrong");
+    }
+  };
   return (
     <div className={styles.parent}>
       <Tabs defaultValue={1}>
@@ -74,17 +160,19 @@ const GeneralSettingsMainContent = () => {
           <Tab value={2}>Quick Transfers</Tab>
         </TabsList>
         <TabPanel value={1}>
-          <div style={{ height: "auto", width: "100%" }}>
+          <div style={{ height: "auto", width: "100%", marginTop: "-30px" }}>
             <p className="generalSettings_TextHeading">
-              Custom ammount Transfer Percentage
+              Transfer Fee Percentage
             </p>
             <div className="generalSettings_CustomAmmount">
               <input
-                type="text"
-                placeholder="Enter amount (current amount is 100)"
+                type="number"
+                value={fee}
+                onChange={(e) => setFee(e.target.value)}
+                placeholder={`Enter amount (current fee is ${generalSettings?.transfer_percentage}%)`}
                 style={{ border: "1px solid #999" }}
               />
-              <button>Update</button>
+              <button onClick={handleFeeUpdate}>Update</button>
             </div>
 
             <div className="generalSettings_MainBanner">
@@ -92,29 +180,36 @@ const GeneralSettingsMainContent = () => {
               <p className="generalSettings_SubTextHeading">Title</p>
               <input
                 type="text"
-                placeholder="Enter title"
+                value={mainTitle}
+                onChange={(e) => setMainTitle(e.target.value)}
+                placeholder={`Enter title here (We recommend title length less than 10 words)`}
                 style={{ border: "1px solid #999" }}
               />
               <p className="generalSettings_SubTextHeading">Description</p>
               <textarea
-                placeholder="Enter description"
+                value={mainDescription}
+                onChange={(e) => setMainDescription(e.target.value)}
+                placeholder={`Enter description here (We recommend description length less than 15-20 words)`}
                 rows={6}
                 cols={10}
               ></textarea>
-              <button>Update</button>
+              <button
+              onClick={handleMainBannerUpdate}
+              >Update
+              </button>
             </div>
 
             <div className="generalSettings_MainBanner">
               <div className="generalSettings_serviceBox">
                 <div>
                   <p className="generalSettings_TextHeading">
-                    Service box info
+                    Update Service box number {box}
                   </p>
                 </div>
                 <div style={{ width: "200px" }}>
                   <FormControl fullWidth>
                     <InputLabel id="demo-simple-select-label">
-                      Select Box No
+                      Select Box No 
                     </InputLabel>
                     <Select
                       labelId="demo-simple-select-label"
@@ -123,17 +218,19 @@ const GeneralSettingsMainContent = () => {
                       label="Select Box No"
                       onChange={handleChange}
                     >
-                      <MenuItem value={"Box 1"}>Box 1</MenuItem>
-                      <MenuItem value={"Box 2"}>Box 2</MenuItem>
-                      <MenuItem value={"Box 3"}>Box 3</MenuItem>
+                      {
+                        [1, 2, 3].map((item, index) => (
+                          <MenuItem key={index} value={item}>Service box {item}</MenuItem>
+                        ))
+                      }
                     </Select>
                   </FormControl>
                 </div>
               </div>
-              <p className="generalSettings_SubTextHeading">Title</p>
+              <p className="generalSettings_SubTextHeading">Title </p>
               <input
                 type="text"
-                placeholder="Enter title here (We recommend title length less than 10)"
+                placeholder={`Enter title here (We recommend title length less than 10)`}
                 style={{ border: "1px solid #999" }}
               />
               <div className="generalSettings_MainServices">

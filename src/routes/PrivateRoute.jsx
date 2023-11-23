@@ -19,6 +19,9 @@ const PrivateRoute = ({ children }) => {
     //         <Alert severity="warning">Unauthorized login detected. We are humbly requesting you for not interrupting system. We may take legal action.</Alert>
     //     </div>
     // }
+    // if(user?.token){
+    //     return children;
+    // }
     if (user?.isAdmin == true) {
         return children;
     }

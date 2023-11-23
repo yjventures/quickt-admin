@@ -34,7 +34,7 @@ const LoginForm = () => {
 
         try {
             await login(e.target.email.value, e.target.password.value);
-            navigate('/dashboard/home');
+            
         } catch (error) {
             setError(error.message);
         }
