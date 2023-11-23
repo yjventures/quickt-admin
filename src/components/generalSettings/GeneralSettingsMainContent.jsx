@@ -28,33 +28,109 @@ const GeneralSettingsMainContent = () => {
   const handleChange = (event) => {
     setBox(event.target.value);
   };
+  const [quickAmount, setQuickAmount] = React.useState("");
+  const [quickFee, setQuickFee] = React.useState("");
+  const [visibility, setVisibility] = React.useState("");
   const [fee, setFee] = useState('');
   const [mainTitle, setMainTitle] = useState('');
   const [mainDescription, setMainDescription] = useState('');
   const [serviceTitle, setServiceTitle] = useState('');
   const [serviceDescription, setServiceDescription] = useState('');
-  const [serviceIcon, setServiceIcon] = useState('');
-
+  const [newTransferAmount, setNewTransferAmount] = useState('');
+  const [newTransferFee, setNewTransferFee] = useState('');
+  const [newTransferVisibility, setNewTransferVisibility] = useState('');
+  const [selectedImage, setSelectedImage] = useState(imageTemplate);
+  const [strapiImage, setStrapiImage] = useState(null);
   // const [generalSettings, setGeneralSettings] = useState(null);
+  console.log(newTransferVisibility, newTransferFee, newTransferAmount)
+  const createQuickTransfer = async () => {
+    if (newTransferAmount === "" || newTransferFee === "" || newTransferVisibility === "") {
+      alert("Please enter amount, fee and visibility");
+      return;
+    }
+    const res = await axios.post(`https://api.quickt.com.au/api/quick-transfers`, {
+      "data": {
+        "amount": Number(newTransferAmount),
+        "fee": Number(newTransferFee),
+        "enabled": newTransferVisibility
+      }
+    }, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+      },
+    });
+    console.log(res.data?.data?.id)
+    if (res.data?.data?.id) {
+      setNewTransferAmount('');
+      setNewTransferFee('');
+      setNewTransferVisibility('');
+      alert("Quick transfer created successfully");
+      setNewTransfer(false);
 
-  const { data: generalSettings, isLoading, isError } = useQuery("generalSettings", async () => {
+    } else {
+      alert("Something went wrong");
+    }
+
+  }
+
+  const { data: generalSettings, isLoading: isgeneralSettingLoading, isError: isgeneralSettingError } = useQuery("generalSettings", async () => {
     const res = await axios.get(`https://api.quickt.com.au/api/general-settings/1`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("jwt")}`,
       },
     });
-    console.log(res.data.data.attributes)
+    // console.log(res.data.data.attributes)
     return res.data.data.attributes;
 
   })
-  console.log(generalSettings?.transfer_percentage)
+  // console.log(generalSettings?.transfer_percentage)
+  // get quick transfers
+  const { data: quickTransfers, isLoading, isError } = useQuery("quickTransfers", async () => {
+    const res = await axios.get(`https://api.quickt.com.au/api/quick-transfers`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+      },
+    });
+    // console.log(res.data.data)
+    return res.data.data;
+  })
+
+  React.useEffect(() => {
+    if (quickTransfers) {
+      setVisibility(quickTransfers?.[box - 1]?.attributes?.enabled);
+      setQuickAmount(quickTransfers?.[box - 1]?.attributes?.amount);
+      setQuickFee(quickTransfers?.[box - 1]?.attributes?.fee);
+    }
+  }, [box, quickTransfers])
+  // console.log(quickTransfers.length)
   /////////////////////////////
   //image uploading
   /////////////////////////////
-  const [selectedImage, setSelectedImage] = useState(imageTemplate);
-  const [strapiImage, setStrapiImage] = useState(null);
-  // console.log(selectedImage);
-  // console.log(strapiImage);
+
+  const updateQuickTransfer = async () => {
+    if (quickAmount === "" || quickFee === "") {
+      alert("Please enter amount and fee");
+      return;
+    }
+    const res = await axios.put(`https://api.quickt.com.au/api/quick-transfers/${quickTransfers?.[box - 1]?.id}`, {
+      "data": {
+        "amount": Number(quickAmount),
+        "fee": Number(quickFee),
+        "enabled": visibility
+      }
+    }, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+      },
+    });
+    console.log(res.data?.data?.id)
+    if (res.data?.data?.id) {
+      alert("Quick transfer updated successfully");
+    } else {
+      alert("Something went wrong");
+    }
+  };
+
   const handleImageClick = () => {
     const input = document.createElement("input");
     input.type = "file";
@@ -160,7 +236,7 @@ const GeneralSettingsMainContent = () => {
       return;
     }
     let serviceBoxData = {}
-    if(box === 1){
+    if (box === 1) {
       serviceBoxData = {
         "data": {
           "service_box_one_title": serviceTitle,
@@ -168,7 +244,7 @@ const GeneralSettingsMainContent = () => {
           // "service_box_one_icon": strapiImage
         }
       }
-    }else if(box === 2){
+    } else if (box === 2) {
       serviceBoxData = {
         "data": {
           "service_box_two_title": serviceTitle,
@@ -176,7 +252,7 @@ const GeneralSettingsMainContent = () => {
           // "service_box_two_icon": strapiImage
         }
       }
-    }else{
+    } else {
       serviceBoxData = {
         "data": {
           "service_box_three_title": serviceTitle,
@@ -186,7 +262,7 @@ const GeneralSettingsMainContent = () => {
       }
     }
 
-    
+
     console.log(serviceBoxData)
     // /api/general-settings/:id
     const res = await axios.put(`https://api.quickt.com.au/api/general-settings/1`, serviceBoxData, {
@@ -353,10 +429,11 @@ const GeneralSettingsMainContent = () => {
                     label="Select existing transfers"
                     onChange={handleChange}
                   >
-                    <MenuItem value={1}>Transfer No 1</MenuItem>
-                    <MenuItem value={2}>Transfer No 2</MenuItem>
-                    <MenuItem value={3}>Transfer No 3</MenuItem>
-                    <MenuItem value={4}>Transfer No 4</MenuItem>
+                    {
+                      [...Array(quickTransfers?.length)].map((item, index) => (
+                        <MenuItem key={index} value={index + 1}>Quick Transfer No {index + 1}</MenuItem>
+                      ))
+                    }
                   </Select>
                 </FormControl>
               </div>
@@ -368,11 +445,24 @@ const GeneralSettingsMainContent = () => {
             <Box className={quickStyle.inputParent}>
               <div className={quickStyle.inputBox}>
                 <label htmlFor="amount">Amount</label>
-                <input type="text" className={quickStyle.textInput} />
+                <input
+                  type="text"
+                  className={quickStyle.textInput}
+                  value={quickAmount}
+                  onChange={(e) => handleW}
+                />
               </div>
+              {/* fee */}
               <div className={quickStyle.inputBox}>
                 <label htmlFor="amount">Fee</label>
-                <input type="text" className={quickStyle.textInput} />
+                <input
+                  type="text"
+                  className={quickStyle.textInput}
+                  value={quickFee}
+                  onChange={(e) => {
+                    setQuickFee(e.target.value)
+                  }}
+                />
               </div>
             </Box>
             {/* lower inputs */}
@@ -383,14 +473,22 @@ const GeneralSettingsMainContent = () => {
               >
                 <label htmlFor="amount">User Visibility</label>
                 {/* <input type="text" className={quickStyle.textInput} /> */}
-                <select name="visibility" className={quickStyle.textInput}>
-                  <option value="public">Visible</option>
-                  <option value="private">Invisible</option>
+                <select
+                  name="visibility"
+                  className={quickStyle.textInput}
+                  value={visibility}
+                  onChange={(e) => {
+                    setVisibility(e.target.value);
+                    // setBox(e.target.value)
+                  }}
+                >
+                  <option value="true">Visible </option>
+                  <option value="false">Invisible </option>
                 </select>
                 <div className={quickStyle.absDiv}>{/* asd */}</div>
               </div>
               {/* update button */}
-              <button className={quickStyle.updateButton}>
+              <button className={quickStyle.updateButton} onClick={updateQuickTransfer}>
                 <span> Update quick transfer {box}</span>
                 <img src={updateIcon} alt="icon" />
               </button>
@@ -414,11 +512,26 @@ const GeneralSettingsMainContent = () => {
               <Box className={quickStyle.inputParent}>
                 <div className={quickStyle.inputBox}>
                   <label htmlFor="amount">Amount</label>
-                  <input type="text" className={quickStyle.textInput} />
+                  <input
+                    type="text"
+                    className={quickStyle.textInput}
+                    value={newTransferAmount}
+                    onChange={(e) => {
+                      setNewTransferAmount(e.target.value)
+                    }}
+                  />
                 </div>
                 <div className={quickStyle.inputBox}>
                   <label htmlFor="amount">Fee</label>
-                  <input type="text" className={quickStyle.textInput} />
+                  <input
+                    type="text"
+                    className={quickStyle.textInput}
+                    value={newTransferFee}
+                    onChange={(e) => {
+                      setNewTransferFee(e.target.value)
+                    }}
+
+                  />
                 </div>
               </Box>
               {/* lower inputs */}
@@ -429,16 +542,22 @@ const GeneralSettingsMainContent = () => {
                 >
                   <label htmlFor="amount">User Visibility</label>
                   {/* <input type="text" className={quickStyle.textInput} /> */}
-                  <select name="visibility" className={quickStyle.textInput}>
-                    <option value="public">Visible</option>
-                    <option value="private">Invisible</option>
+                  <select name="visibility" className={quickStyle.textInput}
+                    value={newTransferVisibility}
+                    onChange={(e) => {
+                      setNewTransferVisibility(e.target.value)
+                    }}
+                  >
+                    <option value="true">Visible</option>
+                    <option value="false">Invisible</option>
                   </select>
                   <div className={quickStyle.absDiv}>{/* asd */}</div>
                 </div>
-                {/* update button */}
+                {/* create button */}
                 <button
                   className={quickStyle.updateButton}
                   style={{ width: "200px" }}
+                  const onClick={createQuickTransfer}
                 >
                   <span> Confirm Creation</span>
                   <img src={plusIcon} alt="icon" />
