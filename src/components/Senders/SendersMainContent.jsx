@@ -15,21 +15,14 @@ import disableIcon from "../../assets/img/country/disable.svg";
 import editIcon from "../../assets/img/country/edit.svg";
 import deleteIcon from "../../assets/img/country/delete.svg";
 import Dialog from "@mui/material/Dialog";
-import ListItemText from "@mui/material/ListItemText";
-import ListItem from "@mui/material/ListItem";
-import List from "@mui/material/List";
-import Divider from "@mui/material/Divider";
-import AppBar from "@mui/material/AppBar";
-import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
-import Typography from "@mui/material/Typography";
 import CloseIcon from "@mui/icons-material/Close";
 import Slide from "@mui/material/Slide";
 import { useState } from "react";
-import Switch from "react-switch";
 import IconImage from "../../assets/img/country/iconImage.png";
-import plusIcon from "../../assets/img/generalSettings/plus.svg";
 import { useQuery } from "react-query";
+import avatarDemo from "../../assets/img/senders/avatarDemo.png";
+import frontId from "../../assets/img/senders/frontId.png";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -488,71 +481,287 @@ const SendersMainContent = () => {
             {selectedAction === "edit" && (
               <Box sx={{ ml: 2 }}>
                 <h2>View KYC</h2>
-                {/* <Box sx={{ mt: 3 }}>
-                  <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-                    <p className="generalSettings_SubTextHeading">Icon</p>
-                    <img
-                      src={selectedImage}
+                <div style={{ display: "flex" }}>
+                  <div style={{ marginTop: "30px" }}>
+                    <p
                       style={{
-                        width: "270px",
-                        height: "180px",
-                        cursor: "pointer",
-                      }}
-                      alt=""
-                      onClick={handleImageClick}
-                    />
-                    <p className="generalSettings_SubTextHeading">
-                      Country Name <span style={{ color: "red" }}>*</span>
-                    </p>
-                    <input
-                      type="text"
-                      placeholder="ex: United States of America"
-                      style={{
-                        padding: "16px 20px",
-                        width: "100%",
                         fontSize: "20px",
-                        borderRadius: "16px",
-                        border: "1px solid #E9E9EA",
-                        outline: "none",
+                        fontWeight: "500",
+                        color: "#2F80ED",
+                        marginLeft: "20px",
                       }}
-                    />
-
-                    <p className="generalSettings_SubTextHeading">
-                      Country Code <span style={{ color: "red" }}>*</span>
+                    >
+                      Personal Details
                     </p>
-
-                    <input
-                      type="text"
-                      placeholder="ex: USA"
+                    <div style={{ display: "flex" }}>
+                      <div>
+                        <img
+                          src={avatarDemo}
+                          alt="icon"
+                          style={{
+                            height: "258px",
+                            width: "285px",
+                            borderRadius: "24px",
+                          }}
+                        />
+                      </div>
+                      <div style={{ paddingTop: "20px" }}>
+                        <p
+                          style={{
+                            fontSize: "15px",
+                            fontWeight: "600",
+                            marginBottom: "8px",
+                          }}
+                        >
+                          Name
+                        </p>
+                        <p
+                          style={{
+                            fontSize: "18px",
+                            fontWeight: "500",
+                            marginBottom: "20px",
+                          }}
+                        >
+                          Ahad Ali Chowdhury
+                        </p>
+                        <p
+                          style={{
+                            fontSize: "15px",
+                            fontWeight: "600",
+                            marginBottom: "8px",
+                          }}
+                        >
+                          Date of Birth
+                        </p>
+                        <p
+                          style={{
+                            fontSize: "18px",
+                            fontWeight: "500",
+                            marginBottom: "20px",
+                          }}
+                        >
+                          August 27th, 1999
+                        </p>
+                        <p
+                          style={{
+                            fontSize: "15px",
+                            fontWeight: "600",
+                            marginBottom: "8px",
+                          }}
+                        >
+                          Nationality
+                        </p>
+                        <p
+                          style={{
+                            fontSize: "18px",
+                            fontWeight: "500",
+                            marginBottom: "20px",
+                          }}
+                        >
+                          Australian
+                        </p>
+                      </div>
+                    </div>
+                    <div style={{ display: "flex", padding: "20px" }}>
+                      <div>
+                        <p
+                          style={{
+                            fontSize: "20px",
+                            fontWeight: "500",
+                            color: "#2F80ED",
+                            marginBottom: "10px",
+                          }}
+                        >
+                          Address
+                        </p>
+                        <p
+                          style={{
+                            fontSize: "15px",
+                            fontWeight: "600",
+                            marginBottom: "8px",
+                          }}
+                        >
+                          Address Line
+                        </p>
+                        <p
+                          style={{
+                            fontSize: "18px",
+                            fontWeight: "500",
+                            marginBottom: "20px",
+                          }}
+                        >
+                          No 35 Jimmy Ebi Street
+                        </p>
+                        <p
+                          style={{
+                            fontSize: "15px",
+                            fontWeight: "600",
+                            marginBottom: "8px",
+                          }}
+                        >
+                          City
+                        </p>
+                        <p
+                          style={{
+                            fontSize: "18px",
+                            fontWeight: "500",
+                            marginBottom: "20px",
+                          }}
+                        >
+                          Yenagoa
+                        </p>
+                        <p
+                          style={{
+                            fontSize: "15px",
+                            fontWeight: "600",
+                            marginBottom: "8px",
+                          }}
+                        >
+                          State
+                        </p>
+                        <p
+                          style={{
+                            fontSize: "18px",
+                            fontWeight: "500",
+                            marginBottom: "20px",
+                          }}
+                        >
+                          Bayelsa
+                        </p>
+                        <p
+                          style={{
+                            fontSize: "15px",
+                            fontWeight: "600",
+                            marginBottom: "8px",
+                          }}
+                        >
+                          Country
+                        </p>
+                        <p
+                          style={{
+                            fontSize: "18px",
+                            fontWeight: "500",
+                            marginBottom: "20px",
+                          }}
+                        >
+                          Nigeria
+                        </p>
+                      </div>
+                      <div style={{ paddingLeft: "70px" }}>
+                        <p
+                          style={{
+                            fontSize: "20px",
+                            fontWeight: "500",
+                            color: "#2F80ED",
+                            marginBottom: "10px",
+                          }}
+                        >
+                          Contact Details
+                        </p>
+                        <p
+                          style={{
+                            fontSize: "15px",
+                            fontWeight: "600",
+                            marginBottom: "8px",
+                          }}
+                        >
+                          Phone Number
+                        </p>
+                        <p
+                          style={{
+                            fontSize: "18px",
+                            fontWeight: "500",
+                            marginBottom: "20px",
+                          }}
+                        >
+                          09034867656
+                        </p>
+                        <p
+                          style={{
+                            fontSize: "15px",
+                            fontWeight: "600",
+                            marginBottom: "8px",
+                          }}
+                        >
+                          Email
+                        </p>
+                        <p
+                          style={{
+                            fontSize: "18px",
+                            fontWeight: "500",
+                            marginBottom: "20px",
+                          }}
+                        >
+                          tomilola@me.com
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div style={{ padding: "30px" }}>
+                    <p
                       style={{
-                        padding: "16px 20px",
-                        width: "100%",
                         fontSize: "20px",
-                        borderRadius: "16px",
-                        border: "1px solid #E9E9EA",
-                        outline: "none",
+                        fontWeight: "500",
+                        color: "#2F80ED",
+                        marginTop: "-5px",
+                        marginBottom: "10px",
                       }}
-                    />
-                    <p className="generalSettings_SubTextHeading">Enabled</p>
-                    <Switch onChange={handleChange} checked={checked} />
-                  </Typography>
-                  <Box sx={{ mt: 3 }}>
-                    <Button
-                      variant="contained"
-                      color="success"
-                      onClick={() => alert("Call edit api here")}
                     >
-                      Confim Update
-                    </Button>
-                    <Button
-                      variant="outlined"
-                      sx={{ ml: 2 }}
-                      onClick={handleClose}
-                    >
-                      Cancel
-                    </Button>
-                  </Box>
-                </Box> */}
+                      Submitted Documents
+                    </p>
+                    <div>
+                      <img
+                        src={frontId}
+                        alt="icon"
+                        style={{
+                          height: "336px",
+                          width: "350px",
+                          borderRadius: "24px",
+                          marginBottom: "20px",
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <img
+                        src={frontId}
+                        alt="icon"
+                        style={{
+                          height: "336px",
+                          width: "350px",
+                          borderRadius: "24px",
+                        }}
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <button
+                    style={{
+                      padding: "16px 36px",
+                      borderRadius: "16px",
+                      cursor: "pointer",
+                      border: "none",
+                      color: "white",
+                      backgroundColor: "#003CFF",
+                      marginLeft: "16px",
+                      marginRight: "16px",
+                    }}
+                  >
+                    Approve KYC
+                  </button>
+                  <button
+                    style={{
+                      padding: "16px 56px",
+                      borderRadius: "16px",
+                      cursor: "pointer",
+                      border: "none",
+                      color: "white",
+                      backgroundColor: "#A7A7A7",
+                    }}
+                  >
+                    Deny KYC
+                  </button>
+                </div>
               </Box>
             )}
             {selectedAction === "delete" && (
