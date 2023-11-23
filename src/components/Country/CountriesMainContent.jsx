@@ -29,6 +29,7 @@ import { useState } from "react";
 import Switch from "react-switch";
 import IconImage from "../../assets/img/country/iconImage.png";
 import plusIcon from "../../assets/img/generalSettings/plus.svg";
+import { useQuery } from "react-query";
 
 
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -59,6 +60,55 @@ const CountriesMainContent = () => {
   const handleClearRows = () => {
     setSelectedRows([]);
   }
+
+  const fetchCounties = async () => {
+    const response = await fetch('https://api.quickt.com.au/api/countries', {
+      headers: {
+        'Authorization': `${localStorage.getItem('jwt')}`
+      }
+    })
+    const data = await response.json();
+    // return data.data
+    if (data.data) {
+      // console.log(data.data.data)
+      return data.data
+    } else {
+      return [];
+      // throw new Error('Could not fetch users')
+    }
+  }
+  const { isLoading: countriesLoading, error: countriesError, data: countries } = useQuery('allCountry', fetchCounties);
+  // Check if countries is an array before calling map
+  console.log()
+  const allCountry = Array.isArray(countries) ? countries?.map((item) => ({
+    id: item.id,
+    name: item.attributes?.name,
+    code: item.attributes?.code,
+    image: item.attributes?.icon,
+    enabled: item.attributes?.enabled,
+  })) : [];
+  // get only enabled countries
+  const enabledCountries = Array.isArray(countries) ? countries?.filter((item) => item.attributes?.enabled === true).map((item) => ({
+    id: item.id,
+    name: item.attributes?.name,
+    code: item.attributes?.code,
+    image: item.attributes?.icon,
+    enabled: item.attributes?.enabled,
+  })) : [];
+  // get only disabled countries
+  const disabledCountries = Array.isArray(countries) ? countries?.filter((item) => {
+    return item.attributes?.enabled === false;
+  }).map((item) => ({
+    id: item.id,
+    name: item.attributes?.name,
+    code: item.attributes?.code,
+    image: item.attributes?.icon,
+    enabled: item.attributes?.enabled,
+  })) : [];
+
+
+
+  // console.log(allCountry)
   const [selectedImage, setSelectedImage] = useState(IconImage);
   const handleImageClick = () => {
     const input = document.createElement("input");
@@ -89,6 +139,8 @@ const CountriesMainContent = () => {
     };
     input.click();
   };
+
+  // columns for data grid
   const columns = [
     { field: "id", headerName: "ID", width: 70 },
     {
@@ -96,7 +148,13 @@ const CountriesMainContent = () => {
       headerName: "Country name",
       width: 130,
     },
-    { field: "code", headerName: "Code", width: 130 },
+    { field: "code", headerName: "Code", width: 130,
+      renderCell: (params) => (
+        <div style={{ display: "flex", alignItems: "center" }}>
+          {params.row.code ? params.row.code : "Not available"}
+        </div>
+      ),
+    },
     {
       field: "image",
       headerName: "Icon",
@@ -211,199 +269,17 @@ const CountriesMainContent = () => {
           </div>
         );
       },
-    },
-    // {
-    // field: "action",
-    // headerName: "Action",
-    // width: 100,
-    // type: "number",
-    // sortable: false,
-    // filterable: false,
-    // disableColumnMenu: true,
-    // renderCell: (params) => (
-    //   <select
-    //     // onClick={() => alert('Show action popup')}
-    //     style={{
-    //       display: "flex",
-    //       justifyContent: "space-around",
-    //       flexDirection: "column",
-    //       alignItems: "center",
-    //       width: "105px",
-    //       backgroundColor: "#fff",
-    //       borderRadius: "15px",
-    //       border: "1px solid #E9E9EA",
-    //       color: "#1D1929",
-    //       fontFamily: "Open Sans",
-    //       fontSize: "14px",
-    //       fontStyle: "normal",
-    //       padding: "7px",
-    //     }}
-    //   >
-    //     <option value="view" selected>
-    //       Action
-    //     </option>
-    //     <option
-    //       value="edit"
-    //       onClick={() => {
-    //         alert("Edit");
-    //       }}
-    //     >
-    //       Edit
-    //     </option>
-    //     <option
-    //       value="delete"
-    //       onClick={() => {
-    //         alert("Delete");
-    //       }}
-    //     >
-    //       Delete
-    //     </option>
-    //   </select>
-    // ),
-    // },
-  ];
-
-  const rows = [
-    {
-      id: 1,
-      name: "Australia",
-      code: "AU",
-      image:
-        "https://upload.wikimedia.org/wikipedia/commons/b/b9/Flag_of_Australia.svg",
-      enabled: true,
-    },
-    {
-      id: 2,
-      name: "Lannister",
-      code: "LI",
-      image:
-        "https://upload.wikimedia.org/wikipedia/commons/b/b9/Flag_of_Australia.svg",
-      enabled: true,
-    },
-    {
-      id: 4,
-      name: "Stark",
-      code: "SN",
-      image:
-        "https://upload.wikimedia.org/wikipedia/commons/b/b9/Flag_of_Australia.svg",
-      enabled: false,
-    },
-    {
-      id: 5,
-      name: "Targaryen",
-      code: "SN",
-      image:
-        "https://upload.wikimedia.org/wikipedia/commons/b/b9/Flag_of_Australia.svg",
-      enabled: true,
-    },
-    {
-      id: 6,
-      name: "Melisandre",
-      code: "SN",
-      image:
-        "https://upload.wikimedia.org/wikipedia/commons/b/b9/Flag_of_Australia.svg",
-      enabled: true,
-    },
-    {
-      id: 7,
-      name: "Clifford",
-      code: "SN",
-      image:
-        "https://upload.wikimedia.org/wikipedia/commons/b/b9/Flag_of_Australia.svg",
-      enabled: true,
-    },
-    {
-      id: 8,
-      name: "Frances",
-      code: "SN",
-      image:
-        "https://upload.wikimedia.org/wikipedia/commons/b/b9/Flag_of_Australia.svg",
-      enabled: true,
-    },
-    {
-      id: 9,
-      name: "Roxie",
-      code: "SN",
-      image:
-        "https://upload.wikimedia.org/wikipedia/commons/b/b9/Flag_of_Australia.svg",
-      enabled: false,
-    },
-  ];
-  const rows2 = [
-    {
-      id: 1,
-      name: "Australia",
-      code: "AU",
-      image:
-        "https://upload.wikimedia.org/wikipedia/commons/b/b9/Flag_of_Australia.svg",
-      enabled: true,
-    },
-    {
-      id: 2,
-      name: "Lannister",
-      code: "LI",
-      image:
-        "https://upload.wikimedia.org/wikipedia/commons/b/b9/Flag_of_Australia.svg",
-      enabled: true,
-    },
-    {
-      id: 5,
-      name: "Targaryen",
-      code: "SN",
-      image:
-        "https://upload.wikimedia.org/wikipedia/commons/b/b9/Flag_of_Australia.svg",
-      enabled: true,
-    },
-    {
-      id: 6,
-      name: "Melisandre",
-      code: "SN",
-      image:
-        "https://upload.wikimedia.org/wikipedia/commons/b/b9/Flag_of_Australia.svg",
-      enabled: true,
-    },
-    {
-      id: 7,
-      name: "Clifford",
-      code: "SN",
-      image:
-        "https://upload.wikimedia.org/wikipedia/commons/b/b9/Flag_of_Australia.svg",
-      enabled: true,
-    },
-    {
-      id: 8,
-      name: "Frances",
-      code: "SN",
-      image:
-        "https://upload.wikimedia.org/wikipedia/commons/b/b9/Flag_of_Australia.svg",
-      enabled: true,
     }
   ];
-  const rows3 = [
-    {
-      id: 4,
-      name: "Stark",
-      code: "SN",
-      image:
-        "https://upload.wikimedia.org/wikipedia/commons/b/b9/Flag_of_Australia.svg",
-      enabled: false,
-    },
-    {
-      id: 9,
-      name: "Roxie",
-      code: "SN",
-      image:
-        "https://upload.wikimedia.org/wikipedia/commons/b/b9/Flag_of_Australia.svg",
-      enabled: false,
-    },
-  ];
+
+
   return (
     <div className={styles.parent} style={{ position: "relative" }}>
       <Tabs defaultValue={1}>
         <TabsList>
-          <Tab onClick={handleClearRows} value={1} >All- 30</Tab>
-          <Tab value={2}>Enabled - 10</Tab>
-          <Tab value={3}>Disabled - 5</Tab>
+          <Tab onClick={handleClearRows} value={1} >All- {countries?.length}</Tab>
+          <Tab value={2}>Enabled - {enabledCountries?.length}</Tab>
+          <Tab value={3}>Disabled - {disabledCountries.length}</Tab>
         </TabsList>
         {
           selectedRows.length > 1 && <Box sx={{ display: 'flex', gap: 1, position: "absolute", top: "15px", right: '35px' }}>
@@ -459,7 +335,7 @@ const CountriesMainContent = () => {
         <TabPanel value={1}>
           <div style={{ height: "auto", width: "100%" }}>
             <DataGrid
-              rows={rows}
+              rows={allCountry}
               columns={columns}
               initialState={{
                 pagination: {
@@ -471,7 +347,7 @@ const CountriesMainContent = () => {
               // by default seleted row is first row
               onRowSelectionModelChange={(ids) => {
                 const selectedIDs = new Set(ids);
-                const selectedRowData = rows.filter((row) =>
+                const selectedRowData = countries.filter((row) =>
                   // selectedIDs.has(row.id.toString())
                   selectedIDs.has(row.id)
                 )
@@ -483,7 +359,7 @@ const CountriesMainContent = () => {
         {/* for enabled countries */}
         <TabPanel value={2}>
           <DataGrid
-            rows={rows2}
+            rows={enabledCountries}
             columns={columns}
             initialState={{
               pagination: {
@@ -494,7 +370,7 @@ const CountriesMainContent = () => {
             checkboxSelection
             onRowSelectionModelChange={(ids) => {
               const selectedIDs = new Set(ids);
-              const selectedRowData = rows.filter((row) =>
+              const selectedRowData = enabledCountries.filter((row) =>
                 // selectedIDs.has(row.id.toString())
                 selectedIDs.has(row.id)
               )
@@ -505,7 +381,7 @@ const CountriesMainContent = () => {
         {/* for enabled country */}
         <TabPanel value={3}>
           <DataGrid
-            rows={rows3}
+            rows={disabledCountries}
             columns={columns}
             initialState={{
               pagination: {
@@ -516,7 +392,7 @@ const CountriesMainContent = () => {
             checkboxSelection
             onRowSelectionModelChange={(ids) => {
               const selectedIDs = new Set(ids);
-              const selectedRowData = rows.filter((row) =>
+              const selectedRowData = disabledCountries.filter((row) =>
                 // selectedIDs.has(row.id.toString())
                 selectedIDs.has(row.id)
               )
