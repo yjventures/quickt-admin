@@ -137,7 +137,7 @@ const GeneralSettingsMainContent = () => {
         "main_banner_title": mainTitle,
         "main_banner_description": mainDescription
       }
-      
+
     }, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("jwt")}`,
@@ -152,6 +152,60 @@ const GeneralSettingsMainContent = () => {
       alert("Something went wrong");
     }
   };
+
+
+  const handleServiceBoxUpdate = async () => {
+    if (serviceTitle === "" || serviceDescription === "" || strapiImage === null) {
+      alert("Please enter title, description and icon");
+      return;
+    }
+    let serviceBoxData = {}
+    if(box === 1){
+      serviceBoxData = {
+        "data": {
+          "service_box_one_title": serviceTitle,
+          "service_box_one_descr": serviceDescription,
+          // "service_box_one_icon": strapiImage
+        }
+      }
+    }else if(box === 2){
+      serviceBoxData = {
+        "data": {
+          "service_box_two_title": serviceTitle,
+          "service_box_two_desc": serviceDescription,
+          // "service_box_two_icon": strapiImage
+        }
+      }
+    }else{
+      serviceBoxData = {
+        "data": {
+          "service_box_three_title": serviceTitle,
+          "service_box_three_desc": serviceDescription,
+          // "service_box_three_icon": strapiImage
+        }
+      }
+    }
+
+    
+    console.log(serviceBoxData)
+    // /api/general-settings/:id
+    const res = await axios.put(`https://api.quickt.com.au/api/general-settings/1`, serviceBoxData, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+      },
+    });
+    console.log(res.data?.data?.id)
+    if (res.data?.data?.id) {
+      setServiceTitle('');
+      setServiceDescription('');
+      setSelectedImage(imageTemplate);
+      setStrapiImage(null);
+      alert("Service box updated successfully");
+    } else {
+      alert("Something went wrong");
+    }
+  };
+
   return (
     <div className={styles.parent}>
       <Tabs defaultValue={1}>
@@ -194,7 +248,7 @@ const GeneralSettingsMainContent = () => {
                 cols={10}
               ></textarea>
               <button
-              onClick={handleMainBannerUpdate}
+                onClick={handleMainBannerUpdate}
               >Update
               </button>
             </div>
@@ -209,7 +263,7 @@ const GeneralSettingsMainContent = () => {
                 <div style={{ width: "200px" }}>
                   <FormControl fullWidth>
                     <InputLabel id="demo-simple-select-label">
-                      Select Box No 
+                      Select Box No
                     </InputLabel>
                     <Select
                       labelId="demo-simple-select-label"
@@ -229,6 +283,8 @@ const GeneralSettingsMainContent = () => {
               </div>
               <p className="generalSettings_SubTextHeading">Title </p>
               <input
+                value={serviceTitle}
+                onChange={(e) => setServiceTitle(e.target.value)}
                 type="text"
                 placeholder={`Enter title here (We recommend title length less than 10)`}
                 style={{ border: "1px solid #999" }}
@@ -242,8 +298,9 @@ const GeneralSettingsMainContent = () => {
                       width: "283px",
                       height: "193px",
                       borderRadius: "10px",
+                      cursor: "pointer",
                     }}
-                    alt=""
+                    alt="icon"
                     onClick={handleImageClick}
                   />
 
@@ -251,13 +308,15 @@ const GeneralSettingsMainContent = () => {
                 <div>
                   <p className="generalSettings_SubTextHeading">Description</p>
                   <textarea
+                    value={serviceDescription}
+                    onChange={(e) => setServiceDescription(e.target.value)}
                     placeholder="Enter description"
                     rows={7}
                     cols={60}
                   ></textarea>
                 </div>
               </div>
-              <button className="generalSettings__serviceButton">
+              <button className="generalSettings__serviceButton" onClick={handleServiceBoxUpdate}>
                 Update Service {box} <img src={plusIcon} alt="icon" />
               </button>
             </div>
