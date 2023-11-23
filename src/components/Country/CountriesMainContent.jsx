@@ -30,6 +30,7 @@ import Switch from "react-switch";
 import IconImage from "../../assets/img/country/iconImage.png";
 import plusIcon from "../../assets/img/generalSettings/plus.svg";
 import { useQuery } from "react-query";
+import axios from "axios";
 
 
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -110,7 +111,7 @@ const CountriesMainContent = () => {
 
   // console.log(allCountry)
   const [selectedImage, setSelectedImage] = useState(IconImage);
-  const handleImageClick = () => {
+  const handleImageClick = () => {90
     const input = document.createElement("input");
     input.type = "file";
     input.accept = "image/*";

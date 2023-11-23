@@ -29,6 +29,7 @@ import { useState } from "react";
 import Switch from "react-switch";
 import IconImage from "../../assets/img/country/iconImage.png";
 import plusIcon from "../../assets/img/generalSettings/plus.svg";
+import { useQuery } from "react-query";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -60,6 +61,82 @@ const SendersMainContent = () => {
   const handleClearRows = () => {
     setSelectedRows([]);
   };
+  ////////////////////////////////////////////////////////////////////////
+  //fatches the senders info from the server
+  ////////////////////////////////////////////////////////////////////////
+  const fetchesSender = async () => {
+    const response = await fetch("https://api.quickt.com.au/api/users", {
+      headers: {
+        Authorization: `${localStorage.getItem("jwt")}`,
+      },
+    });
+    const data = await response.json();
+    console.log(data);
+    // return data.data
+    if (data) {
+      // console.log(data.data.data)
+      return data;
+    } else {
+      return [];
+      // throw new Error('Could not fetch users')
+    }
+  };
+  const {
+    isLoading: sendersLoading,
+    error: sendersError,
+    data: senders,
+  } = useQuery("allSenders", fetchesSender);
+
+  const allSenders = Array.isArray(senders)
+    ? senders?.map((item) => ({
+        id: item.id,
+        firstName: item.first_name,
+        lastName: item.last_name,
+        email: item.email,
+        phone: item.phone,
+        DOB: item.dob,
+        kyc: item.kyc_complete,
+        status: item.confirmed,
+      }))
+    : [];
+
+  ////////////////////////////////////////////////////////////////
+  //for only status enabled list
+  ////////////////////////////////////////////////////////////////////////
+  const enabledSender = Array.isArray(senders)
+    ? senders
+        ?.filter((item) => item.confirmed === true)
+        .map((item) => ({
+          id: item.id,
+          firstName: item.first_name,
+          lastName: item.last_name,
+          email: item.email,
+          phone: item.phone,
+          DOB: item.dob,
+          kyc: item.kyc_complete,
+          status: item.confirmed,
+        }))
+    : [];
+
+  ////////////////////////////////////////////////////////////////
+  //for only status enabled list
+  ////////////////////////////////////////////////////////////////////////
+  const disabledSender = Array.isArray(senders)
+    ? senders
+        ?.filter((item) => item.confirmed === false)
+        .map((item) => ({
+          id: item.id,
+          firstName: item.first_name,
+          lastName: item.last_name,
+          email: item.email,
+          phone: item.phone,
+          DOB: item.dob,
+          kyc: item.kyc_complete,
+          status: item.confirmed,
+        }))
+    : [];
+
+  // console.log(allSenders);
   const columns = [
     { field: "id", headerName: "ID", width: 70 },
     {
@@ -228,113 +305,15 @@ const SendersMainContent = () => {
     },
   ];
 
-  const rows = [
-    {
-      id: 1,
-      firstName: "ahad ",
-      lastName: "chowdhury",
-      email: "ahadalichowdhury@gmail.com",
-      phone: "01700000000",
-      DOB: "28/09/2001",
-      kyc: true,
-      status: false,
-    },
-    {
-      id: 2,
-      firstName: "ahad ",
-      lastName: "chowdhury",
-      email: "ahadalichowdhury@gmail.com",
-      phone: "01700000000",
-      DOB: "28/09/2001",
-      kyc: true,
-      status: true,
-    },
-    {
-      id: 3,
-      firstName: "ahad ",
-      lastName: "chowdhury",
-      email: "ahadalichowdhury@gmail.com",
-      phone: "01700000000",
-      DOB: "28/09/2001",
-      kyc: true,
-      status: false,
-    },
-    {
-      id: 4,
-      firstName: "ahad ",
-      lastName: "chowdhury",
-      email: "ahadalichowdhury@gmail.com",
-      phone: "01700000000",
-      DOB: "28/09/2001",
-      kyc: true,
-      status: true,
-    },
-    {
-      id: 5,
-      firstName: "ahad ",
-      lastName: "chowdhury",
-      email: "ahadalichowdhury@gmail.com",
-      phone: "01700000000",
-      DOB: "28/09/2001",
-      kyc: true,
-      status: true,
-    },
-  ];
-  const rows2 = [
-    {
-      id: 2,
-      firstName: "ahad ",
-      lastName: "chowdhury",
-      email: "ahadalichowdhury@gmail.com",
-      phone: "01700000000",
-      DOB: "28/09/2001",
-      kyc: true,
-      status: true,
-    },
-    {
-      id: 4,
-      firstName: "ahad ",
-      lastName: "chowdhury",
-      email: "ahadalichowdhury@gmail.com",
-      phone: "01700000000",
-      DOB: "28/09/2001",
-      kyc: true,
-      status: true,
-    },
-    {
-      id: 5,
-      firstName: "ahad ",
-      lastName: "chowdhury",
-      email: "ahadalichowdhury@gmail.com",
-      phone: "01700000000",
-      DOB: "28/09/2001",
-      kyc: true,
-      status: true,
-    },
-  ];
-
-  const rows3 = [
-    {
-      id: 1,
-      firstName: "ahad ",
-      lastName: "chowdhury",
-      email: "ahadalichowdhury@gmail.com",
-      phone: "01700000000",
-      DOB: "28/09/2001",
-      kyc: true,
-      status: false,
-    },
-  ];
-
   return (
     <div className={styles.parent} style={{ position: "relative" }}>
       <Tabs defaultValue={1}>
         <TabsList>
           <Tab value={1} onClick={handleClearRows}>
-            All - 30
+            All - {senders?.length}
           </Tab>
-          <Tab value={2}>Enabled - 10</Tab>
-          <Tab value={3}>Disabled - 5</Tab>
+          <Tab value={2}>Enabled - {enabledSender?.length}</Tab>
+          <Tab value={3}>Disabled - {disabledSender?.length}</Tab>
         </TabsList>
         {selectedRows.length > 1 && (
           <Box
@@ -397,7 +376,7 @@ const SendersMainContent = () => {
         <TabPanel value={1}>
           <div style={{ height: "auto", width: "100%" }}>
             <DataGrid
-              rows={rows}
+              rows={allSenders}
               columns={columns}
               initialState={{
                 pagination: {
@@ -409,7 +388,7 @@ const SendersMainContent = () => {
               // by default seleted row is first row
               onRowSelectionModelChange={(ids) => {
                 const selectedIDs = new Set(ids);
-                const selectedRowData = rows.filter((row) =>
+                const selectedRowData = allSenders.filter((row) =>
                   // selectedIDs.has(row.id.toString())
                   selectedIDs.has(row.id)
                 );
@@ -420,7 +399,7 @@ const SendersMainContent = () => {
         </TabPanel>
         <TabPanel value={2}>
           <DataGrid
-            rows={rows2}
+            rows={enabledSender}
             columns={columns}
             initialState={{
               pagination: {
@@ -431,7 +410,7 @@ const SendersMainContent = () => {
             checkboxSelection
             onRowSelectionModelChange={(ids) => {
               const selectedIDs = new Set(ids);
-              const selectedRowData = rows.filter((row) =>
+              const selectedRowData = enabledSender.filter((row) =>
                 // selectedIDs.has(row.id.toString())
                 selectedIDs.has(row.id)
               );
@@ -441,7 +420,7 @@ const SendersMainContent = () => {
         </TabPanel>
         <TabPanel value={3}>
           <DataGrid
-            rows={rows3}
+            rows={disabledSender}
             columns={columns}
             initialState={{
               pagination: {
@@ -452,7 +431,7 @@ const SendersMainContent = () => {
             checkboxSelection
             onRowSelectionModelChange={(ids) => {
               const selectedIDs = new Set(ids);
-              const selectedRowData = rows.filter((row) =>
+              const selectedRowData = disabledSender.filter((row) =>
                 // selectedIDs.has(row.id.toString())
                 selectedIDs.has(row.id)
               );
