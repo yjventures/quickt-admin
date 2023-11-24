@@ -10,6 +10,7 @@ import Senders from '../pages/Senders/Senders';
 import GeneralSettings from '../pages/GenSettings/GeneralSettings';
 import Receivers from '../pages/Receivers/Receivers';
 import Partners from '../pages/Partners/Partners';
+import Transaction from '../pages/Transactions/Transaction';
 // import ProtectedRoute from './ProtectedRoute';
 
 const routes = createBrowserRouter([
@@ -54,6 +55,11 @@ const routes = createBrowserRouter([
             {
                 path: 'revenue',
                 element: <TotalRevenue />,
+                errorElement: <ErrorPage />,
+            },
+            {
+                path: 'transections',
+                element: <Transaction />,
                 errorElement: <ErrorPage />,
             },
         ],

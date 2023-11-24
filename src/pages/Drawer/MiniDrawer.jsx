@@ -33,6 +33,10 @@ import revenueIcon from '../../assets/img/drawer/revenue.svg';
 import revenueIconWhite from '../../assets/img/drawer/revenue-white.svg';
 import usersIcon from '../../assets/img/drawer/users.svg';
 import usersIconWhite from '../../assets/img/drawer/users-white.svg';
+import partnershipIcon from '../../assets/img/drawer/partnership.svg';
+import partnershipIconWhite from '../../assets/img/drawer/partnership-white.svg';
+import transactionIcon from '../../assets/img/drawer/transaction.svg';
+import transactionIconWhite from '../../assets/img/drawer/transaction-white.svg';
 import { AuthContext } from '../../provider/AuthProvider';
 import LogoutIcon from '@mui/icons-material/Logout';
 
@@ -195,7 +199,8 @@ export default function MiniDrawer() {
                     <CustomList icon={usersIcon} whiteIcon={usersIconWhite} text="Senders" link="senders" pathText={pathText} />
                     <CustomList icon={pendingIcon} whiteIcon={pendingIconWhite} text="Receivers" link="receivers" pathText={pathText} />
                     <CustomList icon={revenueIcon} whiteIcon={revenueIconWhite} text="Revenue" link="revenue" pathText={pathText} />
-                    <CustomList icon={revenueIcon} whiteIcon={revenueIconWhite} text="Partners" link="partners" pathText={pathText} />
+                    <CustomList icon={partnershipIcon} whiteIcon={partnershipIconWhite} text="Partners" link="partners" pathText={pathText} />
+                    <CustomList icon={transactionIcon} whiteIcon={transactionIconWhite} text="Transections" link="transections" pathText={pathText} />
                 </List>
                 {/* logout button */}
                 <List sx={{ position: 'absolute', bottom: 0, left: 10, width: '100%' }}>
