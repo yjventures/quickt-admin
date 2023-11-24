@@ -27,6 +27,26 @@ const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 const SendersMainContent = () => {
+  ////////////////////////////////////////////////////////////////
+  //for focusing image
+  ////////////////////////////////////////////////////////////////
+
+  const [isProfileFullSize, setIsProfileFullSize] = useState(false);
+
+  const toggleProfileFullSize = () => {
+    setIsProfileFullSize(!isProfileFullSize);
+  };
+  const [isFrontFullSize, setIsFrontFullSize] = useState(false);
+
+  const toggleFrontFullSize = () => {
+    setIsFrontFullSize(!isFrontFullSize);
+  };
+
+  const [isBackFullSize, setIsBackFullSize] = useState(false);
+
+  const toggleBackFullSize = () => {
+    setIsBackFullSize(!isBackFullSize);
+  };
   ////////////////////////////////////////////////////////////////////////
   //action buttons
   ////////////////////////////////////////////////////////////////////////
@@ -658,16 +678,42 @@ const SendersMainContent = () => {
                       Personal Details
                     </p>
                     <div style={{ display: "flex" }}>
-                      <div>
+                      <div style={{ position: "relative" }}>
                         <img
                           src={avatarDemo}
                           alt="icon"
                           style={{
-                            height: "258px",
+                            height: "298px",
                             width: "285px",
                             borderRadius: "24px",
                           }}
                         />
+                        <div
+                          style={{
+                            position: "absolute",
+                            width: "70%",
+                            bottom: "40px",
+                            padding: "12px 20px",
+                            backgroundColor: "rgba(255, 255, 255, 0.80)",
+                            borderRadius: "50px",
+                            left: "40px",
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                          }}
+                        >
+                          <div>
+                            <p
+                              style={{
+                                fontSize: "15px",
+                                fontWeight: "500",
+                                color: "#000",
+                              }}
+                            >
+                              Verification Photo
+                            </p>
+                          </div>
+                        </div>
                       </div>
                       <div style={{ paddingTop: "20px" }}>
                         <p
@@ -873,28 +919,167 @@ const SendersMainContent = () => {
                     >
                       Submitted Documents
                     </p>
-                    <div>
+                    <div style={{ position: "relative" }}>
                       <img
-                        src={frontId}
+                        src="https://bpsbd.org/wp-content/uploads/2021/03/NID-c137030591d94c73b8ff0db8a5a9311e.jpg"
                         alt="icon"
                         style={{
-                          height: "336px",
-                          width: "350px",
+                          height: isFrontFullSize ? "100%" : "286px",
+                          width: isFrontFullSize ? "100%" : "350px",
                           borderRadius: "24px",
                           marginBottom: "20px",
+                          cursor: "pointer",
                         }}
+                        onClick={toggleFrontFullSize}
                       />
+                      {isFrontFullSize && (
+                        <div
+                          style={{
+                            position: "fixed",
+                            top: 0,
+                            left: 0,
+                            width: "100%",
+                            height: "100%",
+                            backgroundColor: "rgba(0, 0, 0, 0.8)",
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            zIndex: 9999,
+                          }}
+                          onClick={toggleFrontFullSize}
+                        >
+                          <img
+                            src="https://bpsbd.org/wp-content/uploads/2021/03/NID-c137030591d94c73b8ff0db8a5a9311e.jpg"
+                            alt="icon"
+                            style={{
+                              maxHeight: "90%",
+                              maxWidth: "90%",
+                              borderRadius: "24px",
+                            }}
+                          />
+                        </div>
+                      )}
+                      <div
+                        style={{
+                          position: "absolute",
+                          width: "90%",
+                          bottom: "40px",
+                          padding: "12px 20px",
+                          backgroundColor: "rgba(255, 255, 255, 0.80)",
+                          borderRadius: "30px",
+                          left: "18px",
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                        }}
+                      >
+                        <div>
+                          <p
+                            style={{
+                              fontSize: "15px",
+                              fontWeight: "500",
+                              color: "#000",
+                            }}
+                          >
+                            ID Front
+                          </p>
+                        </div>
+                        <div>
+                          <p
+                            style={{
+                              backgroundColor: "rgba(255, 255, 255, 0.80)",
+                              border: "1px solid black",
+                              borderRadius: "16px",
+                              padding: "4px 14px",
+                              cursor: "pointer",
+                            }}
+                            onClick={toggleFrontFullSize}
+                          >
+                            view
+                          </p>
+                        </div>
+                      </div>
                     </div>
-                    <div>
+                    <div style={{ position: "relative" }}>
                       <img
-                        src={frontId}
+                        src="https://bpsbd.org/wp-content/uploads/2021/03/NID-c137030591d94c73b8ff0db8a5a9311e.jpg"
                         alt="icon"
                         style={{
-                          height: "336px",
-                          width: "350px",
+                          height: isBackFullSize ? "100%" : "286px",
+                          width: isBackFullSize ? "100%" : "350px",
                           borderRadius: "24px",
+                          marginBottom: "20px",
+                          cursor: "pointer",
                         }}
+                        onClick={toggleBackFullSize}
                       />
+                      {isBackFullSize && (
+                        <div
+                          style={{
+                            position: "fixed",
+                            top: 0,
+                            left: 0,
+                            width: "100%",
+                            height: "100%",
+                            backgroundColor: "rgba(0, 0, 0, 0.8)",
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            zIndex: 9999,
+                          }}
+                          onClick={toggleBackFullSize}
+                        >
+                          <img
+                            src="https://bpsbd.org/wp-content/uploads/2021/03/NID-c137030591d94c73b8ff0db8a5a9311e.jpg"
+                            alt="icon"
+                            style={{
+                              maxHeight: "90%",
+                              maxWidth: "90%",
+                              borderRadius: "24px",
+                            }}
+                          />
+                        </div>
+                      )}
+                      <div
+                        style={{
+                          position: "absolute",
+                          width: "90%",
+                          bottom: "40px",
+                          padding: "12px 20px",
+                          backgroundColor: "rgba(255, 255, 255, 0.80)",
+                          borderRadius: "30px",
+                          left: "18px",
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                        }}
+                      >
+                        <div>
+                          <p
+                            style={{
+                              fontSize: "15px",
+                              fontWeight: "500",
+                              color: "#000",
+                            }}
+                          >
+                            ID Back
+                          </p>
+                        </div>
+                        <div>
+                          <p
+                            style={{
+                              backgroundColor: "rgba(255, 255, 255, 0.80)",
+                              border: "1px solid black",
+                              borderRadius: "16px",
+                              padding: "4px 14px",
+                              cursor: "pointer",
+                            }}
+                            onClick={toggleBackFullSize}
+                          >
+                            view
+                          </p>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
