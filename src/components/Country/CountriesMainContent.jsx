@@ -8,30 +8,24 @@ import { TabPanel as BaseTabPanel } from "@mui/base/TabPanel";
 import { buttonClasses } from "@mui/base/Button";
 import { Tab as BaseTab, tabClasses } from "@mui/base/Tab";
 import { DataGrid } from "@mui/x-data-grid";
-import { Button, Menu, MenuItem } from '@mui/material';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-import ArrowIcon from '../../assets/img/country/arrow.svg';
-import disableIcon from '../../assets/img/country/disable.svg';
-import editIcon from '../../assets/img/country/edit.svg';
-import deleteIcon from '../../assets/img/country/delete.svg';
-import Dialog from '@mui/material/Dialog';
-import ListItemText from '@mui/material/ListItemText';
-import ListItem from '@mui/material/ListItem';
-import List from '@mui/material/List';
-import Divider from '@mui/material/Divider';
-import AppBar from '@mui/material/AppBar';
-import Toolbar from '@mui/material/Toolbar';
-import IconButton from '@mui/material/IconButton';
-import Typography from '@mui/material/Typography';
-import CloseIcon from '@mui/icons-material/Close';
-import Slide from '@mui/material/Slide';
+import { Button, Menu, MenuItem } from "@mui/material";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+import ArrowIcon from "../../assets/img/country/arrow.svg";
+import disableIcon from "../../assets/img/country/disable.svg";
+import editIcon from "../../assets/img/country/edit.svg";
+import deleteIcon from "../../assets/img/country/delete.svg";
+import Dialog from "@mui/material/Dialog";
+import { Modal, Typography } from "@mui/material";
+import IconButton from "@mui/material/IconButton";
+
+import CloseIcon from "@mui/icons-material/Close";
+import Slide from "@mui/material/Slide";
 import { useState } from "react";
 import Switch from "react-switch";
 import IconImage from "../../assets/img/country/iconImage.png";
 import plusIcon from "../../assets/img/generalSettings/plus.svg";
 import { useQuery } from "react-query";
 import axios from "axios";
-
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -42,7 +36,7 @@ const CountriesMainContent = () => {
   console.log(selectedRows);
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
-  const [selectedAction, setSelectedAction] = React.useState('');
+  const [selectedAction, setSelectedAction] = React.useState("");
   const handleClickOpen = (action) => {
     setSelectedAction(action);
     console.log(action);
@@ -60,58 +54,71 @@ const CountriesMainContent = () => {
   };
   const handleClearRows = () => {
     setSelectedRows([]);
-  }
+  };
 
   const fetchCounties = async () => {
-    const response = await fetch('https://api.quickt.com.au/api/countries', {
+    const response = await fetch("https://api.quickt.com.au/api/countries", {
       headers: {
-        'Authorization': `${localStorage.getItem('jwt')}`
-      }
-    })
+        Authorization: `${localStorage.getItem("jwt")}`,
+      },
+    });
     const data = await response.json();
     // return data.data
     if (data.data) {
       // console.log(data.data.data)
-      return data.data
+      return data.data;
     } else {
       return [];
       // throw new Error('Could not fetch users')
     }
-  }
-  const { isLoading: countriesLoading, error: countriesError, data: countries } = useQuery('allCountry', fetchCounties);
+  };
+  const {
+    isLoading: countriesLoading,
+    error: countriesError,
+    data: countries,
+  } = useQuery("allCountry", fetchCounties);
   // Check if countries is an array before calling map
-  console.log()
-  const allCountry = Array.isArray(countries) ? countries?.map((item) => ({
-    id: item.id,
-    name: item.attributes?.name,
-    code: item.attributes?.code,
-    image: item.attributes?.icon,
-    enabled: item.attributes?.enabled,
-  })) : [];
+  console.log();
+  const allCountry = Array.isArray(countries)
+    ? countries?.map((item) => ({
+        id: item.id,
+        name: item.attributes?.name,
+        code: item.attributes?.code,
+        image: item.attributes?.icon,
+        enabled: item.attributes?.enabled,
+      }))
+    : [];
   // get only enabled countries
-  const enabledCountries = Array.isArray(countries) ? countries?.filter((item) => item.attributes?.enabled === true).map((item) => ({
-    id: item.id,
-    name: item.attributes?.name,
-    code: item.attributes?.code,
-    image: item.attributes?.icon,
-    enabled: item.attributes?.enabled,
-  })) : [];
+  const enabledCountries = Array.isArray(countries)
+    ? countries
+        ?.filter((item) => item.attributes?.enabled === true)
+        .map((item) => ({
+          id: item.id,
+          name: item.attributes?.name,
+          code: item.attributes?.code,
+          image: item.attributes?.icon,
+          enabled: item.attributes?.enabled,
+        }))
+    : [];
   // get only disabled countries
-  const disabledCountries = Array.isArray(countries) ? countries?.filter((item) => {
-    return item.attributes?.enabled === false;
-  }).map((item) => ({
-    id: item.id,
-    name: item.attributes?.name,
-    code: item.attributes?.code,
-    image: item.attributes?.icon,
-    enabled: item.attributes?.enabled,
-  })) : [];
-
-
+  const disabledCountries = Array.isArray(countries)
+    ? countries
+        ?.filter((item) => {
+          return item.attributes?.enabled === false;
+        })
+        .map((item) => ({
+          id: item.id,
+          name: item.attributes?.name,
+          code: item.attributes?.code,
+          image: item.attributes?.icon,
+          enabled: item.attributes?.enabled,
+        }))
+    : [];
 
   // console.log(allCountry)
   const [selectedImage, setSelectedImage] = useState(IconImage);
-  const handleImageClick = () => {90
+  const handleImageClick = () => {
+    90;
     const input = document.createElement("input");
     input.type = "file";
     input.accept = "image/*";
@@ -149,7 +156,10 @@ const CountriesMainContent = () => {
       headerName: "Country name",
       width: 130,
     },
-    { field: "code", headerName: "Code", width: 130,
+    {
+      field: "code",
+      headerName: "Code",
+      width: 130,
       renderCell: (params) => (
         <div style={{ display: "flex", alignItems: "center" }}>
           {params.row.code ? params.row.code : "Not available"}
@@ -173,7 +183,7 @@ const CountriesMainContent = () => {
             marginRight: 10,
           }}
           src={`${params.row.image}`}
-        // alt="user-image"
+          // alt="user-image"
         />
       ),
     },
@@ -193,7 +203,9 @@ const CountriesMainContent = () => {
             alignItems: "center",
             height: "25px",
             width: "75px",
-            backgroundColor: `${params.row.enabled == true ? "#DCFDD4" : "#FDD4D4"}`,
+            backgroundColor: `${
+              params.row.enabled == true ? "#DCFDD4" : "#FDD4D4"
+            }`,
             borderRadius: "15px",
             // border: `${params.row.enabled == true ? '1px solid #007FFF' : '1px solid #FFA800'}`,
             color: `${params.row.enabled == true ? "#4FAC16" : "#AC1616"}`,
@@ -207,10 +219,10 @@ const CountriesMainContent = () => {
       ),
     },
     {
-      field: 'action',
-      headerName: 'Action',
+      field: "action",
+      headerName: "Action",
       width: 150,
-      type: 'number',
+      type: "number",
       renderCell: (params) => {
         const [anchorEl, setAnchorEl] = React.useState(null);
 
@@ -226,72 +238,185 @@ const CountriesMainContent = () => {
           <div>
             <div
               style={{
-                background: 'transparent',
-                border: '1px solid #999',
-                borderRadius: '25px',
-                outline: 'none',
-                cursor: 'pointer',
-                width: '100px',
-                fontSize: '12px',
-                color: '#000',
-                fontFamily: 'Open Sans',
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                padding: '5px 10px',
+                background: "transparent",
+                border: "1px solid #999",
+                borderRadius: "25px",
+                outline: "none",
+                cursor: "pointer",
+                width: "100px",
+                fontSize: "12px",
+                color: "#000",
+                fontFamily: "Open Sans",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                padding: "5px 10px",
               }}
               onClick={handleClick}
             >
               Action
-              <img src={ArrowIcon} alt="icon" style={{ marginLeft: '10px' }} />
+              <img src={ArrowIcon} alt="icon" style={{ marginLeft: "10px" }} />
             </div>
             <Menu
               anchorEl={anchorEl}
               open={Boolean(anchorEl)}
               onClose={handleClose}
               style={{
-                marginLeft: '-20px',
-                boxShadow: 'none',
+                marginLeft: "-20px",
+                boxShadow: "none",
               }}
             >
-              <MenuItem onClick={() => handleClickOpen('disable')}>
-                <img style={{ marginRight: "10px" }} src={disableIcon} alt="icon" />
+              <MenuItem onClick={() => handleClickOpen("disable")}>
+                <img
+                  style={{ marginRight: "10px" }}
+                  src={disableIcon}
+                  alt="icon"
+                />
                 Disable
               </MenuItem>
-              <MenuItem onClick={() => handleClickOpen('edit')}>
-                <img style={{ marginRight: "10px" }} src={editIcon} alt="icon" />
+              <MenuItem onClick={() => handleClickOpen("edit")}>
+                <img
+                  style={{ marginRight: "10px" }}
+                  src={editIcon}
+                  alt="icon"
+                />
                 Edit
               </MenuItem>
-              <MenuItem onClick={() => handleClickOpen('delete')}>
-                <img style={{ marginRight: "10px" }} src={deleteIcon} alt="icon" />
+              <MenuItem onClick={() => handleClickOpen("delete")}>
+                <img
+                  style={{ marginRight: "10px" }}
+                  src={deleteIcon}
+                  alt="icon"
+                />
                 Delete
               </MenuItem>
             </Menu>
           </div>
         );
       },
-    }
+    },
   ];
 
+  ////////////////////////////////////////////////////////////////
+  //for delete the contries with multirow
+  ////////////////////////////////////////////////////////////////
+  const [deleteModalOpen, setDeleteModalOpen] = React.useState(false);
+  const handleDeleteModalOpen = () => setDeleteModalOpen(true);
+  const handleDeleteModalClose = () => setDeleteModalOpen(false);
+  const deleteModalStyle = {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: 600,
+    bgcolor: "background.paper",
+    boxShadow: 24,
+    borderRadius: "24px",
+    p: 4,
+  };
+
+  const callDeleteApi = () => {
+    const deletePromises = selectedRows.map((item) =>
+      axios
+        .delete(`https://api.quickt.com.au/api/countries/${item.id}`)
+        .then((res) => console.log(res))
+        .catch((error) => console.error(error))
+    );
+
+    // Wait for all delete promises to resolve or reject
+    Promise.all(deletePromises)
+      .then((results) => {
+        // Handle the results if needed
+        console.log(results);
+        handleDeleteModalClose();
+        window.location.reload();
+      })
+      .catch((error) => {
+        // Handle errors from any of the delete requests
+        console.error(error);
+      });
+  };
+
+  ////////////////////////////////////////////////////////////////
+  //for disable the countries with multirow
+  ////////////////////////////////////////////////////////////////
+  const [disableModalOpen, setDisableModalOpen] = React.useState(false);
+  const handleDisableModalOpen = () => setDisableModalOpen(true);
+  const handleDisableModalClose = () => setDisableModalOpen(false);
+  const disableModalStyle = {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: 600,
+    bgcolor: "background.paper",
+    boxShadow: 24,
+    borderRadius: "24px",
+    p: 4,
+  };
+
+  const callDisableApi = () => {
+    const disablePromises = selectedRows.map((item) =>
+      axios
+        .put(
+          `https://api.quickt.com.au/api/countries/${item.id}`,
+          {
+            data: {
+              enabled: false,
+            },
+          },
+          {
+            headers: {
+              Authorization: `${localStorage.getItem("jwt")}`,
+              // Add other headers if needed
+            },
+          }
+        )
+        .then((res) => console.log(res))
+        .catch((error) => console.error(error))
+    );
+
+    // Wait for all disable promises to resolve or reject
+    Promise.all(disablePromises)
+      .then((results) => {
+        // Handle the results if needed
+        console.log(results);
+        handleDeleteModalClose();
+        window.location.reload();
+      })
+      .catch((error) => {
+        // Handle errors from any of the disable requests
+        console.error(error);
+      });
+  };
 
   return (
     <div className={styles.parent} style={{ position: "relative" }}>
       <Tabs defaultValue={1}>
         <TabsList>
-          <Tab onClick={handleClearRows} value={1} >All- {countries?.length}</Tab>
+          <Tab onClick={handleClearRows} value={1}>
+            All- {countries?.length}
+          </Tab>
           <Tab value={2}>Enabled - {enabledCountries?.length}</Tab>
           <Tab value={3}>Disabled - {disabledCountries.length}</Tab>
         </TabsList>
-        {
-          selectedRows.length > 1 && <Box sx={{ display: 'flex', gap: 1, position: "absolute", top: "15px", right: '35px' }}>
+        {selectedRows.length > 1 && (
+          <Box
+            sx={{
+              display: "flex",
+              gap: 1,
+              position: "absolute",
+              top: "15px",
+              right: "35px",
+            }}
+          >
             <button
               onClick={() => {
-                alert('Call disable api here')
-                setSelectedRows([])
+                handleDisableModalOpen();
               }}
               style={{
                 padding: "12px 20px",
-                width: '170px',
+                width: "170px",
                 border: "none",
                 borderRadius: "20px",
                 backgroundColor: "#FDD4D4",
@@ -304,17 +429,56 @@ const CountriesMainContent = () => {
                 gap: "15px",
               }}
             >
-              Disable countries
+              Disable Countries
               {/* <img src={plusIcon} alt="icon" /> */}
             </button>
+
+            {/* disable modal */}
+            <Modal
+              open={disableModalOpen}
+              onClose={handleDisableModalClose}
+              aria-labelledby="modal-modal-title"
+              aria-describedby="modal-modal-description"
+            >
+              <Box sx={disableModalStyle}>
+                <Typography id="" sx={{ fontSize: 30 }}>
+                  Are you sure you want to disable those Countries?
+                </Typography>
+                <Button
+                  variant="contained"
+                  color="success"
+                  onClick={() => {
+                    callDisableApi();
+                    setSelectedRows([]);
+                  }}
+                  style={{
+                    padding: "10px 30px",
+                    marginTop: "20px",
+                  }}
+                >
+                  Yes
+                </Button>
+                <Button
+                  variant="contained"
+                  color="error"
+                  onClick={handleDisableModalClose}
+                  style={{
+                    marginLeft: "20px",
+                    padding: "10px 30px",
+                    marginTop: "20px",
+                  }}
+                >
+                  No
+                </Button>
+              </Box>
+            </Modal>
             <button
               onClick={() => {
-                alert('Call delete api here')
-                setSelectedRows([])
+                handleDeleteModalOpen();
               }}
               style={{
                 padding: "12px 20px",
-                width: '170px',
+                width: "170px",
                 border: "none",
                 borderRadius: "20px",
                 backgroundColor: "#BE3144",
@@ -327,11 +491,50 @@ const CountriesMainContent = () => {
                 gap: "15px",
               }}
             >
-              Delete countries
+              Delete Countries
               {/* <img src={plusIcon} alt="icon" /> */}
             </button>
+            {/* delete modal */}
+            <Modal
+              open={deleteModalOpen}
+              onClose={handleDeleteModalClose}
+              aria-labelledby="modal-modal-title"
+              aria-describedby="modal-modal-description"
+            >
+              <Box sx={deleteModalStyle}>
+                <Typography id="" sx={{ fontSize: 30 }}>
+                  Are you sure you want to delete those Countries?
+                </Typography>
+                <Button
+                  variant="contained"
+                  color="success"
+                  onClick={() => {
+                    callDeleteApi();
+                    setSelectedRows([]);
+                  }}
+                  style={{
+                    padding: "10px 30px",
+                    marginTop: "20px",
+                  }}
+                >
+                  Yes
+                </Button>
+                <Button
+                  variant="contained"
+                  color="error"
+                  onClick={handleDeleteModalClose}
+                  style={{
+                    marginLeft: "20px",
+                    padding: "10px 30px",
+                    marginTop: "20px",
+                  }}
+                >
+                  No
+                </Button>
+              </Box>
+            </Modal>
           </Box>
-        }
+        )}
         {/* all countries */}
         <TabPanel value={1}>
           <div style={{ height: "auto", width: "100%" }}>
@@ -351,7 +554,7 @@ const CountriesMainContent = () => {
                 const selectedRowData = countries.filter((row) =>
                   // selectedIDs.has(row.id.toString())
                   selectedIDs.has(row.id)
-                )
+                );
                 setSelectedRows(selectedRowData);
               }}
             />
@@ -374,7 +577,7 @@ const CountriesMainContent = () => {
               const selectedRowData = enabledCountries.filter((row) =>
                 // selectedIDs.has(row.id.toString())
                 selectedIDs.has(row.id)
-              )
+              );
               setSelectedRows(selectedRowData);
             }}
           />
@@ -396,7 +599,7 @@ const CountriesMainContent = () => {
               const selectedRowData = disabledCountries.filter((row) =>
                 // selectedIDs.has(row.id.toString())
                 selectedIDs.has(row.id)
-              )
+              );
               setSelectedRows(selectedRowData);
             }}
           />
@@ -409,12 +612,14 @@ const CountriesMainContent = () => {
         onClose={handleClose}
         TransitionComponent={Transition}
       >
-        <Box style={{
-          height: '100%',
-          padding: '10px',
-        }}>
+        <Box
+          style={{
+            height: "100%",
+            padding: "10px",
+          }}
+        >
           <IconButton
-            style={{ position: 'absolute', right: '5px', top: '5px' }}
+            style={{ position: "absolute", right: "5px", top: "5px" }}
             edge="start"
             color="inherit"
             onClick={handleClose}
@@ -423,32 +628,41 @@ const CountriesMainContent = () => {
             <CloseIcon />
           </IconButton>
           <Box sx={{ ml: 1 }}>
-            {
-              selectedAction === 'disable' && <Box>
-                <h2>
-                  Are you sure you want to DISABLE this country?
-                </h2>
+            {selectedAction === "disable" && (
+              <Box>
+                <h2>Are you sure you want to DISABLE this country?</h2>
                 <Box sx={{ mt: 3 }}>
-                  <Button variant="contained" color="error" onClick={() => alert('Call disbale api here')} >
+                  <Button
+                    variant="contained"
+                    color="error"
+                    onClick={() => alert("Call disbale api here")}
+                  >
                     Confim Disable
                   </Button>
-                  <Button variant="contained" color="success" sx={{ ml: 2 }} onClick={handleClose} >
+                  <Button
+                    variant="contained"
+                    color="success"
+                    sx={{ ml: 2 }}
+                    onClick={handleClose}
+                  >
                     Do not disable
                   </Button>
                 </Box>
               </Box>
-            }
-            {
-              selectedAction === 'edit' && <Box sx={{ ml: 2 }}>
-                <h2>
-                  Edit country
-                </h2>
+            )}
+            {selectedAction === "edit" && (
+              <Box sx={{ ml: 2 }}>
+                <h2>Edit country</h2>
                 <Box sx={{ mt: 3 }}>
                   <Typography id="modal-modal-description" sx={{ mt: 2 }}>
                     <p className="generalSettings_SubTextHeading">Icon</p>
                     <img
                       src={selectedImage}
-                      style={{ width: "270px", height: "180px", cursor: "pointer" }}
+                      style={{
+                        width: "270px",
+                        height: "180px",
+                        cursor: "pointer",
+                      }}
                       alt=""
                       onClick={handleImageClick}
                     />
@@ -464,7 +678,7 @@ const CountriesMainContent = () => {
                         fontSize: "20px",
                         borderRadius: "16px",
                         border: "1px solid #E9E9EA",
-                        outline: 'none'
+                        outline: "none",
                       }}
                     />
 
@@ -481,40 +695,53 @@ const CountriesMainContent = () => {
                         fontSize: "20px",
                         borderRadius: "16px",
                         border: "1px solid #E9E9EA",
-                        outline: 'none'
+                        outline: "none",
                       }}
                     />
                     <p className="generalSettings_SubTextHeading">Enabled</p>
                     <Switch onChange={handleChange} checked={checked} />
-
                   </Typography>
                   <Box sx={{ mt: 3 }}>
-                    <Button variant="contained" color="success" onClick={() => alert('Call edit api here')} >
+                    <Button
+                      variant="contained"
+                      color="success"
+                      onClick={() => alert("Call edit api here")}
+                    >
                       Confim Update
                     </Button>
-                    <Button variant="outlined" sx={{ ml: 2 }} onClick={handleClose} >
+                    <Button
+                      variant="outlined"
+                      sx={{ ml: 2 }}
+                      onClick={handleClose}
+                    >
                       Cancel
                     </Button>
                   </Box>
-
                 </Box>
               </Box>
-            }
-            {
-              selectedAction === 'delete' && <Box>
-                <h2>
-                  Are you sure you want to DELETE this country?
-                </h2>
+            )}
+            {selectedAction === "delete" && (
+              <Box>
+                <h2>Are you sure you want to DELETE this country?</h2>
                 <Box sx={{ mt: 3 }}>
-                  <Button variant="contained" color="error" onClick={() => alert('Call disbale api here')} >
+                  <Button
+                    variant="contained"
+                    color="error"
+                    onClick={() => alert("Call disbale api here")}
+                  >
                     Confim delete
                   </Button>
-                  <Button variant="contained" color="success" sx={{ ml: 2 }} onClick={handleClose} >
+                  <Button
+                    variant="contained"
+                    color="success"
+                    sx={{ ml: 2 }}
+                    onClick={handleClose}
+                  >
                     Do not delete
                   </Button>
                 </Box>
               </Box>
-            }
+            )}
           </Box>
         </Box>
       </Dialog>
@@ -594,7 +821,8 @@ const TabPanel = styled(BaseTabPanel)(
     padding: 20px 12px;
     text-align: start;
     // background: ${theme.palette.mode === "dark" ? grey[900] : "#fff"};
-    // border: 1px solid ${theme.palette.mode === "dark" ? grey[700] : grey[200]
+    // border: 1px solid ${
+      theme.palette.mode === "dark" ? grey[700] : grey[200]
     };
     border-radius: 12px;
     `
@@ -610,7 +838,8 @@ const TabsList = styled(BaseTabsList)(
     align-items: center;
     justify-content: center;
     align-content: space-between;
-    // box-shadow: 0px 4px 30px ${theme.palette.mode === "dark" ? grey[900] : grey[200]
+    // box-shadow: 0px 4px 30px ${
+      theme.palette.mode === "dark" ? grey[900] : grey[200]
     };
     `
 );

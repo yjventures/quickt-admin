@@ -8,7 +8,7 @@ import { TabPanel as BaseTabPanel } from "@mui/base/TabPanel";
 import { buttonClasses } from "@mui/base/Button";
 import { Tab as BaseTab, tabClasses } from "@mui/base/Tab";
 import { DataGrid } from "@mui/x-data-grid";
-import { Button, Menu, MenuItem } from "@mui/material";
+import { Button, Menu, MenuItem, Modal } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import ArrowIcon from "../../assets/img/country/arrow.svg";
 import disableIcon from "../../assets/img/country/disable.svg";
@@ -266,6 +266,46 @@ const PartnersMainContent = () => {
     },
   ];
 
+  ////////////////////////////////////////////////////////////////
+  //for delete the partner with multirow
+  ////////////////////////////////////////////////////////////////
+  const [deleteModalOpen, setDeleteModalOpen] = React.useState(false);
+  const handleDeleteModalOpen = () => setDeleteModalOpen(true);
+  const handleDeleteModalClose = () => setDeleteModalOpen(false);
+  const deleteModalStyle = {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: 600,
+    bgcolor: "background.paper",
+    border: "2px solid #000",
+    boxShadow: 24,
+    borderRadius: "24px",
+    p: 4,
+  };
+
+  const callDeleteApi = () => {
+    const deletePromises = selectedRows.map((item) =>
+      axios
+        .delete(`https://api.quickt.com.au/api/partners/${item.id}`)
+        .then((res) => console.log(res))
+        .catch((error) => console.error(error))
+    );
+
+    // Wait for all delete promises to resolve or reject
+    Promise.all(deletePromises)
+      .then((results) => {
+        // Handle the results if needed
+        console.log(results);
+        handleDeleteModalClose();
+        window.location.reload();
+      })
+      .catch((error) => {
+        // Handle errors from any of the delete requests
+        console.error(error);
+      });
+  };
   return (
     <div className={styles.parent} style={{ position: "relative" }}>
       <Tabs defaultValue={1}>
@@ -284,31 +324,7 @@ const PartnersMainContent = () => {
           >
             <button
               onClick={() => {
-                alert("Call disable api here");
-                setSelectedRows([]);
-              }}
-              style={{
-                padding: "12px 20px",
-                width: "170px",
-                border: "none",
-                borderRadius: "20px",
-                backgroundColor: "#FDD4D4",
-                color: "#AC1616",
-                fontSize: "16px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                cursor: "pointer",
-                gap: "15px",
-              }}
-            >
-              Disable Partners
-              {/* <img src={plusIcon} alt="icon" /> */}
-            </button>
-            <button
-              onClick={() => {
-                alert("Call delete api here");
-                setSelectedRows([]);
+                handleDeleteModalOpen();
               }}
               style={{
                 padding: "12px 20px",
@@ -328,6 +344,45 @@ const PartnersMainContent = () => {
               Delete Partners
               {/* <img src={plusIcon} alt="icon" /> */}
             </button>
+            {/* delete modal */}
+            <Modal
+              open={deleteModalOpen}
+              onClose={handleDeleteModalClose}
+              aria-labelledby="modal-modal-title"
+              aria-describedby="modal-modal-description"
+            >
+              <Box sx={deleteModalStyle}>
+                <Typography id="" sx={{ fontSize: 30 }}>
+                  Are you sure you want to delete those Partner?
+                </Typography>
+                <Button
+                  variant="contained"
+                  color="success"
+                  onClick={() => {
+                    callDeleteApi();
+                    setSelectedRows([]);
+                  }}
+                  style={{
+                    padding: "10px 30px",
+                    marginTop: "20px",
+                  }}
+                >
+                  Yes
+                </Button>
+                <Button
+                  variant="contained"
+                  color="error"
+                  onClick={handleDeleteModalClose}
+                  style={{
+                    marginLeft: "20px",
+                    padding: "10px 30px",
+                    marginTop: "20px",
+                  }}
+                >
+                  No
+                </Button>
+              </Box>
+            </Modal>
           </Box>
         )}
         <TabPanel value={1} onClick={handleClearRows}>

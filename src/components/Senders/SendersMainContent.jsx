@@ -8,7 +8,7 @@ import { TabPanel as BaseTabPanel } from "@mui/base/TabPanel";
 import { buttonClasses } from "@mui/base/Button";
 import { Tab as BaseTab, tabClasses } from "@mui/base/Tab";
 import { DataGrid } from "@mui/x-data-grid";
-import { Button, Menu, MenuItem } from "@mui/material";
+import { Button, Menu, MenuItem, Modal, Typography } from "@mui/material";
 import ArrowIcon from "../../assets/img/country/arrow.svg";
 import disableIcon from "../../assets/img/country/disable.svg";
 import editIcon from "../../assets/img/country/edit.svg";
@@ -21,6 +21,7 @@ import { useState } from "react";
 import { useQuery } from "react-query";
 import avatarDemo from "../../assets/img/senders/avatarDemo.png";
 import frontId from "../../assets/img/senders/frontId.png";
+import axios from "axios";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -296,6 +297,94 @@ const SendersMainContent = () => {
     },
   ];
 
+  ////////////////////////////////////////////////////////////////
+  //for delete the senders with multirow
+  ////////////////////////////////////////////////////////////////
+  const [deleteModalOpen, setDeleteModalOpen] = React.useState(false);
+  const handleDeleteModalOpen = () => setDeleteModalOpen(true);
+  const handleDeleteModalClose = () => setDeleteModalOpen(false);
+  const deleteModalStyle = {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: 600,
+    bgcolor: "background.paper",
+    boxShadow: 24,
+    borderRadius: "24px",
+    p: 4,
+  };
+
+  const callDeleteApi = () => {
+    const deletePromises = selectedRows.map((item) =>
+      axios
+        .delete(`https://api.quickt.com.au/api/users/${item.id}`)
+        .then((res) => console.log(res))
+        .catch((error) => console.error(error))
+    );
+
+    Promise.all(deletePromises)
+      .then((results) => {
+        console.log(results);
+        handleDeleteModalClose();
+        window.location.reload();
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+
+  ////////////////////////////////////////////////////////////////
+  //for disable the countries with multirow
+  ////////////////////////////////////////////////////////////////
+  const [disableModalOpen, setDisableModalOpen] = React.useState(false);
+  const handleDisableModalOpen = () => setDisableModalOpen(true);
+  const handleDisableModalClose = () => setDisableModalOpen(false);
+  const disableModalStyle = {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: 600,
+    bgcolor: "background.paper",
+    boxShadow: 24,
+    borderRadius: "24px",
+    p: 4,
+  };
+
+  const callDisableApi = () => {
+    const disablePromises = selectedRows.map((item) =>
+      axios
+        .put(
+          `https://api.quickt.com.au/api/users/${item.id}`,
+          {
+            blocked: true,
+          },
+          {
+            headers: {
+              Authorization: `${localStorage.getItem("jwt")}`,
+              // Add other headers if needed
+            },
+          }
+        )
+        .then((res) => console.log(res))
+        .catch((error) => console.error(error.response))
+    );
+
+    // Wait for all disable promises to resolve or reject
+    Promise.all(disablePromises)
+      .then((results) => {
+        // Handle the results if needed
+        console.log(results);
+        handleDeleteModalClose();
+        window.location.reload();
+      })
+      .catch((error) => {
+        // Handle errors from any of the disable requests
+        console.error(error);
+      });
+  };
+
   return (
     <div className={styles.parent} style={{ position: "relative" }}>
       <Tabs defaultValue={1}>
@@ -318,8 +407,7 @@ const SendersMainContent = () => {
           >
             <button
               onClick={() => {
-                alert("Call disable api here");
-                setSelectedRows([]);
+                handleDisableModalOpen();
               }}
               style={{
                 padding: "12px 20px",
@@ -339,10 +427,49 @@ const SendersMainContent = () => {
               Disable Senders
               {/* <img src={plusIcon} alt="icon" /> */}
             </button>
+
+            {/* disable modal */}
+            <Modal
+              open={disableModalOpen}
+              onClose={handleDisableModalClose}
+              aria-labelledby="modal-modal-title"
+              aria-describedby="modal-modal-description"
+            >
+              <Box sx={disableModalStyle}>
+                <Typography id="" sx={{ fontSize: 30 }}>
+                  Are you sure you want to disable those senders?
+                </Typography>
+                <Button
+                  variant="contained"
+                  color="success"
+                  onClick={() => {
+                    callDisableApi();
+                    setSelectedRows([]);
+                  }}
+                  style={{
+                    padding: "10px 30px",
+                    marginTop: "20px",
+                  }}
+                >
+                  Yes
+                </Button>
+                <Button
+                  variant="contained"
+                  color="error"
+                  onClick={handleDisableModalClose}
+                  style={{
+                    marginLeft: "20px",
+                    padding: "10px 30px",
+                    marginTop: "20px",
+                  }}
+                >
+                  No
+                </Button>
+              </Box>
+            </Modal>
             <button
               onClick={() => {
-                alert("Call delete api here");
-                setSelectedRows([]);
+                handleDeleteModalOpen();
               }}
               style={{
                 padding: "12px 20px",
@@ -359,9 +486,48 @@ const SendersMainContent = () => {
                 gap: "15px",
               }}
             >
-              Delete Senders
+              Delete senders
               {/* <img src={plusIcon} alt="icon" /> */}
             </button>
+            {/* delete modal */}
+            <Modal
+              open={deleteModalOpen}
+              onClose={handleDeleteModalClose}
+              aria-labelledby="modal-modal-title"
+              aria-describedby="modal-modal-description"
+            >
+              <Box sx={deleteModalStyle}>
+                <Typography id="" sx={{ fontSize: 30 }}>
+                  Are you sure you want to delete those senders?
+                </Typography>
+                <Button
+                  variant="contained"
+                  color="success"
+                  onClick={() => {
+                    callDeleteApi();
+                    setSelectedRows([]);
+                  }}
+                  style={{
+                    padding: "10px 30px",
+                    marginTop: "20px",
+                  }}
+                >
+                  Yes
+                </Button>
+                <Button
+                  variant="contained"
+                  color="error"
+                  onClick={handleDeleteModalClose}
+                  style={{
+                    marginLeft: "20px",
+                    padding: "10px 30px",
+                    marginTop: "20px",
+                  }}
+                >
+                  No
+                </Button>
+              </Box>
+            </Modal>
           </Box>
         )}
         <TabPanel value={1}>
