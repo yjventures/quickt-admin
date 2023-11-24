@@ -89,7 +89,7 @@ const SendersMainContent = () => {
         phone: item.phone,
         DOB: item.dob,
         kyc: item.kyc_complete,
-        status: item.confirmed,
+        status: item.blocked,
       }))
     : [];
 
@@ -98,7 +98,7 @@ const SendersMainContent = () => {
   ////////////////////////////////////////////////////////////////////////
   const enabledSender = Array.isArray(senders)
     ? senders
-        ?.filter((item) => item.confirmed === true)
+        ?.filter((item) => item.blocked == false)
         .map((item) => ({
           id: item.id,
           firstName: item.first_name,
@@ -107,7 +107,7 @@ const SendersMainContent = () => {
           phone: item.phone,
           DOB: item.dob,
           kyc: item.kyc_complete,
-          status: item.confirmed,
+          status: item.blocked,
         }))
     : [];
 
@@ -116,7 +116,7 @@ const SendersMainContent = () => {
   ////////////////////////////////////////////////////////////////////////
   const disabledSender = Array.isArray(senders)
     ? senders
-        ?.filter((item) => item.confirmed === false)
+        ?.filter((item) => item.blocked === true)
         .map((item) => ({
           id: item.id,
           firstName: item.first_name,
@@ -125,7 +125,7 @@ const SendersMainContent = () => {
           phone: item.phone,
           DOB: item.dob,
           kyc: item.kyc_complete,
-          status: item.confirmed,
+          status: item.blocked,
         }))
     : [];
 
@@ -205,17 +205,17 @@ const SendersMainContent = () => {
             height: "25px",
             width: "75px",
             backgroundColor: `${
-              params.row.status == true ? "#DCFDD4" : "#FDD4D4"
+              params.row.status == true ? "#FDD4D4" : "#DCFDD4"
             }`,
+            color: `${params.row.status == true ? "#AC1616" : "#4FAC16"}`,
             borderRadius: "15px",
             // border: `${params.row.enabled == true ? '1px solid #007FFF' : '1px solid #FFA800'}`,
-            color: `${params.row.status == true ? "#4FAC16" : "#AC1616"}`,
             fontFamily: "Open Sans",
             fontSize: "14px",
             fontStyle: "normal",
           }}
         >
-          {params.row.status == true ? "Enabled" : "Disabled"}
+          {params.row.status == false ? "Enabled" : "Disabled"}
         </div>
       ),
     },
