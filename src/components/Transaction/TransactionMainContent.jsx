@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Box } from "@mui/system";
 import styles from "../../assets/css/country.module.css";
 import { styled } from "@mui/system";
@@ -8,70 +8,139 @@ import { TabPanel as BaseTabPanel } from "@mui/base/TabPanel";
 import { buttonClasses } from "@mui/base/Button";
 import { Tab as BaseTab, tabClasses } from "@mui/base/Tab";
 import { DataGrid } from "@mui/x-data-grid";
-import ArrowIcon from "../../assets/img/country/arrow.svg";
+import { useQuery } from "react-query";
 import editIcon from "../../assets/img/country/edit.svg";
 import deleteIcon from "../../assets/img/country/delete.svg";
-import Slide from "@mui/material/Slide";
-import { useState } from "react";
+import ArrowIcon from "../../assets/img/country/arrow.svg";
 import { Menu, MenuItem } from "@mui/material";
-
-const Transition = React.forwardRef(function Transition(props, ref) {
-  return <Slide direction="up" ref={ref} {...props} />;
-});
-
-const RevenueMainContent = () => {
-  /////////////////////////  for handling action  /////////////////////////////
-  const [open, setOpen] = React.useState(false);
+const TransactionMainContent = () => {
   const [selectedRows, setSelectedRows] = useState([]);
-  const handleOpen = () => setOpen(true);
+  const [open, setOpen] = React.useState(false);
   const [selectedAction, setSelectedAction] = React.useState("");
+  const handleClearRows = () => {
+    setSelectedRows([]);
+  };
   const handleClickOpen = (action) => {
     setSelectedAction(action);
     console.log(action);
     setOpen(true);
   };
 
-  const handleClose = () => {
-    setOpen(false);
+  const fetchesTransaction = async () => {
+    const response = await fetch(
+      "https://api.quickt.com.au/api/transactions?populate=*",
+      {
+        headers: {
+          Authorization: `${localStorage.getItem("jwt")}`,
+        },
+      }
+    );
+    const data = await response.json();
+    // return data.data
+    console.log(data.data);
+    if (data.data) {
+      // console.log(data.data.data)
+      return data.data;
+    } else {
+      return [];
+      // throw new Error('Could not fetch users')
+    }
   };
-  const handleClearRows = () => {
-    setSelectedRows([]);
-  };
-  
+  const {
+    isLoading: transactionLoading,
+    error: transactionError,
+    data: transactions,
+  } = useQuery("allTransaction", fetchesTransaction);
+  // Check if countries is an array before calling map
+  console.log();
+  const allTransaction = Array.isArray(transactions)
+    ? transactions?.map((item) => ({
+        id: item.id,
+        senders: {
+          image:
+            item.attributes?.users_permissions_user?.data?.attributes?.image, // Replace with the actual path or URL to the user's image
+          name: item.attributes?.users_permissions_user?.data?.attributes
+            ?.username,
+        },
+        receiverName: item.attributes?.receiver_name,
+        phone: item.attributes?.users_permissions_user?.data?.attributes?.phone,
+        BaseAmount: item.attributes?.transfer_amount,
+        Totalamount: item.attributes?.amount_total,
+        TransactionFees: item.attributes?.transfer_fees,
+        Date: item.attributes?.transaction_date,
+        Currency: item.attributes?.currency,
+        paymentStatus: item.attributes?.payment_status,
+        transferStatus: item.attributes?.transfer?.data?.attributes?.status,
+        TransferNumber: item.attributes?.receiver_number,
+      }))
+    : [];
+
   const columns = [
     { field: "id", headerName: "ID", width: 70 },
     {
-      field: "TransferNumber",
-      headerName: "Transfer Number",
+      field: "senders",
+      headerName: "Sender",
+      width: 170,
+      renderCell: (params) => (
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <img
+            src={params.value.image} // Access the image property from the details object
+            alt="User"
+            style={{
+              borderRadius: "50%",
+              marginRight: "8px",
+              width: "30px",
+              height: "30px",
+            }}
+          />
+          <div>
+            <p style={{ marginTop: "20px" }}>{params.value.name}</p>
+            <br />
+            {/* Add other details as needed */}
+          </div>
+        </div>
+      ),
+    },
+    {
+      field: "receiverName",
+      headerName: "Receiver Details",
       width: 130,
+    },
+    {
+      field: "phone",
+      headerName: "Phone",
+      width: 150,
     },
     {
       field: "BaseAmount",
       headerName: "Base Amount",
-      width: 130,
-    },
-    {
-      field: "TransactionFees",
-      headerName: "Transaction Fees",
-      width: 150,
+      width: 100,
     },
     {
       field: "Totalamount",
       headerName: "Total amount",
-      width: 200,
+      width: 100,
     },
     {
-      field: "PartnerAmount",
-      headerName: "Partner Amount",
-      width: 200,
+      field: "TransactionFees",
+      headerName: "Transaction Fees",
+      width: 100,
     },
     {
-      field: "status",
-      headerName: "Status",
-      // description: 'This column has a value getter and is not sortable.',
-      // sortable: false,
-      width: 160,
-      // disable sorting
+      field: "Date",
+      headerName: "Date",
+      width: 130,
+    },
+    {
+      field: "Currency",
+      headerName: "Currency",
+      width: 70,
+    },
+
+    {
+      field: "paymentStatus",
+      headerName: "payment Status",
+      width: 130,
       sortable: false,
       renderCell: (params) => (
         <div
@@ -81,28 +150,55 @@ const RevenueMainContent = () => {
             alignItems: "center",
             height: "25px",
             width: "75px",
-            backgroundColor: `${
-              params.row.status == true ? "#DCFDD4" : "#FAFDD4"
-            }`,
+            backgroundColor: (() => {
+              switch (params.row.paymentStatus) {
+                case "complete":
+                  return "#DCFDD4";
+                case "pending":
+                  return "#FAFDD4";
+                case "cancel":
+                  return "#FDDCDC";
+                default:
+                  return "#FFFFFF"; // Default color for unknown status
+              }
+            })(),
             borderRadius: "15px",
-            // border: `${params.row.enabled == true ? '1px solid #007FFF' : '1px solid #FFA800'}`,
-            color: `${params.row.status == true ? "#4FAC16" : "#AC9D16"}`,
+            color: (() => {
+              switch (params.row.paymentStatus) {
+                case "complete":
+                  return "#4FAC16";
+                case "pending":
+                  return "#AC9D16";
+                case "cancel":
+                  return "#FF0000"; // Red for canceled status
+                default:
+                  return "#000000"; // Default color for unknown status
+              }
+            })(),
             fontFamily: "Open Sans",
             fontSize: "14px",
             fontStyle: "normal",
           }}
         >
-          {params.row.status == true ? "Paid" : "Pending"}
+          {(() => {
+            switch (params.row.paymentStatus) {
+              case "complete":
+                return "Complete";
+              case "pending":
+                return "Pending";
+              case "cancel":
+                return "Cancel";
+              default:
+                return "Unknown";
+            }
+          })()}
         </div>
       ),
     },
     {
-      field: "paymentstatus",
-      headerName: "Parter Payout Status",
-      // description: 'This column has a value getter and is not sortable.',
-      // sortable: false,
-      width: 160,
-      // disable sorting
+      field: "transferStatus",
+      headerName: "Transfer Status",
+      width: 130,
       sortable: false,
       renderCell: (params) => (
         <div
@@ -112,27 +208,61 @@ const RevenueMainContent = () => {
             alignItems: "center",
             height: "25px",
             width: "75px",
-            backgroundColor: `${
-              params.row.paymentstatus == true ? "#DCFDD4" : "#FAFDD4"
-            }`,
+            backgroundColor: (() => {
+              switch (params.row.transferStatus) {
+                case "complete":
+                  return "#DCFDD4";
+                case "pending":
+                  return "#FAFDD4";
+                case "cancel":
+                  return "#FDDCDC";
+                default:
+                  return "#FFFFFF"; // Default color for unknown status
+              }
+            })(),
             borderRadius: "15px",
-            // border: `${params.row.enabled == true ? '1px solid #007FFF' : '1px solid #FFA800'}`,
-            color: `${
-              params.row.paymentstatus == true ? "#4FAC16" : "#AC9D16"
-            }`,
+            color: (() => {
+              switch (params.row.transferStatus) {
+                case "complete":
+                  return "#4FAC16";
+                case "pending":
+                  return "#AC9D16";
+                case "cancel":
+                  return "#FF0000"; // Red for canceled status
+                default:
+                  return "#000000"; // Default color for unknown status
+              }
+            })(),
             fontFamily: "Open Sans",
             fontSize: "14px",
             fontStyle: "normal",
           }}
         >
-          {params.row.paymentstatus == true ? "Paid" : "Pending"}
+          {(() => {
+            switch (params.row.transferStatus) {
+              case "complete":
+                return "Complete";
+              case "pending":
+                return "Pending";
+              case "cancel":
+                return "Cancel";
+              default:
+                return "Unknown";
+            }
+          })()}
         </div>
       ),
+    },
+
+    {
+      field: "TransferNumber",
+      headerName: "Transfer Number",
+      width: 100,
     },
     {
       field: "action",
       headerName: "Action",
-      width: 150,
+      width: 130,
       type: "number",
       renderCell: (params) => {
         const [anchorEl, setAnchorEl] = useState(null);
@@ -183,7 +313,7 @@ const RevenueMainContent = () => {
                   src={editIcon}
                   alt="icon"
                 />
-                Edit
+                Update Status
               </MenuItem>
               <MenuItem onClick={() => handleClickOpen("delete")}>
                 <img
@@ -200,103 +330,11 @@ const RevenueMainContent = () => {
     },
   ];
 
-  const rows = [
-    {
-      id: 1,
-      TransferNumber: 200,
-      BaseAmount: 20,
-      TransactionFees: 4,
-      Totalamount: 204,
-      PartnerAmount: 20,
-      status: true,
-      paymentstatus: true,
-    },
-    {
-      id: 2,
-      TransferNumber: 200,
-      BaseAmount: 20,
-      TransactionFees: 4,
-      Totalamount: 204,
-      PartnerAmount: 20,
-      status: false,
-      paymentstatus: true,
-    },
-    {
-      id: 3,
-      TransferNumber: 200,
-      BaseAmount: 20,
-      TransactionFees: 4,
-      Totalamount: 204,
-      PartnerAmount: 20,
-      status: true,
-      paymentstatus: true,
-    },
-    {
-      id: 4,
-      TransferNumber: 200,
-      BaseAmount: 20,
-      TransactionFees: 4,
-      Totalamount: 204,
-      PartnerAmount: 20,
-      status: false,
-      paymentstatus: true,
-    },
-  ];
-  const rows2 = [
-    {
-      id: 1,
-      TransferNumber: 200,
-      BaseAmount: 20,
-      TransactionFees: 4,
-      Totalamount: 204,
-      PartnerAmount: 20,
-      status: true,
-      paymentstatus: true,
-    },
-    {
-      id: 3,
-      TransferNumber: 200,
-      BaseAmount: 20,
-      TransactionFees: 4,
-      Totalamount: 204,
-      PartnerAmount: 20,
-      status: true,
-      paymentstatus: true,
-    },
-  ];
-  const rows3 = [
-    {
-      id: 2,
-      TransferNumber: 200,
-      BaseAmount: 20,
-      TransactionFees: 4,
-      Totalamount: 204,
-      PartnerAmount: 20,
-      status: false,
-      paymentstatus: true,
-    },
-
-    {
-      id: 4,
-      TransferNumber: 200,
-      BaseAmount: 20,
-      TransactionFees: 4,
-      Totalamount: 204,
-      PartnerAmount: 20,
-      status: false,
-      paymentstatus: true,
-    },
-  ];
-
   return (
     <div className={styles.parent} style={{ position: "relative" }}>
       <Tabs defaultValue={1}>
         <TabsList>
-          <Tab value={1} onClick={handleClearRows}>
-            All - 30
-          </Tab>
-          <Tab value={2}>Paid - 10</Tab>
-          <Tab value={3}>Pending - 5</Tab>
+          <Tab value={1}>All - {allTransaction?.length}</Tab>
         </TabsList>
         {selectedRows.length > 1 && (
           <Box
@@ -328,7 +366,7 @@ const RevenueMainContent = () => {
                 gap: "15px",
               }}
             >
-              Disable Revenues
+              Disable Transactions
               {/* <img src={plusIcon} alt="icon" /> */}
             </button>
             <button
@@ -351,15 +389,15 @@ const RevenueMainContent = () => {
                 gap: "15px",
               }}
             >
-              Delete Revenues
+              Delete Transaction
               {/* <img src={plusIcon} alt="icon" /> */}
             </button>
           </Box>
         )}
-        <TabPanel value={1}>
+        <TabPanel value={1} onClick={handleClearRows}>
           <div style={{ height: "auto", width: "100%" }}>
             <DataGrid
-              rows={rows}
+              rows={allTransaction}
               columns={columns}
               initialState={{
                 pagination: {
@@ -371,7 +409,7 @@ const RevenueMainContent = () => {
               // by default seleted row is first row
               onRowSelectionModelChange={(ids) => {
                 const selectedIDs = new Set(ids);
-                const selectedRowData = rows.filter((row) =>
+                const selectedRowData = allTransaction.filter((row) =>
                   // selectedIDs.has(row.id.toString())
                   selectedIDs.has(row.id)
                 );
@@ -379,49 +417,6 @@ const RevenueMainContent = () => {
               }}
             />
           </div>
-        </TabPanel>
-
-        <TabPanel value={2}>
-          <DataGrid
-            rows={rows2}
-            columns={columns}
-            initialState={{
-              pagination: {
-                paginationModel: { page: 0, pageSize: 10 },
-              },
-            }}
-            pageSizeOptions={[10, 20]}
-            checkboxSelection
-            onRowSelectionModelChange={(ids) => {
-              const selectedIDs = new Set(ids);
-              const selectedRowData = rows.filter((row) =>
-                // selectedIDs.has(row.id.toString())
-                selectedIDs.has(row.id)
-              );
-              setSelectedRows(selectedRowData);
-            }}
-          />
-        </TabPanel>
-        <TabPanel value={3}>
-          <DataGrid
-            rows={rows3}
-            columns={columns}
-            initialState={{
-              pagination: {
-                paginationModel: { page: 0, pageSize: 10 },
-              },
-            }}
-            pageSizeOptions={[10, 20]}
-            checkboxSelection
-            onRowSelectionModelChange={(ids) => {
-              const selectedIDs = new Set(ids);
-              const selectedRowData = rows.filter((row) =>
-                // selectedIDs.has(row.id.toString())
-                selectedIDs.has(row.id)
-              );
-              setSelectedRows(selectedRowData);
-            }}
-          />
         </TabPanel>
       </Tabs>
     </div>
@@ -521,4 +516,4 @@ const TabsList = styled(BaseTabsList)(
     };
     `
 );
-export default RevenueMainContent;
+export default TransactionMainContent;
