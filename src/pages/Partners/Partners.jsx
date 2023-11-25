@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { Box } from "@mui/material";
 import { light } from "@mui/material/styles/createPalette";
 
@@ -47,7 +47,7 @@ const Partners = () => {
   const [selectedImage, setSelectedImage] = useState(IconImage);
   const [strapiImage, setStrapiImage] = useState(null);
   // console.log(selectedImage);
-  // console.log(strapiImage);
+  console.log(strapiImage);
   const handleImageClick = () => {
     const input = document.createElement("input");
     input.type = "file";
@@ -78,6 +78,34 @@ const Partners = () => {
     input.click();
   };
 
+  let partnerNameRef = useRef(null);
+  let partnerLocationRef = useRef(null);
+  let partnerPercentageRef = useRef(null);
+
+  const handleUpdatePartner = () => {
+    axios
+      .post(
+        `https://api.quickt.com.au/api/partners`,
+        {
+          data: {
+            name: partnerNameRef.value,
+            location: partnerLocationRef.value,
+            partner_percentage: partnerPercentageRef.value,
+            image: strapiImage,
+          },
+        },
+        {
+          headers: {
+            Authorization: `${localStorage.getItem("jwt")}`,
+          },
+        }
+      )
+      .then((res) => {
+        console.log(res);
+        window.location.reload();
+      })
+      .catch((error) => console.error(error));
+  };
   return (
     <Box sx={{ height: "100vh", px: 3, overflow: "scroll" }}>
       {/* pathname */}
@@ -185,6 +213,7 @@ const Partners = () => {
                 <input
                   type="text"
                   placeholder="Enter Partner Name"
+                  ref={(input) => (partnerNameRef = input)}
                   style={{
                     padding: "16px 20px",
                     width: "100%",
@@ -202,6 +231,7 @@ const Partners = () => {
                 <input
                   type="text"
                   placeholder="Enter Partner Location Here"
+                  ref={(input) => (partnerLocationRef = input)}
                   style={{
                     padding: "16px 20px",
                     width: "100%",
@@ -219,6 +249,7 @@ const Partners = () => {
                 <input
                   type="text"
                   placeholder="Percentage"
+                  ref={(input) => (partnerPercentageRef = input)}
                   style={{
                     padding: "16px 20px",
                     width: "50%",
@@ -230,7 +261,7 @@ const Partners = () => {
                 />
 
                 <button
-                  onClick={handleOpen}
+                  onClick={handleUpdatePartner}
                   style={{
                     // padding: "16px 18px",
                     width: "140px",

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { Box } from "@mui/system";
 import styles from "../../assets/css/country.module.css";
 import { styled } from "@mui/system";
@@ -60,38 +60,6 @@ const PartnersMainContent = () => {
     setChecked(isChecked);
   };
 
-  const [selectedImage, setSelectedImage] = useState(IconImage);
-  const [strapiImage, setStrapiImage] = useState("");
-  const handleImageClick = () => {
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = "image/*";
-    input.onchange = (e) => {
-      const file = e.target.files[0];
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        setSelectedImage(event.target.result);
-
-        const formData = new FormData();
-        formData.append("files", file);
-
-        axios
-          .post("https://api.quickt.com.au/api/upload", formData)
-          .then((response) => {
-            console.log("File uploaded successfully: ", response.data);
-            // showSuccessAlert("Image uploaded successfully");
-            console.log(response.data[0].url);
-            setStrapiImage(response.data[0].url);
-          })
-          .catch((error) => {
-            console.error("Error uploading file: ", error.message);
-          });
-      };
-      reader.readAsDataURL(file);
-    };
-    input.click();
-  };
-
   const fetchePartners = async () => {
     const response = await fetch(
       "https://api.quickt.com.au/api/partners?populate=*"
@@ -120,7 +88,7 @@ const PartnersMainContent = () => {
     ? partners?.map((item) => ({
         id: item.id,
         name: item.attributes?.name,
-        image: item.attributes?.image,
+        image: `https://api.quickt.com.au` + item.attributes?.image,
         location: item.attributes?.location,
         percentage: item.attributes?.partner_percentage,
         details: {
@@ -306,6 +274,121 @@ const PartnersMainContent = () => {
         console.error(error);
       });
   };
+
+  ////////////////////////////////////////////////////////////////////////////
+  //delete button integration with backend
+  ////////////////////////////////////////////////////////////////////////////
+  const handleDeleteApi = () => {
+    axios
+      .delete(`https://api.quickt.com.au/api/partners/${selectedRows[0].id}`)
+      .then((res) => {
+        console.log(res);
+        window.location.reload();
+      })
+      .catch((error) => console.error(error));
+  };
+
+  ////////////////////////////////////////////////////////////////////////////
+  //update button integration with backend
+  ////////////////////////////////////////////////////////////////////////////
+  const [partnerData, setPartnerData] = useState(null);
+  let updateNameRef = useRef(null);
+  let updateLocationRef = useRef(null);
+  let updatePercentageRef = useRef(null);
+  useEffect(() => {
+    axios
+      .get(`https://api.quickt.com.au/api/partners/${selectedRows[0]?.id}`, {
+        headers: {
+          Authorization: `${localStorage.getItem("jwt")}`,
+        },
+      })
+      .then((res) => {
+        console.log(res.data.data);
+        // console.log(res.data.image);
+        setPartnerData(res.data.data);
+      });
+  }, [selectedRows]);
+
+  //upload image
+  const [selectedImage, setSelectedImage] = useState(IconImage);
+  const [strapiImage, setStrapiImage] = useState("");
+  console.log(strapiImage);
+  const handleImageClick = () => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.onchange = (e) => {
+      const file = e.target.files[0];
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setSelectedImage(event.target.result);
+
+        const formData = new FormData();
+        formData.append("files", file);
+
+        axios
+          .post("https://api.quickt.com.au/api/upload", formData)
+          .then((response) => {
+            console.log("File uploaded successfully: ", response.data);
+            // showSuccessAlert("Image uploaded successfully");
+            console.log(response.data[0].url);
+            setStrapiImage(response.data[0].url);
+
+            // Update partnerData?.attributes?.image here
+            setPartnerData((prevData) => ({
+              ...prevData,
+              attributes: {
+                ...prevData.attributes,
+                image: response.data[0].url,
+              },
+            }));
+          })
+          .catch((error) => {
+            console.error("Error uploading file: ", error.message);
+          });
+      };
+      reader.readAsDataURL(file);
+    };
+    input.click();
+  };
+
+  console.log();
+  // update the partner
+  const handleUpdatePartner = () => {
+    const updatedData = {
+      name: updateNameRef.value,
+      location: updateLocationRef.value,
+      partner_percentage: updatePercentageRef.value,
+    };
+
+    if (strapiImage) {
+      // If the image is updated, include it in the request
+      updatedData.image = strapiImage;
+    } else if (
+      partnerData &&
+      partnerData.attributes &&
+      partnerData.attributes.image
+    ) {
+      // If the image is not updated, but it exists in the current partnerData, include it in the request
+      updatedData.image = partnerData.attributes.image;
+    }
+
+    axios
+      .put(
+        `https://api.quickt.com.au/api/partners/${selectedRows[0]?.id}`,
+        { data: updatedData },
+        {
+          headers: {
+            Authorization: `${localStorage.getItem("jwt")}`,
+          },
+        }
+      )
+      .then((res) => {
+        console.log(res);
+        window.location.reload();
+      })
+      .catch((error) => console.error(error));
+  };
   return (
     <div className={styles.parent} style={{ position: "relative" }}>
       <Tabs defaultValue={1}>
@@ -440,7 +523,10 @@ const PartnersMainContent = () => {
                   <Typography id="modal-modal-description" sx={{ mt: 2 }}>
                     <p className="generalSettings_SubTextHeading">Image</p>
                     <img
-                      src={selectedImage}
+                      src={`https://api.quickt.com.au${
+                        partnerData?.attributes?.image ||
+                        `https://api.quickt.com.au${selectedImage}`
+                      }`}
                       style={{
                         width: "270px",
                         height: "180px",
@@ -455,6 +541,8 @@ const PartnersMainContent = () => {
                     <input
                       type="text"
                       placeholder="Enter the Partner Name"
+                      defaultValue={partnerData?.attributes?.name}
+                      ref={(input) => (updateNameRef = input)}
                       style={{
                         padding: "16px 20px",
                         width: "100%",
@@ -472,6 +560,8 @@ const PartnersMainContent = () => {
                     <input
                       type="text"
                       placeholder="ex: USA"
+                      defaultValue={partnerData?.attributes?.location}
+                      ref={(input) => (updateLocationRef = input)}
                       style={{
                         padding: "16px 20px",
                         width: "100%",
@@ -488,6 +578,8 @@ const PartnersMainContent = () => {
                     <input
                       type="text"
                       placeholder="Percentage"
+                      defaultValue={partnerData?.attributes?.partner_percentage}
+                      ref={(input) => (updatePercentageRef = input)}
                       style={{
                         padding: "16px 20px",
                         width: "50%",
@@ -498,14 +590,16 @@ const PartnersMainContent = () => {
                       }}
                     />
                   </Typography>
+
                   <Box sx={{ mt: 3 }}>
                     <Button
                       variant="contained"
                       color="success"
-                      onClick={() => alert("Call edit api here")}
+                      onClick={() => handleUpdatePartner()}
                     >
                       Confim Update
                     </Button>
+
                     <Button
                       variant="outlined"
                       sx={{ ml: 2 }}
@@ -524,7 +618,7 @@ const PartnersMainContent = () => {
                   <Button
                     variant="contained"
                     color="error"
-                    onClick={() => alert("Call disbale api here")}
+                    onClick={() => handleDeleteApi()}
                   >
                     Confim delete
                   </Button>
