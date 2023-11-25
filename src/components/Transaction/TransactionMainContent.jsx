@@ -8,12 +8,22 @@ import { TabPanel as BaseTabPanel } from "@mui/base/TabPanel";
 import { buttonClasses } from "@mui/base/Button";
 import { Tab as BaseTab, tabClasses } from "@mui/base/Tab";
 import { DataGrid } from "@mui/x-data-grid";
+import Dialog from "@mui/material/Dialog";
 import { useQuery } from "react-query";
 import editIcon from "../../assets/img/country/edit.svg";
 import deleteIcon from "../../assets/img/country/delete.svg";
 import ArrowIcon from "../../assets/img/country/arrow.svg";
 import { Button, Menu, MenuItem, Modal, Typography } from "@mui/material";
 import axios from "axios";
+import Slide from "@mui/material/Slide";
+import IconButton from "@mui/material/IconButton";
+import CloseIcon from "@mui/icons-material/Close";
+import quickStyle from "../../assets/css/quickTransfer.module.css";
+
+const Transition = React.forwardRef(function Transition(props, ref) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
+
 const TransactionMainContent = () => {
   const [selectedRows, setSelectedRows] = useState([]);
   console.log(selectedRows);
@@ -26,6 +36,12 @@ const TransactionMainContent = () => {
     setSelectedAction(action);
     console.log(action);
     setOpen(true);
+  };
+
+  const handleOpen = () => setOpen(true);
+
+  const handleClose = () => {
+    setOpen(false);
   };
 
   const fetchesTransaction = async () => {
@@ -71,8 +87,9 @@ const TransactionMainContent = () => {
         TransactionFees: item.attributes?.transfer_fees,
         Date: item.attributes?.transaction_date,
         Currency: item.attributes?.currency,
-        paymentStatus: item.attributes?.payment_status,
-        transferStatus: item.attributes?.transfer?.data?.attributes?.status,
+        paymentStatus:
+          item.attributes?.transfer?.data?.attributes?.payout_complete,
+        transferStatus: item.attributes?.payment_status,
         TransferNumber: item.attributes?.receiver_number,
       }))
     : [];
@@ -152,48 +169,20 @@ const TransactionMainContent = () => {
             alignItems: "center",
             height: "25px",
             width: "75px",
-            backgroundColor: (() => {
-              switch (params.row.paymentStatus) {
-                case "complete":
-                  return "#DCFDD4";
-                case "pending":
-                  return "#FAFDD4";
-                case "cancel":
-                  return "#FDDCDC";
-                default:
-                  return "#FFFFFF"; // Default color for unknown status
-              }
-            })(),
+            backgroundColor: `${
+              params.row.paymentStatus == true ? "#DCFDD4" : "#FDD4D4"
+            }`,
             borderRadius: "15px",
-            color: (() => {
-              switch (params.row.paymentStatus) {
-                case "complete":
-                  return "#4FAC16";
-                case "pending":
-                  return "#AC9D16";
-                case "cancel":
-                  return "#FF0000"; // Red for canceled status
-                default:
-                  return "#000000"; // Default color for unknown status
-              }
-            })(),
+            // border: `${params.row.enabled == true ? '1px solid #007FFF' : '1px solid #FFA800'}`,
+            color: `${
+              params.row.paymentStatus == true ? "#4FAC16" : "#AC1616"
+            }`,
             fontFamily: "Open Sans",
             fontSize: "14px",
             fontStyle: "normal",
           }}
         >
-          {(() => {
-            switch (params.row.paymentStatus) {
-              case "complete":
-                return "Complete";
-              case "pending":
-                return "Pending";
-              case "cancel":
-                return "Cancel";
-              default:
-                return "Unknown";
-            }
-          })()}
+          {params.row.paymentStatus == true ? "Enabled" : "Disabled"}
         </div>
       ),
     },
@@ -264,10 +253,10 @@ const TransactionMainContent = () => {
     {
       field: "action",
       headerName: "Action",
-      width: 130,
+      width: 150,
       type: "number",
       renderCell: (params) => {
-        const [anchorEl, setAnchorEl] = useState(null);
+        const [anchorEl, setAnchorEl] = React.useState(null);
 
         const handleClick = (event) => {
           setAnchorEl(event.currentTarget);
@@ -323,7 +312,7 @@ const TransactionMainContent = () => {
                   src={deleteIcon}
                   alt="icon"
                 />
-                Delete
+                Remove
               </MenuItem>
             </Menu>
           </div>
@@ -369,6 +358,45 @@ const TransactionMainContent = () => {
       .catch((error) => {
         // Handle errors from any of the delete requests
         console.error(error);
+      });
+  };
+
+  ////////////////////////////////////////////////////////////////
+  //update integration with backend
+  ////////////////////////////////////////////////////////////////
+  const [transferStatus, setTransferStatus] = React.useState("complete");
+
+  const handleUpdateTransferStatus = () => {
+    console.log("Transfer Status:", transferStatus);
+    axios
+      .put(`https://api.quickt.com.au/api/transactions/${selectedRows[0].id}`, {
+        data: {
+          payment_status: transferStatus,
+        },
+      })
+      .then((response) => {
+        console.log(response);
+        window.location.reload();
+      })
+      .catch((err) => {
+        console.error(err.message);
+      });
+  };
+
+  ////////////////////////////////////////////////////////////////////////
+  //delete integration with backend
+  ////////////////////////////////////////////////////////////////////////
+  const handleDeleteTransaction = () => {
+    axios
+      .delete(
+        `https://api.quickt.com.au/api/transactions/${selectedRows[0].id}`
+      )
+      .then((response) => {
+        // console.log(response);
+        window.location.reload();
+      })
+      .catch((err) => {
+        console.error(err.message);
       });
   };
 
@@ -476,6 +504,99 @@ const TransactionMainContent = () => {
           </div>
         </TabPanel>
       </Tabs>
+      <Dialog
+        maxWidth="md"
+        fullWidth
+        open={open}
+        onClose={handleClose}
+        TransitionComponent={Transition}
+      >
+        <Box
+          style={{
+            height: "100%",
+            padding: "10px",
+          }}
+        >
+          <IconButton
+            style={{ position: "absolute", right: "5px", top: "5px" }}
+            edge="start"
+            color="inherit"
+            onClick={handleClose}
+            aria-label="close"
+          >
+            <CloseIcon />
+          </IconButton>
+          <Box sx={{ ml: 1 }}>
+            {selectedAction === "edit" && (
+              <Box sx={{ ml: 2 }}>
+                <h2 style={{ marginTop: "20px", marginBottom: "20px" }}>
+                  Update Transfer Status
+                </h2>
+                <select
+                  name="visibility"
+                  className={quickStyle.textInput}
+                  value={transferStatus}
+                  onChange={(e) => {
+                    setTransferStatus(e.target.value);
+                    // setBox(e.target.value)
+                  }}
+                  style={{ marginBottom: "20px", marginTop: "20px" }}
+                >
+                  <option value="complete">complete </option>
+                  <option value="cancel">cancel </option>
+                  <option value="pending">pending </option>
+                </select>
+                <Box sx={{ mt: 3, mb: 3 }}>
+                  <Typography
+                    id="modal-modal-description"
+                    sx={{ mt: 2 }}
+                  ></Typography>
+
+                  <Box sx={{ mt: 3 }}>
+                    <Button
+                      variant="contained"
+                      color="success"
+                      onClick={handleUpdateTransferStatus}
+                    >
+                      Confim Update
+                    </Button>
+
+                    <Button
+                      variant="outlined"
+                      sx={{ ml: 2 }}
+                      onClick={handleClose}
+                    >
+                      Cancel
+                    </Button>
+                  </Box>
+                </Box>
+              </Box>
+            )}
+            {selectedAction === "delete" && (
+              <Box>
+                <h2>Are you sure you want to DELETE this Partner?</h2>
+                <Box sx={{ mt: 3 }}>
+                  <Button
+                    variant="contained"
+                    color="error"
+                    onClick={handleDeleteTransaction}
+                  >
+                    Confim delete
+                  </Button>
+                  <Button
+                    variant="contained"
+                    color="success"
+                    sx={{ ml: 2 }}
+                    onClick={handleClose}
+                  >
+                    Do not delete
+                  </Button>
+                </Box>
+              </Box>
+            )}
+          </Box>
+        </Box>
+      </Dialog>
     </div>
   );
 };
