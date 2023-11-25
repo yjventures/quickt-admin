@@ -20,8 +20,9 @@ import Slide from "@mui/material/Slide";
 import { useState } from "react";
 import { useQuery } from "react-query";
 import avatarDemo from "../../assets/img/senders/avatarDemo.png";
-import frontId from "../../assets/img/senders/frontId.png";
+import enableIcon from "../../assets/img/country/enable.svg";
 import axios from "axios";
+import { useEffect } from "react";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -286,14 +287,29 @@ const SendersMainContent = () => {
                 boxShadow: "none",
               }}
             >
-              <MenuItem onClick={() => handleClickOpen("disable")}>
-                <img
-                  style={{ marginRight: "10px" }}
-                  src={disableIcon}
-                  alt="icon"
-                />
-                Disable
-              </MenuItem>
+              {params.row.status == true ? (
+                <MenuItem onClick={() => handleClickOpen("enable")}>
+                  <img
+                    style={{
+                      marginRight: "10px",
+                      width: "15px",
+                      height: "15px",
+                    }}
+                    src={enableIcon}
+                    alt="icon"
+                  />
+                  Enable
+                </MenuItem>
+              ) : (
+                <MenuItem onClick={() => handleClickOpen("disable")}>
+                  <img
+                    style={{ marginRight: "10px" }}
+                    src={disableIcon}
+                    alt="icon"
+                  />
+                  Disable
+                </MenuItem>
+              )}
               <MenuItem onClick={() => handleClickOpen("edit")}>
                 <img
                   style={{ marginRight: "10px" }}
@@ -405,6 +421,101 @@ const SendersMainContent = () => {
       });
   };
 
+  ////////////////////////////////////////////////////////////////
+  //for Enalbe the countries with multirow
+  ////////////////////////////////////////////////////////////////
+  const [enableModalOpen, setEnableModalOpen] = React.useState(false);
+  const handleEnableModalOpen = () => setEnableModalOpen(true);
+  const handleEnableModalClose = () => setEnableModalOpen(false);
+  const enableModalStyle = {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: 600,
+    bgcolor: "background.paper",
+    boxShadow: 24,
+    borderRadius: "24px",
+    p: 4,
+  };
+  const callEnableApi = () => {
+    const disablePromises = selectedRows.map((item) =>
+      axios
+        .put(
+          `https://api.quickt.com.au/api/users/${item.id}`,
+          {
+            blocked: false,
+          },
+          {
+            headers: {
+              Authorization: `${localStorage.getItem("jwt")}`,
+              // Add other headers if needed
+            },
+          }
+        )
+        .then((res) => console.log(res))
+        .catch((error) => console.error(error.response))
+    );
+
+    // Wait for all disable promises to resolve or reject
+    Promise.all(disablePromises)
+      .then((results) => {
+        // Handle the results if needed
+        console.log(results);
+        handleDeleteModalClose();
+        window.location.reload();
+      })
+      .catch((error) => {
+        // Handle errors from any of the disable requests
+        console.error(error);
+      });
+  };
+
+  ////////////////////////////////
+  //fetching kyc value
+  ////////////////////////////////
+  const [fetchKyc, setFetchKyc] = useState(null);
+  useEffect(() => {
+    axios
+      .get(
+        `https://api.quickt.com.au/api/users/${selectedRows[0]?.id}?populate=*`,
+        {
+          headers: {
+            Authorization: `${localStorage.getItem("jwt")}`,
+          },
+        }
+      )
+      .then((res) => {
+        console.log(res.data);
+        // console.log(res.data.image);
+        setFetchKyc(res.data);
+      });
+  }, [selectedRows]);
+
+  //approve kyc
+  const approveKyc = () => {
+    axios
+      .put(`https://api.quickt.com.au/api/users/${selectedRows[0]?.id}`, {
+        kyc_complete: true,
+      })
+      .then((res) => {
+        // console.log(res)
+        window.location.reload();
+      });
+  };
+
+  //approve kyc
+  const declineKyc = () => {
+    axios
+      .put(`https://api.quickt.com.au/api/users/${selectedRows[0]?.id}`, {
+        kyc_complete: false,
+      })
+      .then((res) => {
+        // console.log(res)
+        window.location.reload();
+      });
+  };
+
   return (
     <div className={styles.parent} style={{ position: "relative" }}>
       <Tabs defaultValue={1}>
@@ -425,6 +536,66 @@ const SendersMainContent = () => {
               right: "35px",
             }}
           >
+            <button
+              onClick={() => {
+                handleEnableModalOpen();
+              }}
+              style={{
+                padding: "12px 20px",
+                width: "170px",
+                border: "none",
+                borderRadius: "20px",
+                backgroundColor: "#DCFDD3",
+                color: "#4FAC15",
+                fontSize: "16px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                gap: "15px",
+              }}
+            >
+              Enable Senders
+              {/* <img src={plusIcon} alt="icon" /> */}
+            </button>
+            <Modal
+              open={enableModalOpen}
+              onClose={handleEnableModalClose}
+              aria-labelledby="modal-modal-title"
+              aria-describedby="modal-modal-description"
+            >
+              <Box sx={enableModalStyle}>
+                <Typography id="" sx={{ fontSize: 30 }}>
+                  Are you sure you want to enable those senders?
+                </Typography>
+                <Button
+                  variant="contained"
+                  color="success"
+                  onClick={() => {
+                    callEnableApi();
+                    setSelectedRows([]);
+                  }}
+                  style={{
+                    padding: "10px 30px",
+                    marginTop: "20px",
+                  }}
+                >
+                  Yes
+                </Button>
+                <Button
+                  variant="contained"
+                  color="error"
+                  onClick={handleEnableModalClose}
+                  style={{
+                    marginLeft: "20px",
+                    padding: "10px 30px",
+                    marginTop: "20px",
+                  }}
+                >
+                  No
+                </Button>
+              </Box>
+            </Modal>
             <button
               onClick={() => {
                 handleDisableModalOpen();
@@ -647,7 +818,7 @@ const SendersMainContent = () => {
                   <Button
                     variant="contained"
                     color="error"
-                    onClick={() => alert("Call disbale api here")}
+                    onClick={() => callDisableApi()}
                   >
                     Confim Disable
                   </Button>
@@ -662,455 +833,491 @@ const SendersMainContent = () => {
                 </Box>
               </Box>
             )}
+            {selectedAction === "enable" && (
+              <Box>
+                <h2>Are you sure you want to Enable this?</h2>
+                <Box sx={{ mt: 3 }}>
+                  <Button
+                    variant="contained"
+                    color="error"
+                    onClick={() => callEnableApi()}
+                  >
+                    Confim Enable
+                  </Button>
+                  <Button
+                    variant="contained"
+                    color="success"
+                    sx={{ ml: 2 }}
+                    onClick={handleClose}
+                  >
+                    Do not Enable
+                  </Button>
+                </Box>
+              </Box>
+            )}
             {selectedAction === "edit" && (
               <Box sx={{ ml: 2 }}>
                 <h2>View KYC</h2>
-                <div style={{ display: "flex" }}>
-                  <div style={{ marginTop: "30px" }}>
-                    <p
-                      style={{
-                        fontSize: "20px",
-                        fontWeight: "500",
-                        color: "#2F80ED",
-                        marginLeft: "20px",
-                      }}
+                {fetchKyc && (
+                  <>
+                    <div
+                      style={{ display: "flex", justifyContent: "spce-around" }}
                     >
-                      Personal Details
-                    </p>
-                    <div style={{ display: "flex" }}>
-                      <div style={{ position: "relative" }}>
-                        <img
-                          src={avatarDemo}
-                          alt="icon"
+                      <div style={{ marginTop: "30px" }}>
+                        <p
                           style={{
-                            height: "298px",
-                            width: "285px",
-                            borderRadius: "24px",
-                          }}
-                        />
-                        <div
-                          style={{
-                            position: "absolute",
-                            width: "70%",
-                            bottom: "40px",
-                            padding: "12px 20px",
-                            backgroundColor: "rgba(255, 255, 255, 0.80)",
-                            borderRadius: "50px",
-                            left: "40px",
-                            display: "flex",
-                            justifyContent: "center",
-                            alignItems: "center",
+                            fontSize: "20px",
+                            fontWeight: "500",
+                            color: "#2F80ED",
+                            marginLeft: "20px",
                           }}
                         >
-                          <div>
+                          Personal Details
+                        </p>
+                        <div
+                          style={{
+                            display: "flex",
+                            gap: "20px",
+                            marginTop: "10px",
+                          }}
+                        >
+                          <div style={{ position: "relative" }}>
+                            <img
+                              src={fetchKyc?.image}
+                              alt="icon"
+                              style={{
+                                height: "298px",
+                                width: "255px",
+                                borderRadius: "24px",
+                              }}
+                            />
+                            <div
+                              style={{
+                                position: "absolute",
+                                width: "70%",
+                                bottom: "40px",
+                                padding: "12px 20px",
+                                backgroundColor: "rgba(255, 255, 255, 0.80)",
+                                borderRadius: "50px",
+                                left: "40px",
+                                display: "flex",
+                                justifyContent: "center",
+                                alignItems: "center",
+                              }}
+                            >
+                              <div>
+                                <p
+                                  style={{
+                                    fontSize: "15px",
+                                    fontWeight: "500",
+                                    color: "#000",
+                                  }}
+                                >
+                                  Verification Photo
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                          <div style={{ paddingTop: "20px" }}>
                             <p
                               style={{
                                 fontSize: "15px",
-                                fontWeight: "500",
-                                color: "#000",
+                                fontWeight: "600",
+                                marginBottom: "8px",
                               }}
                             >
-                              Verification Photo
+                              Name
+                            </p>
+                            <p
+                              style={{
+                                fontSize: "18px",
+                                fontWeight: "500",
+                                marginBottom: "20px",
+                              }}
+                            >
+                              {fetchKyc?.username}
+                            </p>
+                            <p
+                              style={{
+                                fontSize: "15px",
+                                fontWeight: "600",
+                                marginBottom: "8px",
+                              }}
+                            >
+                              Date of Birth
+                            </p>
+                            <p
+                              style={{
+                                fontSize: "18px",
+                                fontWeight: "500",
+                                marginBottom: "20px",
+                              }}
+                            >
+                              {fetchKyc?.dob}
+                            </p>
+                            <p
+                              style={{
+                                fontSize: "15px",
+                                fontWeight: "600",
+                                marginBottom: "8px",
+                              }}
+                            >
+                              Nationality
+                            </p>
+                            <p
+                              style={{
+                                fontSize: "18px",
+                                fontWeight: "500",
+                                marginBottom: "20px",
+                              }}
+                            >
+                              {fetchKyc?.kyc?.country}
+                            </p>
+                          </div>
+                        </div>
+                        <div style={{ display: "flex", padding: "20px" }}>
+                          <div>
+                            <p
+                              style={{
+                                fontSize: "20px",
+                                fontWeight: "500",
+                                color: "#2F80ED",
+                                marginBottom: "10px",
+                              }}
+                            >
+                              Address
+                            </p>
+                            <p
+                              style={{
+                                fontSize: "15px",
+                                fontWeight: "600",
+                                marginBottom: "8px",
+                              }}
+                            >
+                              Address Line
+                            </p>
+                            <p
+                              style={{
+                                fontSize: "18px",
+                                fontWeight: "500",
+                                marginBottom: "20px",
+                              }}
+                            >
+                              {fetchKyc?.kyc?.street_address}
+                            </p>
+                            <p
+                              style={{
+                                fontSize: "15px",
+                                fontWeight: "600",
+                                marginBottom: "8px",
+                              }}
+                            >
+                              City
+                            </p>
+                            <p
+                              style={{
+                                fontSize: "18px",
+                                fontWeight: "500",
+                                marginBottom: "20px",
+                              }}
+                            >
+                              {fetchKyc?.kyc?.city}
+                            </p>
+                            <p
+                              style={{
+                                fontSize: "15px",
+                                fontWeight: "600",
+                                marginBottom: "8px",
+                              }}
+                            >
+                              State
+                            </p>
+                            <p
+                              style={{
+                                fontSize: "18px",
+                                fontWeight: "500",
+                                marginBottom: "20px",
+                              }}
+                            >
+                              {fetchKyc?.kyc?.city}
+                            </p>
+                            <p
+                              style={{
+                                fontSize: "15px",
+                                fontWeight: "600",
+                                marginBottom: "8px",
+                              }}
+                            >
+                              Country
+                            </p>
+                            <p
+                              style={{
+                                fontSize: "18px",
+                                fontWeight: "500",
+                                marginBottom: "20px",
+                              }}
+                            >
+                              {fetchKyc?.kyc?.country}
+                            </p>
+                          </div>
+                          <div style={{ paddingLeft: "70px" }}>
+                            <p
+                              style={{
+                                fontSize: "20px",
+                                fontWeight: "500",
+                                color: "#2F80ED",
+                                marginBottom: "10px",
+                              }}
+                            >
+                              Contact Details
+                            </p>
+                            <p
+                              style={{
+                                fontSize: "15px",
+                                fontWeight: "600",
+                                marginBottom: "8px",
+                              }}
+                            >
+                              Phone Number
+                            </p>
+                            <p
+                              style={{
+                                fontSize: "18px",
+                                fontWeight: "500",
+                                marginBottom: "20px",
+                              }}
+                            >
+                              {fetchKyc?.phone}
+                            </p>
+                            <p
+                              style={{
+                                fontSize: "15px",
+                                fontWeight: "600",
+                                marginBottom: "8px",
+                              }}
+                            >
+                              Email
+                            </p>
+                            <p
+                              style={{
+                                fontSize: "18px",
+                                fontWeight: "500",
+                                marginBottom: "20px",
+                              }}
+                            >
+                              {fetchKyc?.email}
                             </p>
                           </div>
                         </div>
                       </div>
-                      <div style={{ paddingTop: "20px" }}>
-                        <p
-                          style={{
-                            fontSize: "15px",
-                            fontWeight: "600",
-                            marginBottom: "8px",
-                          }}
-                        >
-                          Name
-                        </p>
-                        <p
-                          style={{
-                            fontSize: "18px",
-                            fontWeight: "500",
-                            marginBottom: "20px",
-                          }}
-                        >
-                          Ahad Ali Chowdhury
-                        </p>
-                        <p
-                          style={{
-                            fontSize: "15px",
-                            fontWeight: "600",
-                            marginBottom: "8px",
-                          }}
-                        >
-                          Date of Birth
-                        </p>
-                        <p
-                          style={{
-                            fontSize: "18px",
-                            fontWeight: "500",
-                            marginBottom: "20px",
-                          }}
-                        >
-                          August 27th, 1999
-                        </p>
-                        <p
-                          style={{
-                            fontSize: "15px",
-                            fontWeight: "600",
-                            marginBottom: "8px",
-                          }}
-                        >
-                          Nationality
-                        </p>
-                        <p
-                          style={{
-                            fontSize: "18px",
-                            fontWeight: "500",
-                            marginBottom: "20px",
-                          }}
-                        >
-                          Australian
-                        </p>
-                      </div>
-                    </div>
-                    <div style={{ display: "flex", padding: "20px" }}>
-                      <div>
+                      <div style={{ marginTop: "30px", marginRight: "10px" }}>
                         <p
                           style={{
                             fontSize: "20px",
                             fontWeight: "500",
                             color: "#2F80ED",
+                            marginTop: "-5px",
                             marginBottom: "10px",
                           }}
                         >
-                          Address
+                          Submitted Documents
                         </p>
-                        <p
-                          style={{
-                            fontSize: "15px",
-                            fontWeight: "600",
-                            marginBottom: "8px",
-                          }}
-                        >
-                          Address Line
-                        </p>
-                        <p
-                          style={{
-                            fontSize: "18px",
-                            fontWeight: "500",
-                            marginBottom: "20px",
-                          }}
-                        >
-                          No 35 Jimmy Ebi Street
-                        </p>
-                        <p
-                          style={{
-                            fontSize: "15px",
-                            fontWeight: "600",
-                            marginBottom: "8px",
-                          }}
-                        >
-                          City
-                        </p>
-                        <p
-                          style={{
-                            fontSize: "18px",
-                            fontWeight: "500",
-                            marginBottom: "20px",
-                          }}
-                        >
-                          Yenagoa
-                        </p>
-                        <p
-                          style={{
-                            fontSize: "15px",
-                            fontWeight: "600",
-                            marginBottom: "8px",
-                          }}
-                        >
-                          State
-                        </p>
-                        <p
-                          style={{
-                            fontSize: "18px",
-                            fontWeight: "500",
-                            marginBottom: "20px",
-                          }}
-                        >
-                          Bayelsa
-                        </p>
-                        <p
-                          style={{
-                            fontSize: "15px",
-                            fontWeight: "600",
-                            marginBottom: "8px",
-                          }}
-                        >
-                          Country
-                        </p>
-                        <p
-                          style={{
-                            fontSize: "18px",
-                            fontWeight: "500",
-                            marginBottom: "20px",
-                          }}
-                        >
-                          Nigeria
-                        </p>
-                      </div>
-                      <div style={{ paddingLeft: "70px" }}>
-                        <p
-                          style={{
-                            fontSize: "20px",
-                            fontWeight: "500",
-                            color: "#2F80ED",
-                            marginBottom: "10px",
-                          }}
-                        >
-                          Contact Details
-                        </p>
-                        <p
-                          style={{
-                            fontSize: "15px",
-                            fontWeight: "600",
-                            marginBottom: "8px",
-                          }}
-                        >
-                          Phone Number
-                        </p>
-                        <p
-                          style={{
-                            fontSize: "18px",
-                            fontWeight: "500",
-                            marginBottom: "20px",
-                          }}
-                        >
-                          09034867656
-                        </p>
-                        <p
-                          style={{
-                            fontSize: "15px",
-                            fontWeight: "600",
-                            marginBottom: "8px",
-                          }}
-                        >
-                          Email
-                        </p>
-                        <p
-                          style={{
-                            fontSize: "18px",
-                            fontWeight: "500",
-                            marginBottom: "20px",
-                          }}
-                        >
-                          tomilola@me.com
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                  <div style={{ padding: "30px" }}>
-                    <p
-                      style={{
-                        fontSize: "20px",
-                        fontWeight: "500",
-                        color: "#2F80ED",
-                        marginTop: "-5px",
-                        marginBottom: "10px",
-                      }}
-                    >
-                      Submitted Documents
-                    </p>
-                    <div style={{ position: "relative" }}>
-                      <img
-                        src="https://bpsbd.org/wp-content/uploads/2021/03/NID-c137030591d94c73b8ff0db8a5a9311e.jpg"
-                        alt="icon"
-                        style={{
-                          height: isFrontFullSize ? "100%" : "286px",
-                          width: isFrontFullSize ? "100%" : "350px",
-                          borderRadius: "24px",
-                          marginBottom: "20px",
-                          cursor: "pointer",
-                        }}
-                        onClick={toggleFrontFullSize}
-                      />
-                      {isFrontFullSize && (
-                        <div
-                          style={{
-                            position: "fixed",
-                            top: 0,
-                            left: 0,
-                            width: "100%",
-                            height: "100%",
-                            backgroundColor: "rgba(0, 0, 0, 0.8)",
-                            display: "flex",
-                            justifyContent: "center",
-                            alignItems: "center",
-                            zIndex: 9999,
-                          }}
-                          onClick={toggleFrontFullSize}
-                        >
+                        <div style={{ position: "relative" }}>
                           <img
-                            src="https://bpsbd.org/wp-content/uploads/2021/03/NID-c137030591d94c73b8ff0db8a5a9311e.jpg"
+                            src={fetchKyc?.kyc?.id_front}
                             alt="icon"
                             style={{
-                              maxHeight: "90%",
-                              maxWidth: "90%",
+                              height: isFrontFullSize ? "100%" : "286px",
+                              width: isFrontFullSize ? "100%" : "350px",
                               borderRadius: "24px",
-                            }}
-                          />
-                        </div>
-                      )}
-                      <div
-                        style={{
-                          position: "absolute",
-                          width: "90%",
-                          bottom: "40px",
-                          padding: "12px 20px",
-                          backgroundColor: "rgba(255, 255, 255, 0.80)",
-                          borderRadius: "30px",
-                          left: "18px",
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                        }}
-                      >
-                        <div>
-                          <p
-                            style={{
-                              fontSize: "15px",
-                              fontWeight: "500",
-                              color: "#000",
-                            }}
-                          >
-                            ID Front
-                          </p>
-                        </div>
-                        <div>
-                          <p
-                            style={{
-                              backgroundColor: "rgba(255, 255, 255, 0.80)",
-                              border: "1px solid black",
-                              borderRadius: "16px",
-                              padding: "4px 14px",
+                              marginBottom: "20px",
                               cursor: "pointer",
                             }}
                             onClick={toggleFrontFullSize}
+                          />
+                          {isFrontFullSize && (
+                            <div
+                              style={{
+                                position: "fixed",
+                                top: 0,
+                                left: 0,
+                                width: "100%",
+                                height: "100%",
+                                backgroundColor: "rgba(0, 0, 0, 0.8)",
+                                display: "flex",
+                                justifyContent: "center",
+                                alignItems: "center",
+                                zIndex: 9999,
+                              }}
+                              onClick={toggleFrontFullSize}
+                            >
+                              <img
+                                src={fetchKyc?.kyc?.id_front}
+                                alt="icon"
+                                style={{
+                                  maxHeight: "90%",
+                                  maxWidth: "90%",
+                                  borderRadius: "24px",
+                                }}
+                              />
+                            </div>
+                          )}
+                          <div
+                            style={{
+                              position: "absolute",
+                              width: "90%",
+                              bottom: "40px",
+                              padding: "12px 20px",
+                              backgroundColor: "rgba(255, 255, 255, 0.80)",
+                              borderRadius: "30px",
+                              left: "18px",
+                              display: "flex",
+                              justifyContent: "space-between",
+                              alignItems: "center",
+                            }}
                           >
-                            view
-                          </p>
+                            <div>
+                              <p
+                                style={{
+                                  fontSize: "15px",
+                                  fontWeight: "500",
+                                  color: "#000",
+                                }}
+                              >
+                                ID Front
+                              </p>
+                            </div>
+                            <div>
+                              <p
+                                style={{
+                                  backgroundColor: "rgba(255, 255, 255, 0.80)",
+                                  border: "1px solid black",
+                                  borderRadius: "16px",
+                                  padding: "4px 14px",
+                                  cursor: "pointer",
+                                }}
+                                onClick={toggleFrontFullSize}
+                              >
+                                view
+                              </p>
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    </div>
-                    <div style={{ position: "relative" }}>
-                      <img
-                        src="https://bpsbd.org/wp-content/uploads/2021/03/NID-c137030591d94c73b8ff0db8a5a9311e.jpg"
-                        alt="icon"
-                        style={{
-                          height: isBackFullSize ? "100%" : "286px",
-                          width: isBackFullSize ? "100%" : "350px",
-                          borderRadius: "24px",
-                          marginBottom: "20px",
-                          cursor: "pointer",
-                        }}
-                        onClick={toggleBackFullSize}
-                      />
-                      {isBackFullSize && (
-                        <div
-                          style={{
-                            position: "fixed",
-                            top: 0,
-                            left: 0,
-                            width: "100%",
-                            height: "100%",
-                            backgroundColor: "rgba(0, 0, 0, 0.8)",
-                            display: "flex",
-                            justifyContent: "center",
-                            alignItems: "center",
-                            zIndex: 9999,
-                          }}
-                          onClick={toggleBackFullSize}
-                        >
+                        <div style={{ position: "relative" }}>
                           <img
-                            src="https://bpsbd.org/wp-content/uploads/2021/03/NID-c137030591d94c73b8ff0db8a5a9311e.jpg"
+                            src={fetchKyc?.kyc?.id_back}
                             alt="icon"
                             style={{
-                              maxHeight: "90%",
-                              maxWidth: "90%",
+                              height: isBackFullSize ? "100%" : "286px",
+                              width: isBackFullSize ? "100%" : "350px",
                               borderRadius: "24px",
-                            }}
-                          />
-                        </div>
-                      )}
-                      <div
-                        style={{
-                          position: "absolute",
-                          width: "90%",
-                          bottom: "40px",
-                          padding: "12px 20px",
-                          backgroundColor: "rgba(255, 255, 255, 0.80)",
-                          borderRadius: "30px",
-                          left: "18px",
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                        }}
-                      >
-                        <div>
-                          <p
-                            style={{
-                              fontSize: "15px",
-                              fontWeight: "500",
-                              color: "#000",
-                            }}
-                          >
-                            ID Back
-                          </p>
-                        </div>
-                        <div>
-                          <p
-                            style={{
-                              backgroundColor: "rgba(255, 255, 255, 0.80)",
-                              border: "1px solid black",
-                              borderRadius: "16px",
-                              padding: "4px 14px",
+                              marginBottom: "20px",
                               cursor: "pointer",
                             }}
                             onClick={toggleBackFullSize}
+                          />
+                          {isBackFullSize && (
+                            <div
+                              style={{
+                                position: "fixed",
+                                top: 0,
+                                left: 0,
+                                width: "100%",
+                                height: "100%",
+                                backgroundColor: "rgba(0, 0, 0, 0.8)",
+                                display: "flex",
+                                justifyContent: "center",
+                                alignItems: "center",
+                                zIndex: 9999,
+                              }}
+                              onClick={toggleBackFullSize}
+                            >
+                              <img
+                                src={fetchKyc?.kyc?.id_back}
+                                alt="icon"
+                                style={{
+                                  maxHeight: "90%",
+                                  maxWidth: "90%",
+                                  borderRadius: "24px",
+                                }}
+                              />
+                            </div>
+                          )}
+                          <div
+                            style={{
+                              position: "absolute",
+                              width: "90%",
+                              bottom: "40px",
+                              padding: "12px 20px",
+                              backgroundColor: "rgba(255, 255, 255, 0.80)",
+                              borderRadius: "30px",
+                              left: "18px",
+                              display: "flex",
+                              justifyContent: "space-between",
+                              alignItems: "center",
+                            }}
                           >
-                            view
-                          </p>
+                            <div>
+                              <p
+                                style={{
+                                  fontSize: "15px",
+                                  fontWeight: "500",
+                                  color: "#000",
+                                }}
+                              >
+                                ID Back
+                              </p>
+                            </div>
+                            <div>
+                              <p
+                                style={{
+                                  backgroundColor: "rgba(255, 255, 255, 0.80)",
+                                  border: "1px solid black",
+                                  borderRadius: "16px",
+                                  padding: "4px 14px",
+                                  cursor: "pointer",
+                                }}
+                                onClick={toggleBackFullSize}
+                              >
+                                view
+                              </p>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                </div>
-                <div>
-                  <button
-                    style={{
-                      padding: "16px 36px",
-                      borderRadius: "16px",
-                      cursor: "pointer",
-                      border: "none",
-                      color: "white",
-                      backgroundColor: "#003CFF",
-                      marginLeft: "16px",
-                      marginRight: "16px",
-                    }}
-                  >
-                    Approve KYC
-                  </button>
-                  <button
-                    style={{
-                      padding: "16px 56px",
-                      borderRadius: "16px",
-                      cursor: "pointer",
-                      border: "none",
-                      color: "white",
-                      backgroundColor: "#A7A7A7",
-                    }}
-                  >
-                    Deny KYC
-                  </button>
-                </div>
+                    <div>
+                      <button
+                        style={{
+                          padding: "16px 36px",
+                          borderRadius: "16px",
+                          cursor: "pointer",
+                          border: "none",
+                          color: "white",
+                          backgroundColor: "#003CFF",
+                          marginLeft: "16px",
+                          marginRight: "16px",
+                        }}
+                        onClick={() => approveKyc()}
+                      >
+                        Approve KYC
+                      </button>
+                      <button
+                        style={{
+                          padding: "16px 56px",
+                          borderRadius: "16px",
+                          cursor: "pointer",
+                          border: "none",
+                          color: "white",
+                          backgroundColor: "#A7A7A7",
+                        }}
+                        onClick={declineKyc}
+                      >
+                        Deny KYC
+                      </button>
+                    </div>
+                  </>
+                )}
               </Box>
             )}
             {selectedAction === "delete" && (
@@ -1120,7 +1327,7 @@ const SendersMainContent = () => {
                   <Button
                     variant="contained"
                     color="error"
-                    onClick={() => alert("Call disbale api here")}
+                    onClick={() => callDeleteApi()}
                   >
                     Confim delete
                   </Button>
