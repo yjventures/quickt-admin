@@ -12,6 +12,7 @@ import { Button, Menu, MenuItem } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import ArrowIcon from "../../assets/img/country/arrow.svg";
 import disableIcon from "../../assets/img/country/disable.svg";
+import enableIcon from "../../assets/img/country/enable.svg";
 import editIcon from "../../assets/img/country/edit.svg";
 import deleteIcon from "../../assets/img/country/delete.svg";
 import Dialog from "@mui/material/Dialog";
@@ -33,6 +34,8 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 
 const CountriesMainContent = () => {
   const [selectedRows, setSelectedRows] = useState([]);
+  const [countryName, setCountryName] = useState("");
+  const [countryCode, setCountryCode] = useState("");
   console.log(selectedRows);
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
@@ -65,7 +68,7 @@ const CountriesMainContent = () => {
     const data = await response.json();
     // return data.data
     if (data.data) {
-      // console.log(data.data.data)
+      console.log(data.data)
       return data.data;
     } else {
       return [];
@@ -81,6 +84,18 @@ const CountriesMainContent = () => {
   console.log();
   const allCountry = Array.isArray(countries)
     ? countries?.map((item) => ({
+      id: item.id,
+      name: item.attributes?.name,
+      code: item.attributes?.code,
+      image: item.attributes?.icon,
+      enabled: item.attributes?.enabled,
+    }))
+    : [];
+  // get only enabled countries
+  const enabledCountries = Array.isArray(countries)
+    ? countries
+      ?.filter((item) => item.attributes?.enabled === true)
+      .map((item) => ({
         id: item.id,
         name: item.attributes?.name,
         code: item.attributes?.code,
@@ -88,37 +103,30 @@ const CountriesMainContent = () => {
         enabled: item.attributes?.enabled,
       }))
     : [];
-  // get only enabled countries
-  const enabledCountries = Array.isArray(countries)
-    ? countries
-        ?.filter((item) => item.attributes?.enabled === true)
-        .map((item) => ({
-          id: item.id,
-          name: item.attributes?.name,
-          code: item.attributes?.code,
-          image: item.attributes?.icon,
-          enabled: item.attributes?.enabled,
-        }))
-    : [];
   // get only disabled countries
   const disabledCountries = Array.isArray(countries)
     ? countries
-        ?.filter((item) => {
-          return item.attributes?.enabled === false;
-        })
-        .map((item) => ({
-          id: item.id,
-          name: item.attributes?.name,
-          code: item.attributes?.code,
-          image: item.attributes?.icon,
-          enabled: item.attributes?.enabled,
-        }))
+      ?.filter((item) => {
+        return item.attributes?.enabled === false;
+      })
+      .map((item) => ({
+        id: item.id,
+        name: item.attributes?.name,
+        code: item.attributes?.code,
+        image: item.attributes?.icon,
+        enabled: item.attributes?.enabled,
+      }))
     : [];
 
   // console.log(allCountry)
+  ////////////////////////////////////////////////////////////////////////
+  //upload image and show preview
+  ////////////////////////////////////////////////////////////////////////
   const [selectedImage, setSelectedImage] = useState(IconImage);
+  const [strapiImage, setStrapiImage] = useState(null);
+  // console.log(selectedImage);
+  // console.log(strapiImage);
   const handleImageClick = () => {
-    90;
     const input = document.createElement("input");
     input.type = "file";
     input.accept = "image/*";
@@ -147,7 +155,36 @@ const CountriesMainContent = () => {
     };
     input.click();
   };
-
+  const handleCountryUpdate = () => {
+    // if empty field
+    if(countryName === "" || countryCode === ""){
+      alert("Please fill all the fields");
+      return;
+    }
+    const data = {
+      "data": {
+        "name": countryName,
+        "code": countryCode,
+        "icon": strapiImage 
+      },
+    };
+    
+    console.log(data);
+    axios.put(`https://api.quickt.com.au/api/countries/${selectedRows[0]?.id}`, data, {
+      headers: {
+        Authorization: `${localStorage.getItem("jwt")}`,
+      },
+    })
+      .then((response) => {
+        console.log(response);
+        alert("Country updated successfully");
+        handleClose();
+      })
+      .catch((error) => {
+        alert("Someting went wrong");
+        console.log(error);
+      });
+  };
   // columns for data grid
   const columns = [
     { field: "id", headerName: "ID", width: 70 },
@@ -182,8 +219,8 @@ const CountriesMainContent = () => {
             borderRadius: "50%",
             marginRight: 10,
           }}
-          src={`${params.row.image}`}
-          // alt="user-image"
+          src={`https://api.quickt.com.au${params.row.image}`}
+        // alt="user-image"
         />
       ),
     },
@@ -203,9 +240,8 @@ const CountriesMainContent = () => {
             alignItems: "center",
             height: "25px",
             width: "75px",
-            backgroundColor: `${
-              params.row.enabled == true ? "#DCFDD4" : "#FDD4D4"
-            }`,
+            backgroundColor: `${params.row.enabled == true ? "#DCFDD4" : "#FDD4D4"
+              }`,
             borderRadius: "15px",
             // border: `${params.row.enabled == true ? '1px solid #007FFF' : '1px solid #FFA800'}`,
             color: `${params.row.enabled == true ? "#4FAC16" : "#AC1616"}`,
@@ -266,14 +302,24 @@ const CountriesMainContent = () => {
                 boxShadow: "none",
               }}
             >
-              <MenuItem onClick={() => handleClickOpen("disable")}>
-                <img
-                  style={{ marginRight: "10px" }}
-                  src={disableIcon}
-                  alt="icon"
-                />
-                Disable
-              </MenuItem>
+              {
+                params.row.enabled == true ? <MenuItem onClick={() => handleClickOpen("disable")}>
+                  <img
+                    style={{ marginRight: "10px" }}
+                    src={disableIcon}
+                    alt="icon"
+                  />
+                  Disable
+                </MenuItem> : <MenuItem onClick={() => handleClickOpen("enable")}>
+                  <img
+                    style={{ marginRight: "10px", width: '15px', height: '15px' }}
+                    src={enableIcon}
+                    alt="icon"
+                  />
+                  Enable
+                </MenuItem>
+              }
+
               <MenuItem onClick={() => handleClickOpen("edit")}>
                 <img
                   style={{ marginRight: "10px" }}
@@ -389,6 +435,44 @@ const CountriesMainContent = () => {
         console.error(error);
       });
   };
+  const [enableModalOpen, setEnableModalOpen] = React.useState(false);
+  const handleEnableModalOpen = () => setEnableModalOpen(true);
+  const handleEnableModalClose = () => setEnableModalOpen(false);
+  // handle enable api for multirow
+  const callEnableApi = () => {
+    const enablePromises = selectedRows.map((item) =>
+      axios
+        .put(
+          `https://api.quickt.com.au/api/countries/${item.id}`,
+          {
+            data: {
+              enabled: true,
+            },
+          },
+          {
+            headers: {
+              Authorization: `${localStorage.getItem("jwt")}`,
+              // Add other headers if needed
+            },
+          }
+        )
+        .then((res) => console.log(res))
+        .catch((error) => console.error(error))
+    );
+
+    // Wait for all enable promises to resolve or reject
+    Promise.all(enablePromises)
+      .then((results) => {
+        // Handle the results if needed
+        console.log(results);
+        handleEnableModalClose();
+        window.location.reload();
+      })
+      .catch((error) => {
+        // Handle errors from any of the enable requests
+        console.error(error);
+      });
+  };
 
   return (
     <div className={styles.parent} style={{ position: "relative" }}>
@@ -410,6 +494,69 @@ const CountriesMainContent = () => {
               right: "35px",
             }}
           >
+            <button
+              onClick={() => {
+                handleEnableModalOpen();
+              }}
+              style={{
+                padding: "12px 20px",
+                width: "170px",
+                border: "none",
+                borderRadius: "20px",
+                backgroundColor: "#DCFDD3",
+                color: "#4FAC15",
+                fontSize: "16px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                gap: "15px",
+              }}
+            >
+              Enable Countries
+              {/* <img src={plusIcon} alt="icon" /> */}
+            </button>
+
+            {/* enable modal */}
+            <Modal
+              open={enableModalOpen}
+              onClose={handleDisableModalClose}
+              aria-labelledby="modal-modal-title"
+              aria-describedby="modal-modal-description"
+            >
+              <Box sx={disableModalStyle}>
+                <Typography id="" sx={{ fontSize: 30 }}>
+                  Are you sure you want to enable those Countries?
+                </Typography>
+                <Button
+                  variant="contained"
+                  color="success"
+                  onClick={() => {
+                    callEnableApi();
+                    setSelectedRows([]);
+                  }}
+                  style={{
+                    padding: "10px 30px",
+                    marginTop: "20px",
+                  }}
+                >
+                  Confim
+                </Button>
+                <Button
+                  variant="contained"
+                  color="error"
+                  onClick={handleDisableModalClose}
+                  style={{
+                    marginLeft: "20px",
+                    padding: "10px 30px",
+                    marginTop: "20px",
+                  }}
+                >
+                  No
+                </Button>
+              </Box>
+            </Modal>
+            {/* disable */}
             <button
               onClick={() => {
                 handleDisableModalOpen();
@@ -635,7 +782,7 @@ const CountriesMainContent = () => {
                   <Button
                     variant="contained"
                     color="error"
-                    onClick={() => alert("Call disbale api here")}
+                    onClick={() => callDisableApi()}
                   >
                     Confim Disable
                   </Button>
@@ -646,6 +793,28 @@ const CountriesMainContent = () => {
                     onClick={handleClose}
                   >
                     Do not disable
+                  </Button>
+                </Box>
+              </Box>
+            )}
+            {selectedAction === "enable" && (
+              <Box>
+                <h2>Are you sure you want to Enable this country?</h2>
+                <Box sx={{ mt: 3 }}>
+                  <Button
+                    variant="contained"
+                    color="success"
+                    onClick={() => callEnableApi()}
+                  >
+                    Confim Enable
+                  </Button>
+                  <Button
+                    variant="contained"
+                    color="error"
+                    sx={{ ml: 2 }}
+                    onClick={handleClose}
+                  >
+                    cancel
                   </Button>
                 </Box>
               </Box>
@@ -663,7 +832,7 @@ const CountriesMainContent = () => {
                         height: "180px",
                         cursor: "pointer",
                       }}
-                      alt=""
+                      alt="icon"
                       onClick={handleImageClick}
                     />
                     <p className="generalSettings_SubTextHeading">
@@ -672,6 +841,7 @@ const CountriesMainContent = () => {
                     <input
                       type="text"
                       placeholder="ex: United States of America"
+                      onChange={(e) => setCountryName(e.target.value)}
                       style={{
                         padding: "16px 20px",
                         width: "100%",
@@ -689,6 +859,7 @@ const CountriesMainContent = () => {
                     <input
                       type="text"
                       placeholder="ex: USA"
+                      onChange={(e) => setCountryCode(e.currentTarget.value)}
                       style={{
                         padding: "16px 20px",
                         width: "100%",
@@ -698,14 +869,12 @@ const CountriesMainContent = () => {
                         outline: "none",
                       }}
                     />
-                    <p className="generalSettings_SubTextHeading">Enabled</p>
-                    <Switch onChange={handleChange} checked={checked} />
                   </Typography>
                   <Box sx={{ mt: 3 }}>
                     <Button
                       variant="contained"
                       color="success"
-                      onClick={() => alert("Call edit api here")}
+                      onClick={() => handleCountryUpdate()}
                     >
                       Confim Update
                     </Button>
@@ -727,7 +896,7 @@ const CountriesMainContent = () => {
                   <Button
                     variant="contained"
                     color="error"
-                    onClick={() => alert("Call disbale api here")}
+                    onClick={() => callDeleteApi()}
                   >
                     Confim delete
                   </Button>
@@ -821,8 +990,7 @@ const TabPanel = styled(BaseTabPanel)(
     padding: 20px 12px;
     text-align: start;
     // background: ${theme.palette.mode === "dark" ? grey[900] : "#fff"};
-    // border: 1px solid ${
-      theme.palette.mode === "dark" ? grey[700] : grey[200]
+    // border: 1px solid ${theme.palette.mode === "dark" ? grey[700] : grey[200]
     };
     border-radius: 12px;
     `
@@ -838,8 +1006,7 @@ const TabsList = styled(BaseTabsList)(
     align-items: center;
     justify-content: center;
     align-content: space-between;
-    // box-shadow: 0px 4px 30px ${
-      theme.palette.mode === "dark" ? grey[900] : grey[200]
+    // box-shadow: 0px 4px 30px ${theme.palette.mode === "dark" ? grey[900] : grey[200]
     };
     `
 );

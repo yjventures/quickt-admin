@@ -33,12 +33,13 @@ const Country = () => {
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-
   const [checked, setChecked] = useState(true);
-
   const handleChange = (isChecked) => {
     setChecked(isChecked);
   };
+  const [countryName, setCountryName] = useState("");
+  const [countryCode, setCountryCode] = useState("");
+  
 
   ////////////////////////////////////////////////////////////////////////
   //upload image and show preview
@@ -76,7 +77,30 @@ const Country = () => {
     };
     input.click();
   };
-
+  
+  // create country
+  const handelCreateCountry = () => {
+    const data = {
+      "data": {
+        "name": countryName,
+        "code": countryCode,
+        "icon": strapiImage,
+        "enabled": checked
+      }
+    };
+    console.log(data);
+    axios
+      .post("https://api.quickt.com.au/api/countries", data)
+      .then((response) => {
+        console.log(response);
+        alert("Country created successfully");
+        handleClose();
+      })
+      .catch((error) => {
+        console.log(error);
+        alert("Something went wrong");
+      });
+  };
   return (
     <Box sx={{ height: "100vh", px: 3, overflow: "scroll" }}>
       {/* pathname */}
@@ -183,6 +207,7 @@ const Country = () => {
                 </p>
                 <input
                   type="text"
+                  onChange={(e) => setCountryName(e.target.value)}
                   placeholder="ex: United States of America"
                   style={{
                     padding: "16px 20px",
@@ -200,6 +225,7 @@ const Country = () => {
 
                 <input
                   type="text"
+                  onChange={(e) => setCountryCode(e.target.value)}
                   placeholder="ex: USA"
                   style={{
                     padding: "16px 20px",
@@ -214,7 +240,7 @@ const Country = () => {
                 <Switch onChange={handleChange} checked={checked} />
 
                 <button
-                  onClick={handleOpen}
+                  onClick={handelCreateCountry}
                   style={{
                     // padding: "16px 18px",
                     width: '140px',
