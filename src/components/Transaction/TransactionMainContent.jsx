@@ -70,10 +70,33 @@ const TransactionMainContent = () => {
     data: transactions,
   } = useQuery("allTransaction", fetchesTransaction);
   // Check if countries is an array before calling map
-  console.log();
   const allTransaction = Array.isArray(transactions)
     ? transactions?.map((item) => ({
-        id: item.id,
+      id: item.attributes?.transfer?.data?.id,
+      senders: {
+        image:
+          item.attributes?.users_permissions_user?.data?.attributes?.image, // Replace with the actual path or URL to the user's image
+        name: item.attributes?.users_permissions_user?.data?.attributes
+          ?.username,
+      },
+      receiverName: item.attributes?.receiver_name,
+      phone: item.attributes?.users_permissions_user?.data?.attributes?.phone,
+      BaseAmount: item.attributes?.transfer_amount,
+      Totalamount: item.attributes?.amount_total,
+      TransactionFees: item.attributes?.transfer_fees,
+      Date: item.attributes?.transaction_date,
+      Currency: item.attributes?.currency,
+      // is payment complete from QuickT
+      payoutStatus: item.attributes?.transfer?.data?.attributes?.payout_complete,
+      transferStatus: item.attributes?.transfer?.data?.attributes?.status,
+      transactionNumber: item.id,
+    }))
+    : [];
+  const completeCountries = Array.isArray(transactions)
+    ? transactions
+      ?.filter((item) => item.attributes?.transfer?.data?.attributes?.payout_complete == true)
+      .map((item) => ({
+        id: item.attributes?.transfer?.data?.id,
         senders: {
           image:
             item.attributes?.users_permissions_user?.data?.attributes?.image, // Replace with the actual path or URL to the user's image
@@ -87,101 +110,46 @@ const TransactionMainContent = () => {
         TransactionFees: item.attributes?.transfer_fees,
         Date: item.attributes?.transaction_date,
         Currency: item.attributes?.currency,
-        paymentStatus:
-          item.attributes?.transfer?.data?.attributes?.payout_complete,
-        transferStatus: item.attributes?.payment_status,
-        TransferNumber: item.id,
+        // is payment complete from QuickT
+        payoutStatus: item.attributes?.transfer?.data?.attributes?.payout_complete,
+        transferStatus: item.attributes?.transfer?.data?.attributes?.status,
+        transactionNumber: item.id,
       }))
-    : [];
-
-  const completeCountries = Array.isArray(transactions)
-    ? transactions
-        ?.filter((item) => item.attributes?.payment_status === "complete")
-        .map((item) => ({
-          id: item.id,
-          senders: {
-            image:
-              item.attributes?.users_permissions_user?.data?.attributes?.image, // Replace with the actual path or URL to the user's image
-            name: item.attributes?.users_permissions_user?.data?.attributes
-              ?.username,
-          },
-          receiverName: item.attributes?.receiver_name,
-          phone:
-            item.attributes?.users_permissions_user?.data?.attributes?.phone,
-          BaseAmount: item.attributes?.transfer_amount,
-          Totalamount: item.attributes?.amount_total,
-          TransactionFees: item.attributes?.transfer_fees,
-          Date: item.attributes?.transaction_date,
-          Currency: item.attributes?.currency,
-          paymentStatus:
-            item.attributes?.transfer?.data?.attributes?.payout_complete,
-          transferStatus: item.attributes?.payment_status,
-          TransferNumber: item.id,
-        }))
     : [];
   // get only pending countries
   const pendingCountries = Array.isArray(transactions)
     ? transactions
-        ?.filter((item) => {
-          return item.attributes?.payment_status === "pending";
-        })
-        .map((item) => ({
-          id: item.id,
-          senders: {
-            image:
-              item.attributes?.users_permissions_user?.data?.attributes?.image, // Replace with the actual path or URL to the user's image
-            name: item.attributes?.users_permissions_user?.data?.attributes
-              ?.username,
-          },
-          receiverName: item.attributes?.receiver_name,
-          phone:
-            item.attributes?.users_permissions_user?.data?.attributes?.phone,
-          BaseAmount: item.attributes?.transfer_amount,
-          Totalamount: item.attributes?.amount_total,
-          TransactionFees: item.attributes?.transfer_fees,
-          Date: item.attributes?.transaction_date,
-          Currency: item.attributes?.currency,
-          paymentStatus:
-            item.attributes?.transfer?.data?.attributes?.payout_complete,
-          transferStatus: item.attributes?.payment_status,
-          TransferNumber: item.id,
-        }))
-    : [];
-
-  const cancelCountries = Array.isArray(transactions)
-    ? transactions
-        ?.filter((item) => {
-          return item.attributes?.payment_status === "cancel";
-        })
-        .map((item) => ({
-          id: item.id,
-          senders: {
-            image:
-              item.attributes?.users_permissions_user?.data?.attributes?.image, // Replace with the actual path or URL to the user's image
-            name: item.attributes?.users_permissions_user?.data?.attributes
-              ?.username,
-          },
-          receiverName: item.attributes?.receiver_name,
-          phone:
-            item.attributes?.users_permissions_user?.data?.attributes?.phone,
-          BaseAmount: item.attributes?.transfer_amount,
-          Totalamount: item.attributes?.amount_total,
-          TransactionFees: item.attributes?.transfer_fees,
-          Date: item.attributes?.transaction_date,
-          Currency: item.attributes?.currency,
-          paymentStatus:
-            item.attributes?.transfer?.data?.attributes?.payout_complete,
-          transferStatus: item.attributes?.payment_status,
-          TransferNumber: item.id,
-        }))
+      ?.filter((item) => {
+        return item.attributes?.transfer?.data?.attributes?.payout_complete == false;
+      })
+      .map((item) => ({
+        id: item.attributes?.transfer?.data?.id,
+        senders: {
+          image:
+            item.attributes?.users_permissions_user?.data?.attributes?.image, // Replace with the actual path or URL to the user's image
+          name: item.attributes?.users_permissions_user?.data?.attributes
+            ?.username,
+        },
+        receiverName: item.attributes?.receiver_name,
+        phone: item.attributes?.users_permissions_user?.data?.attributes?.phone,
+        BaseAmount: item.attributes?.transfer_amount,
+        Totalamount: item.attributes?.amount_total,
+        TransactionFees: item.attributes?.transfer_fees,
+        Date: item.attributes?.transaction_date,
+        Currency: item.attributes?.currency,
+        // is payment complete from QuickT
+        payoutStatus: item.attributes?.transfer?.data?.attributes?.payout_complete,
+        transferStatus: item.attributes?.transfer?.data?.attributes?.status,
+        transactionNumber: item.id,
+      }))
     : [];
 
   const columns = [
     {
       field: "id",
       headerName: "QT-ID",
-      width: 100,
-      renderCell: (params) => <p>QT-{params.value}</p>,
+      width: 80,
+      renderCell: (params) => <p>QT-{params.row.transactionNumber}</p>,
     },
     {
       field: "senders",
@@ -243,10 +211,10 @@ const TransactionMainContent = () => {
         return <div>{localDate}</div>;
       },
     },
-    
+
     {
-      field: "paymentStatus",
-      headerName: "Partner Payment Status",
+      field: "payoutStatus",
+      headerName: "Partner Payout Status",
       width: 200,
       sortable: false,
       renderCell: (params) => (
@@ -258,20 +226,33 @@ const TransactionMainContent = () => {
             height: "25px",
             width: "80px",
             padding: "5px 10px",
-            backgroundColor: `${
-              params.row.paymentStatus == true ? "#DCFDD4" : "#FDD4D4"
-            }`,
+            backgroundColor: (() => {
+              switch (params.row.payoutStatus) {
+                case true:
+                  return "#DCFDD4";
+                case false:
+                  return "#FAFDD4";
+                default:
+                  return "#FAFDD4"; // Default color for unknown status
+              }
+            })(),
             borderRadius: "15px",
-            // border: `${params.row.enabled == true ? '1px solid #007FFF' : '1px solid #FFA800'}`,
-            color: `${
-              params.row.paymentStatus == true ? "#4FAC16" : "#AC1616"
-            }`,
+            color: (() => {
+              switch (params.row.payoutStatus) {
+                case true:
+                  return "#4FAC16";
+                case false:
+                  return "#AC9D16";
+                default:
+                  return "#AC9D16"; // Default color for unknown status
+              }
+            })(),
             fontFamily: "Open Sans",
             fontSize: "14px",
             fontStyle: "normal",
           }}
         >
-          {params.row.paymentStatus == true ? "Complete" : "Incomplete"}
+          {params.row.payoutStatus == true ? "Complete" : "Pending"}
         </div>
       ),
     },
@@ -294,8 +275,6 @@ const TransactionMainContent = () => {
                   return "#DCFDD4";
                 case "pending":
                   return "#FAFDD4";
-                case "cancel":
-                  return "#FDDCDC";
                 default:
                   return "#FAFDD4"; // Default color for unknown status
               }
@@ -307,8 +286,6 @@ const TransactionMainContent = () => {
                   return "#4FAC16";
                 case "pending":
                   return "#AC9D16";
-                case "cancel":
-                  return "#FF0000"; // Red for canceled status
                 default:
                   return "#000000"; // Default color for unknown status
               }
@@ -324,8 +301,6 @@ const TransactionMainContent = () => {
                 return "Complete";
               case "pending":
                 return "Pending";
-              case "cancel":
-                return "Cancel";
               default:
                 return "Pending";
             }
@@ -333,16 +308,6 @@ const TransactionMainContent = () => {
         </div>
       ),
     },
-
-    // {
-    //   field: "TransferNumber",
-    //   headerName: "",
-    //   width: 100,
-    //   renderCell: (params) => (
-    //     <p >QT-{params.value}</p>
-
-    //   ),
-    // },
     {
       field: "action",
       headerName: "Action",
@@ -457,18 +422,18 @@ const TransactionMainContent = () => {
   ////////////////////////////////////////////////////////////////
   //update integration with backend
   ////////////////////////////////////////////////////////////////
-  const [transferStatus, setTransferStatus] = React.useState("complete");
+  const [transferStatus, setTransferStatus] = React.useState("true");
 
   const handleUpdateTransferStatus = () => {
     console.log("Transfer Status:", transferStatus);
     axios
-      .put(`https://api.quickt.com.au/api/transactions/${selectedRows[0].id}`, {
+      .put(`https://api.quickt.com.au/api/transfers/${selectedRows[0].id}`, {
         data: {
-          payment_status: transferStatus,
+          payout_complete: transferStatus,
         },
       })
       .then((response) => {
-        console.log(response);
+        console.log(response, 'res');
         window.location.reload();
       })
       .catch((err) => {
@@ -500,7 +465,6 @@ const TransactionMainContent = () => {
           <Tab value={1}>All - {allTransaction?.length}</Tab>
           <Tab value={2}>Complete - {completeCountries?.length}</Tab>
           <Tab value={3}>Pending - {pendingCountries?.length}</Tab>
-          <Tab value={4}>cancel - {cancelCountries?.length}</Tab>
         </TabsList>
         {selectedRows.length > 1 && (
           <Box
@@ -641,27 +605,6 @@ const TransactionMainContent = () => {
             }}
           />
         </TabPanel>
-        <TabPanel value={4}>
-          <DataGrid
-            rows={cancelCountries}
-            columns={columns}
-            initialState={{
-              pagination: {
-                paginationModel: { page: 0, pageSize: 10 },
-              },
-            }}
-            pageSizeOptions={[10, 20]}
-            checkboxSelection
-            onRowSelectionModelChange={(ids) => {
-              const selectedIDs = new Set(ids);
-              const selectedRowData = cancelCountries.filter((row) =>
-                // selectedIDs.has(row.id.toString())
-                selectedIDs.has(row.id)
-              );
-              setSelectedRows(selectedRowData);
-            }}
-          />
-        </TabPanel>
       </Tabs>
       <Dialog
         maxWidth="md"
@@ -697,13 +640,11 @@ const TransactionMainContent = () => {
                   value={transferStatus}
                   onChange={(e) => {
                     setTransferStatus(e.target.value);
-                    // setBox(e.target.value)
                   }}
                   style={{ marginBottom: "20px", marginTop: "20px" }}
                 >
-                  <option value="complete">complete </option>
-                  <option value="cancel">cancel </option>
-                  <option value="pending">pending </option>
+                  <option value="true">complete </option>
+                  <option value="false">pending </option>
                 </select>
                 <Box sx={{ mt: 3, mb: 3 }}>
                   <Typography
@@ -831,8 +772,7 @@ const TabPanel = styled(BaseTabPanel)(
     font-size: 0.875rem;
     padding: 20px 12px;
     // background: ${theme.palette.mode === "dark" ? grey[900] : "#fff"};
-    // border: 1px solid ${
-      theme.palette.mode === "dark" ? grey[700] : grey[200]
+    // border: 1px solid ${theme.palette.mode === "dark" ? grey[700] : grey[200]
     };
     border-radius: 12px;
     `
@@ -848,8 +788,7 @@ const TabsList = styled(BaseTabsList)(
     align-items: center;
     justify-content: center;
     align-content: space-between;
-    // box-shadow: 0px 4px 30px ${
-      theme.palette.mode === "dark" ? grey[900] : grey[200]
+    // box-shadow: 0px 4px 30px ${theme.palette.mode === "dark" ? grey[900] : grey[200]
     };
     `
 );
