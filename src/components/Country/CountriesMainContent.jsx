@@ -754,7 +754,7 @@ const CountriesMainContent = () => {
       </Tabs>
       <Dialog
         maxWidth="md"
-        fullWidth
+        fullWidth= {selectedAction == "edit" ? true : false}
         open={open}
         onClose={handleClose}
         TransitionComponent={Transition}
@@ -765,7 +765,7 @@ const CountriesMainContent = () => {
             padding: "10px",
           }}
         >
-          <IconButton
+          {/* <IconButton
             style={{ position: "absolute", right: "5px", top: "5px" }}
             edge="start"
             color="inherit"
@@ -773,7 +773,7 @@ const CountriesMainContent = () => {
             aria-label="close"
           >
             <CloseIcon />
-          </IconButton>
+          </IconButton> */}
           <Box sx={{ ml: 1 }}>
             {selectedAction === "disable" && (
               <Box>

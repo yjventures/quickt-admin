@@ -495,7 +495,7 @@ const PartnersMainContent = () => {
       </Tabs>
       <Dialog
         maxWidth="md"
-        fullWidth
+        fullWidth={selectedAction === "delete" ? false : true}
         open={open}
         onClose={handleClose}
         TransitionComponent={Transition}
@@ -506,7 +506,7 @@ const PartnersMainContent = () => {
             padding: "10px",
           }}
         >
-          <IconButton
+          {/* <IconButton
             style={{ position: "absolute", right: "5px", top: "5px" }}
             edge="start"
             color="inherit"
@@ -514,7 +514,7 @@ const PartnersMainContent = () => {
             aria-label="close"
           >
             <CloseIcon />
-          </IconButton>
+          </IconButton> */}
           <Box sx={{ ml: 1 }}>
             {selectedAction === "edit" && (
               <Box sx={{ ml: 2 }}>

@@ -73,33 +73,38 @@ const TransactionMainContent = () => {
   console.log();
   const allTransaction = Array.isArray(transactions)
     ? transactions?.map((item) => ({
-        id: item.id,
-        senders: {
-          image:
-            item.attributes?.users_permissions_user?.data?.attributes?.image, // Replace with the actual path or URL to the user's image
-          name: item.attributes?.users_permissions_user?.data?.attributes
-            ?.username,
-        },
-        receiverName: item.attributes?.receiver_name,
-        phone: item.attributes?.users_permissions_user?.data?.attributes?.phone,
-        BaseAmount: item.attributes?.transfer_amount,
-        Totalamount: item.attributes?.amount_total,
-        TransactionFees: item.attributes?.transfer_fees,
-        Date: item.attributes?.transaction_date,
-        Currency: item.attributes?.currency,
-        paymentStatus:
-          item.attributes?.transfer?.data?.attributes?.payout_complete,
-        transferStatus: item.attributes?.payment_status,
-        TransferNumber: item.attributes?.receiver_number,
-      }))
+      id: item.id,
+      senders: {
+        image:
+          item.attributes?.users_permissions_user?.data?.attributes?.image, // Replace with the actual path or URL to the user's image
+        name: item.attributes?.users_permissions_user?.data?.attributes
+          ?.username,
+      },
+      receiverName: item.attributes?.receiver_name,
+      phone: item.attributes?.users_permissions_user?.data?.attributes?.phone,
+      BaseAmount: item.attributes?.transfer_amount,
+      Totalamount: item.attributes?.amount_total,
+      TransactionFees: item.attributes?.transfer_fees,
+      Date: item.attributes?.transaction_date,
+      Currency: item.attributes?.currency,
+      paymentStatus:
+        item.attributes?.transfer?.data?.attributes?.payout_complete,
+      transferStatus: item.attributes?.payment_status,
+      TransferNumber: item.id,
+    }))
     : [];
 
   const columns = [
-    { field: "id", headerName: "ID", width: 70 },
+    {
+      field: "id", headerName: "QT-ID", width: 100,
+      renderCell: (params) => (
+        <p >QT-{params.value}</p>
+      ),
+    },
     {
       field: "senders",
       headerName: "Sender",
-      width: 170,
+      width: 250,
       renderCell: (params) => (
         <div style={{ display: "flex", alignItems: "center" }}>
           <img
@@ -121,14 +126,14 @@ const TransactionMainContent = () => {
       ),
     },
     {
-      field: "receiverName",
-      headerName: "Receiver Details",
-      width: 130,
+      field: "phone",
+      headerName: "Senders Phone",
+      width: 200,
     },
     {
-      field: "phone",
-      headerName: "Phone",
-      width: 150,
+      field: "receiverName",
+      headerName: "Receiver Name",
+      width: 200,
     },
     {
       field: "BaseAmount",
@@ -142,24 +147,33 @@ const TransactionMainContent = () => {
     },
     {
       field: "TransactionFees",
-      headerName: "Transaction Fees",
+      headerName: "Fees",
       width: 100,
     },
     {
       field: "Date",
       headerName: "Date",
-      width: 130,
+      width: 100,
+      renderCell: (params) => {
+        const unixTimestamp = params.value * 1000; // Convert to milliseconds
+        const localDate = new Date(unixTimestamp).toLocaleDateString();
+
+        return (
+          <div>
+            {localDate}
+          </div>
+        );
+      }
     },
     {
       field: "Currency",
       headerName: "Currency",
-      width: 70,
+      width: 100,
     },
-
     {
       field: "paymentStatus",
-      headerName: "payment Status",
-      width: 130,
+      headerName: "Partner Payment Status",
+      width: 200,
       sortable: false,
       renderCell: (params) => (
         <div
@@ -168,21 +182,20 @@ const TransactionMainContent = () => {
             justifyContent: "center",
             alignItems: "center",
             height: "25px",
-            width: "75px",
-            backgroundColor: `${
-              params.row.paymentStatus == true ? "#DCFDD4" : "#FDD4D4"
-            }`,
+            width: "80px",
+            padding: "5px 10px",
+            backgroundColor: `${params.row.paymentStatus == true ? "#DCFDD4" : "#FDD4D4"
+              }`,
             borderRadius: "15px",
             // border: `${params.row.enabled == true ? '1px solid #007FFF' : '1px solid #FFA800'}`,
-            color: `${
-              params.row.paymentStatus == true ? "#4FAC16" : "#AC1616"
-            }`,
+            color: `${params.row.paymentStatus == true ? "#4FAC16" : "#AC1616"
+              }`,
             fontFamily: "Open Sans",
             fontSize: "14px",
             fontStyle: "normal",
           }}
         >
-          {params.row.paymentStatus == true ? "Enabled" : "Disabled"}
+          {params.row.paymentStatus == true ? "Complete" : "Incomplete"}
         </div>
       ),
     },
@@ -208,7 +221,7 @@ const TransactionMainContent = () => {
                 case "cancel":
                   return "#FDDCDC";
                 default:
-                  return "#FFFFFF"; // Default color for unknown status
+                  return "#FAFDD4"; // Default color for unknown status
               }
             })(),
             borderRadius: "15px",
@@ -238,18 +251,22 @@ const TransactionMainContent = () => {
               case "cancel":
                 return "Cancel";
               default:
-                return "Unknown";
+                return "Pending";
             }
           })()}
         </div>
       ),
     },
 
-    {
-      field: "TransferNumber",
-      headerName: "Transfer Number",
-      width: 100,
-    },
+    // {
+    //   field: "TransferNumber",
+    //   headerName: "",
+    //   width: 100,
+    //   renderCell: (params) => (
+    //     <p >QT-{params.value}</p>
+
+    //   ),
+    // },
     {
       field: "action",
       headerName: "Action",
@@ -672,8 +689,7 @@ const TabPanel = styled(BaseTabPanel)(
     font-size: 0.875rem;
     padding: 20px 12px;
     // background: ${theme.palette.mode === "dark" ? grey[900] : "#fff"};
-    // border: 1px solid ${
-      theme.palette.mode === "dark" ? grey[700] : grey[200]
+    // border: 1px solid ${theme.palette.mode === "dark" ? grey[700] : grey[200]
     };
     border-radius: 12px;
     `
@@ -689,8 +705,7 @@ const TabsList = styled(BaseTabsList)(
     align-items: center;
     justify-content: center;
     align-content: space-between;
-    // box-shadow: 0px 4px 30px ${
-      theme.palette.mode === "dark" ? grey[900] : grey[200]
+    // box-shadow: 0px 4px 30px ${theme.palette.mode === "dark" ? grey[900] : grey[200]
     };
     `
 );
