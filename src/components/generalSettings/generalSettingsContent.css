@@ -11,6 +11,7 @@
   font-size: 20px;
   margin-right: 30px;
   outline: none;
+  border: 1px solid #1a1919;
 }
 
 .generalSettings_CustomAmmount button {
@@ -24,15 +25,17 @@
 }
 
 .generalSettings_TextHeading {
-  font-size: 20px;
+  font-size: 14px;
   font-weight: 700;
+  color: #000;
   margin-bottom: 20px;
   margin-top: 30px;
 }
 
 .generalSettings_SubTextHeading {
-  font-size: 20px;
-  font-weight: 600;
+  font-size: 14px;
+  font-weight: 400;
+  color: #000;
   margin-bottom: 20px;
   margin-top: 30px;
 }
@@ -44,6 +47,7 @@
   font-size: 20px;
   margin-right: 30px;
   outline: none;
+  border: 1px solid #1a1919;
 }
 
 .generalSettings_MainBanner textarea {
@@ -53,6 +57,7 @@
   font-size: 20px;
   margin-right: 30px;
   outline: none;
+  border: 1px solid #1a1919;
 }
 
 .generalSettings_MainBanner button {
