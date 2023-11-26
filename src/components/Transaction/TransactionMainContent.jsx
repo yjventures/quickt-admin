@@ -73,38 +73,120 @@ const TransactionMainContent = () => {
   console.log();
   const allTransaction = Array.isArray(transactions)
     ? transactions?.map((item) => ({
-      id: item.id,
-      senders: {
-        image:
-          item.attributes?.users_permissions_user?.data?.attributes?.image, // Replace with the actual path or URL to the user's image
-        name: item.attributes?.users_permissions_user?.data?.attributes
-          ?.username,
-      },
-      receiverName: item.attributes?.receiver_name,
-      phone: item.attributes?.users_permissions_user?.data?.attributes?.phone,
-      BaseAmount: item.attributes?.transfer_amount,
-      Totalamount: item.attributes?.amount_total,
-      TransactionFees: item.attributes?.transfer_fees,
-      Date: item.attributes?.transaction_date,
-      Currency: item.attributes?.currency,
-      paymentStatus:
-        item.attributes?.transfer?.data?.attributes?.payout_complete,
-      transferStatus: item.attributes?.payment_status,
-      TransferNumber: item.id,
-    }))
+        id: item.id,
+        senders: {
+          image:
+            item.attributes?.users_permissions_user?.data?.attributes?.image, // Replace with the actual path or URL to the user's image
+          name: item.attributes?.users_permissions_user?.data?.attributes
+            ?.username,
+        },
+        receiverName: item.attributes?.receiver_name,
+        phone: item.attributes?.users_permissions_user?.data?.attributes?.phone,
+        BaseAmount: item.attributes?.transfer_amount,
+        Totalamount: item.attributes?.amount_total,
+        TransactionFees: item.attributes?.transfer_fees,
+        Date: item.attributes?.transaction_date,
+        Currency: item.attributes?.currency,
+        paymentStatus:
+          item.attributes?.transfer?.data?.attributes?.payout_complete,
+        transferStatus: item.attributes?.payment_status,
+        TransferNumber: item.id,
+      }))
+    : [];
+
+  const completeCountries = Array.isArray(transactions)
+    ? transactions
+        ?.filter((item) => item.attributes?.payment_status === "complete")
+        .map((item) => ({
+          id: item.id,
+          senders: {
+            image:
+              item.attributes?.users_permissions_user?.data?.attributes?.image, // Replace with the actual path or URL to the user's image
+            name: item.attributes?.users_permissions_user?.data?.attributes
+              ?.username,
+          },
+          receiverName: item.attributes?.receiver_name,
+          phone:
+            item.attributes?.users_permissions_user?.data?.attributes?.phone,
+          BaseAmount: item.attributes?.transfer_amount,
+          Totalamount: item.attributes?.amount_total,
+          TransactionFees: item.attributes?.transfer_fees,
+          Date: item.attributes?.transaction_date,
+          Currency: item.attributes?.currency,
+          paymentStatus:
+            item.attributes?.transfer?.data?.attributes?.payout_complete,
+          transferStatus: item.attributes?.payment_status,
+          TransferNumber: item.id,
+        }))
+    : [];
+  // get only pending countries
+  const pendingCountries = Array.isArray(transactions)
+    ? transactions
+        ?.filter((item) => {
+          return item.attributes?.payment_status === "pending";
+        })
+        .map((item) => ({
+          id: item.id,
+          senders: {
+            image:
+              item.attributes?.users_permissions_user?.data?.attributes?.image, // Replace with the actual path or URL to the user's image
+            name: item.attributes?.users_permissions_user?.data?.attributes
+              ?.username,
+          },
+          receiverName: item.attributes?.receiver_name,
+          phone:
+            item.attributes?.users_permissions_user?.data?.attributes?.phone,
+          BaseAmount: item.attributes?.transfer_amount,
+          Totalamount: item.attributes?.amount_total,
+          TransactionFees: item.attributes?.transfer_fees,
+          Date: item.attributes?.transaction_date,
+          Currency: item.attributes?.currency,
+          paymentStatus:
+            item.attributes?.transfer?.data?.attributes?.payout_complete,
+          transferStatus: item.attributes?.payment_status,
+          TransferNumber: item.id,
+        }))
+    : [];
+
+  const cancelCountries = Array.isArray(transactions)
+    ? transactions
+        ?.filter((item) => {
+          return item.attributes?.payment_status === "cancel";
+        })
+        .map((item) => ({
+          id: item.id,
+          senders: {
+            image:
+              item.attributes?.users_permissions_user?.data?.attributes?.image, // Replace with the actual path or URL to the user's image
+            name: item.attributes?.users_permissions_user?.data?.attributes
+              ?.username,
+          },
+          receiverName: item.attributes?.receiver_name,
+          phone:
+            item.attributes?.users_permissions_user?.data?.attributes?.phone,
+          BaseAmount: item.attributes?.transfer_amount,
+          Totalamount: item.attributes?.amount_total,
+          TransactionFees: item.attributes?.transfer_fees,
+          Date: item.attributes?.transaction_date,
+          Currency: item.attributes?.currency,
+          paymentStatus:
+            item.attributes?.transfer?.data?.attributes?.payout_complete,
+          transferStatus: item.attributes?.payment_status,
+          TransferNumber: item.id,
+        }))
     : [];
 
   const columns = [
     {
-      field: "id", headerName: "QT-ID", width: 100,
-      renderCell: (params) => (
-        <p >QT-{params.value}</p>
-      ),
+      field: "id",
+      headerName: "QT-ID",
+      width: 100,
+      renderCell: (params) => <p>QT-{params.value}</p>,
     },
     {
       field: "senders",
       headerName: "Sender",
-      width: 250,
+      width: 200,
       renderCell: (params) => (
         <div style={{ display: "flex", alignItems: "center" }}>
           <img
@@ -128,12 +210,12 @@ const TransactionMainContent = () => {
     {
       field: "phone",
       headerName: "Senders Phone",
-      width: 200,
+      width: 130,
     },
     {
       field: "receiverName",
       headerName: "Receiver Name",
-      width: 200,
+      width: 160,
     },
     {
       field: "BaseAmount",
@@ -158,18 +240,10 @@ const TransactionMainContent = () => {
         const unixTimestamp = params.value * 1000; // Convert to milliseconds
         const localDate = new Date(unixTimestamp).toLocaleDateString();
 
-        return (
-          <div>
-            {localDate}
-          </div>
-        );
-      }
+        return <div>{localDate}</div>;
+      },
     },
-    {
-      field: "Currency",
-      headerName: "Currency",
-      width: 100,
-    },
+    
     {
       field: "paymentStatus",
       headerName: "Partner Payment Status",
@@ -184,12 +258,14 @@ const TransactionMainContent = () => {
             height: "25px",
             width: "80px",
             padding: "5px 10px",
-            backgroundColor: `${params.row.paymentStatus == true ? "#DCFDD4" : "#FDD4D4"
-              }`,
+            backgroundColor: `${
+              params.row.paymentStatus == true ? "#DCFDD4" : "#FDD4D4"
+            }`,
             borderRadius: "15px",
             // border: `${params.row.enabled == true ? '1px solid #007FFF' : '1px solid #FFA800'}`,
-            color: `${params.row.paymentStatus == true ? "#4FAC16" : "#AC1616"
-              }`,
+            color: `${
+              params.row.paymentStatus == true ? "#4FAC16" : "#AC1616"
+            }`,
             fontFamily: "Open Sans",
             fontSize: "14px",
             fontStyle: "normal",
@@ -422,6 +498,9 @@ const TransactionMainContent = () => {
       <Tabs defaultValue={1}>
         <TabsList>
           <Tab value={1}>All - {allTransaction?.length}</Tab>
+          <Tab value={2}>Complete - {completeCountries?.length}</Tab>
+          <Tab value={3}>Pending - {pendingCountries?.length}</Tab>
+          <Tab value={4}>cancel - {cancelCountries?.length}</Tab>
         </TabsList>
         {selectedRows.length > 1 && (
           <Box
@@ -519,6 +598,69 @@ const TransactionMainContent = () => {
               }}
             />
           </div>
+        </TabPanel>
+        <TabPanel value={2}>
+          <DataGrid
+            rows={completeCountries}
+            columns={columns}
+            initialState={{
+              pagination: {
+                paginationModel: { page: 0, pageSize: 10 },
+              },
+            }}
+            pageSizeOptions={[10, 20]}
+            checkboxSelection
+            onRowSelectionModelChange={(ids) => {
+              const selectedIDs = new Set(ids);
+              const selectedRowData = completeCountries.filter((row) =>
+                // selectedIDs.has(row.id.toString())
+                selectedIDs.has(row.id)
+              );
+              setSelectedRows(selectedRowData);
+            }}
+          />
+        </TabPanel>
+        <TabPanel value={3}>
+          <DataGrid
+            rows={pendingCountries}
+            columns={columns}
+            initialState={{
+              pagination: {
+                paginationModel: { page: 0, pageSize: 10 },
+              },
+            }}
+            pageSizeOptions={[10, 20]}
+            checkboxSelection
+            onRowSelectionModelChange={(ids) => {
+              const selectedIDs = new Set(ids);
+              const selectedRowData = pendingCountries.filter((row) =>
+                // selectedIDs.has(row.id.toString())
+                selectedIDs.has(row.id)
+              );
+              setSelectedRows(selectedRowData);
+            }}
+          />
+        </TabPanel>
+        <TabPanel value={4}>
+          <DataGrid
+            rows={cancelCountries}
+            columns={columns}
+            initialState={{
+              pagination: {
+                paginationModel: { page: 0, pageSize: 10 },
+              },
+            }}
+            pageSizeOptions={[10, 20]}
+            checkboxSelection
+            onRowSelectionModelChange={(ids) => {
+              const selectedIDs = new Set(ids);
+              const selectedRowData = cancelCountries.filter((row) =>
+                // selectedIDs.has(row.id.toString())
+                selectedIDs.has(row.id)
+              );
+              setSelectedRows(selectedRowData);
+            }}
+          />
         </TabPanel>
       </Tabs>
       <Dialog
@@ -689,7 +831,8 @@ const TabPanel = styled(BaseTabPanel)(
     font-size: 0.875rem;
     padding: 20px 12px;
     // background: ${theme.palette.mode === "dark" ? grey[900] : "#fff"};
-    // border: 1px solid ${theme.palette.mode === "dark" ? grey[700] : grey[200]
+    // border: 1px solid ${
+      theme.palette.mode === "dark" ? grey[700] : grey[200]
     };
     border-radius: 12px;
     `
@@ -705,7 +848,8 @@ const TabsList = styled(BaseTabsList)(
     align-items: center;
     justify-content: center;
     align-content: space-between;
-    // box-shadow: 0px 4px 30px ${theme.palette.mode === "dark" ? grey[900] : grey[200]
+    // box-shadow: 0px 4px 30px ${
+      theme.palette.mode === "dark" ? grey[900] : grey[200]
     };
     `
 );

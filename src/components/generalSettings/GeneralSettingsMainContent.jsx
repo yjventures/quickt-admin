@@ -31,69 +31,88 @@ const GeneralSettingsMainContent = () => {
   const [quickAmount, setQuickAmount] = React.useState("");
   const [quickFee, setQuickFee] = React.useState("");
   const [visibility, setVisibility] = React.useState("");
-  const [fee, setFee] = useState('');
-  const [mainTitle, setMainTitle] = useState('');
-  const [mainDescription, setMainDescription] = useState('');
-  const [serviceTitle, setServiceTitle] = useState('');
-  const [serviceDescription, setServiceDescription] = useState('');
-  const [newTransferAmount, setNewTransferAmount] = useState('');
-  const [newTransferFee, setNewTransferFee] = useState('');
-  const [newTransferVisibility, setNewTransferVisibility] = useState('');
+  const [fee, setFee] = useState("");
+  const [mainTitle, setMainTitle] = useState("");
+  const [mainDescription, setMainDescription] = useState("");
+  const [serviceTitle, setServiceTitle] = useState("");
+  const [serviceDescription, setServiceDescription] = useState("");
+  const [newTransferAmount, setNewTransferAmount] = useState("");
+  const [newTransferFee, setNewTransferFee] = useState("");
+  const [newTransferVisibility, setNewTransferVisibility] = useState("");
   const [selectedImage, setSelectedImage] = useState(imageTemplate);
   const [strapiImage, setStrapiImage] = useState(null);
   // const [generalSettings, setGeneralSettings] = useState(null);
-  console.log(newTransferVisibility, newTransferFee, newTransferAmount)
+  console.log(newTransferVisibility, newTransferFee, newTransferAmount);
   const createQuickTransfer = async () => {
-    if (newTransferAmount === "" || newTransferFee === "" || newTransferVisibility === "") {
+    if (
+      newTransferAmount === "" ||
+      newTransferFee === "" ||
+      newTransferVisibility === ""
+    ) {
       alert("Please enter amount, fee and visibility");
       return;
     }
-    const res = await axios.post(`https://api.quickt.com.au/api/quick-transfers`, {
-      "data": {
-        "amount": Number(newTransferAmount),
-        "fee": Number(newTransferFee),
-        "enabled": newTransferVisibility
-      }
-    }, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+    const res = await axios.post(
+      `https://api.quickt.com.au/api/quick-transfers`,
+      {
+        data: {
+          amount: Number(newTransferAmount),
+          fee: Number(newTransferFee),
+          enabled: newTransferVisibility,
+        },
       },
-    });
-    console.log(res.data?.data?.id)
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+        },
+      }
+    );
+    console.log(res.data?.data?.id);
     if (res.data?.data?.id) {
-      setNewTransferAmount('');
-      setNewTransferFee('');
-      setNewTransferVisibility('');
+      setNewTransferAmount("");
+      setNewTransferFee("");
+      setNewTransferVisibility("");
       alert("Quick transfer created successfully");
       setNewTransfer(false);
-
     } else {
       alert("Something went wrong");
     }
+  };
 
-  }
-
-  const { data: generalSettings, isLoading: isgeneralSettingLoading, isError: isgeneralSettingError } = useQuery("generalSettings", async () => {
-    const res = await axios.get(`https://api.quickt.com.au/api/general-settings/1`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("jwt")}`,
-      },
-    });
+  const {
+    data: generalSettings,
+    isLoading: isgeneralSettingLoading,
+    isError: isgeneralSettingError,
+  } = useQuery("generalSettings", async () => {
+    const res = await axios.get(
+      `https://api.quickt.com.au/api/general-settings/1`,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+        },
+      }
+    );
     // console.log(res.data.data.attributes)
     return res.data.data.attributes;
-
-  })
+  });
   // console.log(generalSettings?.transfer_percentage)
   // get quick transfers
-  const { data: quickTransfers, isLoading, isError } = useQuery("quickTransfers", async () => {
-    const res = await axios.get(`https://api.quickt.com.au/api/quick-transfers`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("jwt")}`,
-      },
-    });
+  const {
+    data: quickTransfers,
+    isLoading,
+    isError,
+  } = useQuery("quickTransfers", async () => {
+    const res = await axios.get(
+      `https://api.quickt.com.au/api/quick-transfers`,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+        },
+      }
+    );
     // console.log(res.data.data)
     return res.data.data;
-  })
+  });
 
   React.useEffect(() => {
     if (quickTransfers) {
@@ -101,7 +120,7 @@ const GeneralSettingsMainContent = () => {
       setQuickAmount(quickTransfers?.[box - 1]?.attributes?.amount);
       setQuickFee(quickTransfers?.[box - 1]?.attributes?.fee);
     }
-  }, [box, quickTransfers])
+  }, [box, quickTransfers]);
   // console.log(quickTransfers.length)
   /////////////////////////////
   //image uploading
@@ -112,18 +131,24 @@ const GeneralSettingsMainContent = () => {
       alert("Please enter amount and fee");
       return;
     }
-    const res = await axios.put(`https://api.quickt.com.au/api/quick-transfers/${quickTransfers?.[box - 1]?.id}`, {
-      "data": {
-        "amount": Number(quickAmount),
-        "fee": Number(quickFee),
-        "enabled": visibility
-      }
-    }, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+    const res = await axios.put(
+      `https://api.quickt.com.au/api/quick-transfers/${
+        quickTransfers?.[box - 1]?.id
+      }`,
+      {
+        data: {
+          amount: Number(quickAmount),
+          fee: Number(quickFee),
+          enabled: visibility,
+        },
       },
-    });
-    console.log(res.data?.data?.id)
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+        },
+      }
+    );
+    console.log(res.data?.data?.id);
     if (res.data?.data?.id) {
       alert("Quick transfer updated successfully");
     } else {
@@ -167,18 +192,22 @@ const GeneralSettingsMainContent = () => {
       return;
     }
     // /api/general-settings/:id
-    const res = await axios.put(`https://api.quickt.com.au/api/general-settings/1`, {
-      "data": {
-        "transfer_percentage": Number(fee)
-      }
-    }, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+    const res = await axios.put(
+      `https://api.quickt.com.au/api/general-settings/1`,
+      {
+        data: {
+          transfer_percentage: Number(fee),
+        },
       },
-    });
-    console.log(res.data?.data?.id)
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+        },
+      }
+    );
+    console.log(res.data?.data?.id);
     if (res.data?.data?.id) {
-      setFee('');
+      setFee("");
       alert("Fee updated successfully");
     } else {
       alert("Something went wrong");
@@ -208,72 +237,81 @@ const GeneralSettingsMainContent = () => {
     //   return;
     // }
 
-    const res = await axios.put(`https://api.quickt.com.au/api/general-settings/1`, {
-      "data": {
-        "main_banner_title": mainTitle,
-        "main_banner_description": mainDescription
-      }
-
-    }, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+    const res = await axios.put(
+      `https://api.quickt.com.au/api/general-settings/1`,
+      {
+        data: {
+          main_banner_title: mainTitle,
+          main_banner_description: mainDescription,
+        },
       },
-    });
-    console.log(res.data?.data?.id)
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+        },
+      }
+    );
+    console.log(res.data?.data?.id);
     if (res.data?.data?.id) {
-      setMainTitle('');
-      setMainDescription('');
+      setMainTitle("");
+      setMainDescription("");
       alert("Main banner updated successfully");
     } else {
       alert("Something went wrong");
     }
   };
 
-
   const handleServiceBoxUpdate = async () => {
-    if (serviceTitle === "" || serviceDescription === "" || strapiImage === null) {
+    if (
+      serviceTitle === "" ||
+      serviceDescription === "" ||
+      strapiImage === null
+    ) {
       alert("Please enter title, description and icon");
       return;
     }
-    let serviceBoxData = {}
+    let serviceBoxData = {};
     if (box === 1) {
       serviceBoxData = {
-        "data": {
-          "service_box_one_title": serviceTitle,
-          "service_box_one_descr": serviceDescription,
+        data: {
+          service_box_one_title: serviceTitle,
+          service_box_one_descr: serviceDescription,
           // "service_box_one_icon": strapiImage
-        }
-      }
+        },
+      };
     } else if (box === 2) {
       serviceBoxData = {
-        "data": {
-          "service_box_two_title": serviceTitle,
-          "service_box_two_desc": serviceDescription,
+        data: {
+          service_box_two_title: serviceTitle,
+          service_box_two_desc: serviceDescription,
           // "service_box_two_icon": strapiImage
-        }
-      }
+        },
+      };
     } else {
       serviceBoxData = {
-        "data": {
-          "service_box_three_title": serviceTitle,
-          "service_box_three_desc": serviceDescription,
+        data: {
+          service_box_three_title: serviceTitle,
+          service_box_three_desc: serviceDescription,
           // "service_box_three_icon": strapiImage
-        }
-      }
+        },
+      };
     }
 
-
-    console.log(serviceBoxData)
+    console.log(serviceBoxData);
     // /api/general-settings/:id
-    const res = await axios.put(`https://api.quickt.com.au/api/general-settings/1`, serviceBoxData, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("jwt")}`,
-      },
-    });
-    console.log(res.data?.data?.id)
+    const res = await axios.put(
+      `https://api.quickt.com.au/api/general-settings/1`,
+      serviceBoxData,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+        },
+      }
+    );
+    console.log(res.data?.data?.id);
     if (res.data?.data?.id) {
-      setServiceTitle('');
-      setServiceDescription('');
+      setServiceTitle("");
+      setServiceDescription("");
       setSelectedImage(imageTemplate);
       setStrapiImage(null);
       alert("Service box updated successfully");
@@ -323,10 +361,7 @@ const GeneralSettingsMainContent = () => {
                 rows={6}
                 cols={10}
               ></textarea>
-              <button
-                onClick={handleMainBannerUpdate}
-              >Update
-              </button>
+              <button onClick={handleMainBannerUpdate}>Update</button>
             </div>
 
             <div className="generalSettings_MainBanner">
@@ -348,11 +383,11 @@ const GeneralSettingsMainContent = () => {
                       label="Select Box No"
                       onChange={handleChange}
                     >
-                      {
-                        [1, 2, 3].map((item, index) => (
-                          <MenuItem key={index} value={item}>Service box {item}</MenuItem>
-                        ))
-                      }
+                      {[1, 2, 3].map((item, index) => (
+                        <MenuItem key={index} value={item}>
+                          Service box {item}
+                        </MenuItem>
+                      ))}
                     </Select>
                   </FormControl>
                 </div>
@@ -379,7 +414,6 @@ const GeneralSettingsMainContent = () => {
                     alt="icon"
                     onClick={handleImageClick}
                   />
-
                 </div>
                 <div>
                   <p className="generalSettings_SubTextHeading">Description</p>
@@ -392,7 +426,10 @@ const GeneralSettingsMainContent = () => {
                   ></textarea>
                 </div>
               </div>
-              <button className="generalSettings__serviceButton" onClick={handleServiceBoxUpdate}>
+              <button
+                className="generalSettings__serviceButton"
+                onClick={handleServiceBoxUpdate}
+              >
                 Update Service {box} <img src={plusIcon} alt="icon" />
               </button>
             </div>
@@ -429,11 +466,11 @@ const GeneralSettingsMainContent = () => {
                     label="Select existing transfers"
                     onChange={handleChange}
                   >
-                    {
-                      [...Array(quickTransfers?.length)].map((item, index) => (
-                        <MenuItem key={index} value={index + 1}>Quick Transfer No {index + 1}</MenuItem>
-                      ))
-                    }
+                    {[...Array(quickTransfers?.length)].map((item, index) => (
+                      <MenuItem key={index} value={index + 1}>
+                        Quick Transfer No {index + 1}
+                      </MenuItem>
+                    ))}
                   </Select>
                 </FormControl>
               </div>
@@ -460,7 +497,7 @@ const GeneralSettingsMainContent = () => {
                   className={quickStyle.textInput}
                   value={quickFee}
                   onChange={(e) => {
-                    setQuickFee(e.target.value)
+                    setQuickFee(e.target.value);
                   }}
                 />
               </div>
@@ -488,26 +525,32 @@ const GeneralSettingsMainContent = () => {
                 <div className={quickStyle.absDiv}>{/* asd */}</div>
               </div>
               {/* update button */}
-              <button className={quickStyle.updateButton} onClick={updateQuickTransfer}>
+              <button
+                className={quickStyle.updateButton}
+                onClick={updateQuickTransfer}
+              >
                 <span> Update quick transfer {box}</span>
                 <img src={updateIcon} alt="icon" />
               </button>
             </Box>
           </Box>
           {
-            <button className={quickStyle.updateButton} onClick={() => {
-              setNewTransfer(!newTransfer)
-            }}>
+            <button
+              className={quickStyle.updateButton}
+              onClick={() => {
+                setNewTransfer(!newTransfer);
+              }}
+            >
               <span>
-                {
-                  newTransfer ? 'Hide making transfer' : 'Create another transfer'
-                }
+                {newTransfer
+                  ? "Hide making transfer"
+                  : "Create another transfer"}
               </span>
               <img src={plusIcon} alt="icon" />
             </button>
           }
-          {
-            newTransfer && <Box className={quickStyle.body} style={{ marginTop: "20px" }}>
+          {newTransfer && (
+            <Box className={quickStyle.body} style={{ marginTop: "20px" }}>
               {/* upper inputs */}
               <Box className={quickStyle.inputParent}>
                 <div className={quickStyle.inputBox}>
@@ -517,7 +560,7 @@ const GeneralSettingsMainContent = () => {
                     className={quickStyle.textInput}
                     value={newTransferAmount}
                     onChange={(e) => {
-                      setNewTransferAmount(e.target.value)
+                      setNewTransferAmount(e.target.value);
                     }}
                   />
                 </div>
@@ -528,9 +571,8 @@ const GeneralSettingsMainContent = () => {
                     className={quickStyle.textInput}
                     value={newTransferFee}
                     onChange={(e) => {
-                      setNewTransferFee(e.target.value)
+                      setNewTransferFee(e.target.value);
                     }}
-
                   />
                 </div>
               </Box>
@@ -542,10 +584,12 @@ const GeneralSettingsMainContent = () => {
                 >
                   <label htmlFor="amount">User Visibility</label>
                   {/* <input type="text" className={quickStyle.textInput} /> */}
-                  <select name="visibility" className={quickStyle.textInput}
+                  <select
+                    name="visibility"
+                    className={quickStyle.textInput}
                     value={newTransferVisibility}
                     onChange={(e) => {
-                      setNewTransferVisibility(e.target.value)
+                      setNewTransferVisibility(e.target.value);
                     }}
                   >
                     <option value="true">Visible</option>
@@ -557,15 +601,15 @@ const GeneralSettingsMainContent = () => {
                 <button
                   className={quickStyle.updateButton}
                   style={{ width: "200px" }}
-                  const onClick={createQuickTransfer}
+                  const
+                  onClick={createQuickTransfer}
                 >
                   <span> Confirm Creation</span>
                   <img src={plusIcon} alt="icon" />
                 </button>
               </Box>
             </Box>
-          }
-
+          )}
         </TabPanel>
       </Tabs>
     </div>
@@ -644,7 +688,8 @@ const TabPanel = styled(BaseTabPanel)(
     padding: 20px 12px;
     text-align: start;
     // background: ${theme.palette.mode === "dark" ? grey[900] : "#fff"};
-    // border: 1px solid ${theme.palette.mode === "dark" ? grey[700] : grey[200]
+    // border: 1px solid ${
+      theme.palette.mode === "dark" ? grey[700] : grey[200]
     };
     border-radius: 12px;
     `
@@ -660,7 +705,8 @@ const TabsList = styled(BaseTabsList)(
     align-items: center;
     justify-content: center;
     align-content: space-between;
-    // box-shadow: 0px 4px 30px ${theme.palette.mode === "dark" ? grey[900] : grey[200]
+    // box-shadow: 0px 4px 30px ${
+      theme.palette.mode === "dark" ? grey[900] : grey[200]
     };
     `
 );
