@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Box } from "@mui/material";
 import { light } from "@mui/material/styles/createPalette";
 
@@ -30,6 +30,7 @@ const style = {
 };
 
 const Partners = () => {
+  
   const path = window.location.pathname.split("/")[2].toUpperCase();
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);

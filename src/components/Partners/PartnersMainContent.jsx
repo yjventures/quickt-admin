@@ -37,8 +37,11 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 });
 
 const PartnersMainContent = () => {
+  //this is for parent component
+
   const [open, setOpen] = React.useState(false);
   const [selectedRows, setSelectedRows] = useState([]);
+
   const handleClearRows = () => {
     setSelectedRows([]);
   };
@@ -101,6 +104,10 @@ const PartnersMainContent = () => {
       }))
     : [];
   console.log(allPartners, "allPartners");
+
+  ////////////////////////////////
+  //for exporting the selected row
+  ////////////////////////////////
 
   const columns = [
     { field: "id", headerName: "ID", width: 40 },
