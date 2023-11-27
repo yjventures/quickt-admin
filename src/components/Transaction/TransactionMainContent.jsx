@@ -147,8 +147,8 @@ const TransactionMainContent = () => {
   const columns = [
     {
       field: "id",
-      headerName: "QT-ID",
-      width: 80,
+      headerName: "Transfer No",
+      width: 100,
       renderCell: (params) => <p>QT-{params.row.transactionNumber}</p>,
     },
     {
@@ -364,13 +364,13 @@ const TransactionMainContent = () => {
                 />
                 Update Status
               </MenuItem>
-              <MenuItem onClick={() => handleClickOpen("delete")}>
+              <MenuItem onClick={() => handleClickOpen("flag")}>
                 <img
                   style={{ marginRight: "10px" }}
                   src={deleteIcon}
                   alt="icon"
                 />
-                Remove
+                Flag
               </MenuItem>
             </Menu>
           </div>
@@ -466,7 +466,7 @@ const TransactionMainContent = () => {
           <Tab value={2}>Complete - {completeCountries?.length}</Tab>
           <Tab value={3}>Pending - {pendingCountries?.length}</Tab>
         </TabsList>
-        {selectedRows.length > 1 && (
+        {/* {selectedRows.length > 1 && (
           <Box
             sx={{
               display: "flex",
@@ -496,9 +496,7 @@ const TransactionMainContent = () => {
               }}
             >
               Delete Transaction
-              {/* <img src={plusIcon} alt="icon" /> */}
             </button>
-            {/* delete modal */}
             <Modal
               open={deleteModalOpen}
               onClose={handleDeleteModalClose}
@@ -538,7 +536,7 @@ const TransactionMainContent = () => {
               </Box>
             </Modal>
           </Box>
-        )}
+        )} */}
         <TabPanel value={1} onClick={handleClearRows}>
           <div style={{ height: "auto", width: "100%" }}>
             <DataGrid
@@ -608,7 +606,8 @@ const TransactionMainContent = () => {
       </Tabs>
       <Dialog
         maxWidth="md"
-        fullWidth
+        
+        fullWidth={selectedAction === "edit" ? true : false}
         open={open}
         onClose={handleClose}
         TransitionComponent={Transition}
@@ -619,7 +618,7 @@ const TransactionMainContent = () => {
             padding: "10px",
           }}
         >
-          <IconButton
+          {/* <IconButton
             style={{ position: "absolute", right: "5px", top: "5px" }}
             edge="start"
             color="inherit"
@@ -627,7 +626,7 @@ const TransactionMainContent = () => {
             aria-label="close"
           >
             <CloseIcon />
-          </IconButton>
+          </IconButton> */}
           <Box sx={{ ml: 1 }}>
             {selectedAction === "edit" && (
               <Box sx={{ ml: 2 }}>
@@ -672,16 +671,16 @@ const TransactionMainContent = () => {
                 </Box>
               </Box>
             )}
-            {selectedAction === "delete" && (
+            {selectedAction === "flag" && (
               <Box>
-                <h2>Are you sure you want to DELETE this Partner?</h2>
+                <h2>Are you sure you want to FLAG this transaction?</h2>
                 <Box sx={{ mt: 3 }}>
                   <Button
                     variant="contained"
                     color="error"
                     onClick={handleDeleteTransaction}
                   >
-                    Confim delete
+                    Confim Flag
                   </Button>
                   <Button
                     variant="contained"
@@ -689,7 +688,7 @@ const TransactionMainContent = () => {
                     sx={{ ml: 2 }}
                     onClick={handleClose}
                   >
-                    Do not delete
+                    Cancel
                   </Button>
                 </Box>
               </Box>
