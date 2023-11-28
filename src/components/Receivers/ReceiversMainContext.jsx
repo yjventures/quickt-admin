@@ -11,8 +11,10 @@ import { DataGrid } from "@mui/x-data-grid";
 import { useQuery } from "react-query";
 import { Button, Modal, Typography } from "@mui/material";
 import axios from "axios";
+import { useQueryClient } from "react-query";
 
 const ReceiversMainContent = () => {
+  const queryClient = useQueryClient();
   const [selectedRows, setSelectedRows] = useState([]);
   const handleClearRows = () => {
     setSelectedRows([]);
@@ -141,7 +143,7 @@ const ReceiversMainContent = () => {
         // Handle the results if needed
         console.log(results);
         handleDeleteModalClose();
-        window.location.reload();
+        queryClient.invalidateQueries("allReceivers");
       })
       .catch((error) => {
         // Handle errors from any of the delete requests

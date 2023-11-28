@@ -15,13 +15,7 @@ import disableIcon from "../../assets/img/country/disable.svg";
 import editIcon from "../../assets/img/country/edit.svg";
 import deleteIcon from "../../assets/img/country/delete.svg";
 import Dialog from "@mui/material/Dialog";
-import ListItemText from "@mui/material/ListItemText";
-import ListItem from "@mui/material/ListItem";
-import List from "@mui/material/List";
-import Divider from "@mui/material/Divider";
-import AppBar from "@mui/material/AppBar";
-import Toolbar from "@mui/material/Toolbar";
-import IconButton from "@mui/material/IconButton";
+import { useQueryClient } from "react-query";
 import Typography from "@mui/material/Typography";
 import CloseIcon from "@mui/icons-material/Close";
 import Slide from "@mui/material/Slide";
@@ -37,7 +31,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 });
 
 const PartnersMainContent = () => {
-  //this is for parent component
+  const queryClient = useQueryClient();
 
   const [open, setOpen] = React.useState(false);
   const [selectedRows, setSelectedRows] = useState([]);
@@ -274,7 +268,7 @@ const PartnersMainContent = () => {
         // Handle the results if needed
         console.log(results);
         handleDeleteModalClose();
-        window.location.reload();
+        queryClient.invalidateQueries("allPartners");
       })
       .catch((error) => {
         // Handle errors from any of the delete requests
@@ -290,7 +284,8 @@ const PartnersMainContent = () => {
       .delete(`https://api.quickt.com.au/api/partners/${selectedRows[0].id}`)
       .then((res) => {
         console.log(res);
-        window.location.reload();
+        queryClient.invalidateQueries("allPartners");
+        handleClose();
       })
       .catch((error) => console.error(error));
   };
@@ -392,7 +387,8 @@ const PartnersMainContent = () => {
       )
       .then((res) => {
         console.log(res);
-        window.location.reload();
+        queryClient.invalidateQueries("allPartners");
+        handleClose();
       })
       .catch((error) => console.error(error));
   };

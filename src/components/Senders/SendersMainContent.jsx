@@ -23,11 +23,13 @@ import avatarDemo from "../../assets/img/senders/avatarDemo.png";
 import enableIcon from "../../assets/img/country/enable.svg";
 import axios from "axios";
 import { useEffect } from "react";
+import { useQueryClient } from "react-query";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 const SendersMainContent = () => {
+  const queryClient = useQueryClient();
   ////////////////////////////////////////////////////////////////
   //for focusing image
   ////////////////////////////////////////////////////////////////
@@ -363,7 +365,7 @@ const SendersMainContent = () => {
       .then((results) => {
         console.log(results);
         handleDeleteModalClose();
-        window.location.reload();
+        queryClient.invalidateQueries("allSenders");
       })
       .catch((error) => {
         console.error(error);
@@ -413,7 +415,8 @@ const SendersMainContent = () => {
         // Handle the results if needed
         console.log(results);
         handleDeleteModalClose();
-        window.location.reload();
+        queryClient.invalidateQueries("allSenders");
+        handleClose();
       })
       .catch((error) => {
         // Handle errors from any of the disable requests
@@ -463,7 +466,8 @@ const SendersMainContent = () => {
         // Handle the results if needed
         console.log(results);
         handleDeleteModalClose();
-        window.location.reload();
+        queryClient.invalidateQueries("allSenders");
+        handleClose();
       })
       .catch((error) => {
         // Handle errors from any of the disable requests
@@ -475,6 +479,7 @@ const SendersMainContent = () => {
   //fetching kyc value
   ////////////////////////////////
   const [fetchKyc, setFetchKyc] = useState(null);
+
   useEffect(() => {
     axios
       .get(
@@ -500,7 +505,8 @@ const SendersMainContent = () => {
       })
       .then((res) => {
         // console.log(res)
-        window.location.reload();
+        queryClient.invalidateQueries("allSenders");
+        handleClose();
       });
   };
 
@@ -512,7 +518,8 @@ const SendersMainContent = () => {
       })
       .then((res) => {
         // console.log(res)
-        window.location.reload();
+        queryClient.invalidateQueries("allSenders");
+        handleClose(false);
       });
   };
 
@@ -790,8 +797,7 @@ const SendersMainContent = () => {
       </Tabs>
       <Dialog
         maxWidth="md"
-
-        fullWidth = {selectedAction === "edit" ? true : false}
+        fullWidth={selectedAction === "edit" ? true : false}
         open={open}
         onClose={handleClose}
         TransitionComponent={Transition}
@@ -821,7 +827,7 @@ const SendersMainContent = () => {
                     color="error"
                     onClick={() => callDisableApi()}
                   >
-                    Confim Disable
+                    Confirm Disable
                   </Button>
                   <Button
                     variant="contained"
@@ -843,7 +849,7 @@ const SendersMainContent = () => {
                     color="error"
                     onClick={() => callEnableApi()}
                   >
-                    Confim Enable
+                    Confirm Enable
                   </Button>
                   <Button
                     variant="contained"
@@ -1330,7 +1336,7 @@ const SendersMainContent = () => {
                     color="error"
                     onClick={() => callDeleteApi()}
                   >
-                    Confim delete
+                    Confirm delete
                   </Button>
                   <Button
                     variant="contained"

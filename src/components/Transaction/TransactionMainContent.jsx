@@ -9,7 +9,7 @@ import { buttonClasses } from "@mui/base/Button";
 import { Tab as BaseTab, tabClasses } from "@mui/base/Tab";
 import { DataGrid } from "@mui/x-data-grid";
 import Dialog from "@mui/material/Dialog";
-import { useQuery } from "react-query";
+import { useQuery, useQueryClient } from "react-query";
 import editIcon from "../../assets/img/country/edit.svg";
 import deleteIcon from "../../assets/img/country/delete.svg";
 import ArrowIcon from "../../assets/img/country/arrow.svg";
@@ -25,6 +25,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 });
 
 const TransactionMainContent = () => {
+  const queryClient = useQueryClient()
   const [selectedRows, setSelectedRows] = useState([]);
   console.log(selectedRows);
   const [open, setOpen] = React.useState(false);
@@ -72,30 +73,6 @@ const TransactionMainContent = () => {
   // Check if countries is an array before calling map
   const allTransaction = Array.isArray(transactions)
     ? transactions?.map((item) => ({
-      id: item.attributes?.transfer?.data?.id,
-      senders: {
-        image:
-          item.attributes?.users_permissions_user?.data?.attributes?.image, // Replace with the actual path or URL to the user's image
-        name: item.attributes?.users_permissions_user?.data?.attributes
-          ?.username,
-      },
-      receiverName: item.attributes?.receiver_name,
-      phone: item.attributes?.users_permissions_user?.data?.attributes?.phone,
-      BaseAmount: item.attributes?.transfer_amount,
-      Totalamount: item.attributes?.amount_total,
-      TransactionFees: item.attributes?.transfer_fees,
-      Date: item.attributes?.transaction_date,
-      Currency: item.attributes?.currency,
-      // is payment complete from QuickT
-      payoutStatus: item.attributes?.transfer?.data?.attributes?.payout_complete,
-      transferStatus: item.attributes?.transfer?.data?.attributes?.status,
-      transactionNumber: item.id,
-    }))
-    : [];
-  const completeCountries = Array.isArray(transactions)
-    ? transactions
-      ?.filter((item) => item.attributes?.transfer?.data?.attributes?.payout_complete == true)
-      .map((item) => ({
         id: item.attributes?.transfer?.data?.id,
         senders: {
           image:
@@ -111,37 +88,72 @@ const TransactionMainContent = () => {
         Date: item.attributes?.transaction_date,
         Currency: item.attributes?.currency,
         // is payment complete from QuickT
-        payoutStatus: item.attributes?.transfer?.data?.attributes?.payout_complete,
+        payoutStatus:
+          item.attributes?.transfer?.data?.attributes?.payout_complete,
         transferStatus: item.attributes?.transfer?.data?.attributes?.status,
         transactionNumber: item.id,
       }))
+    : [];
+  const completeCountries = Array.isArray(transactions)
+    ? transactions
+        ?.filter(
+          (item) =>
+            item.attributes?.transfer?.data?.attributes?.payout_complete == true
+        )
+        .map((item) => ({
+          id: item.attributes?.transfer?.data?.id,
+          senders: {
+            image:
+              item.attributes?.users_permissions_user?.data?.attributes?.image, // Replace with the actual path or URL to the user's image
+            name: item.attributes?.users_permissions_user?.data?.attributes
+              ?.username,
+          },
+          receiverName: item.attributes?.receiver_name,
+          phone:
+            item.attributes?.users_permissions_user?.data?.attributes?.phone,
+          BaseAmount: item.attributes?.transfer_amount,
+          Totalamount: item.attributes?.amount_total,
+          TransactionFees: item.attributes?.transfer_fees,
+          Date: item.attributes?.transaction_date,
+          Currency: item.attributes?.currency,
+          // is payment complete from QuickT
+          payoutStatus:
+            item.attributes?.transfer?.data?.attributes?.payout_complete,
+          transferStatus: item.attributes?.transfer?.data?.attributes?.status,
+          transactionNumber: item.id,
+        }))
     : [];
   // get only pending countries
   const pendingCountries = Array.isArray(transactions)
     ? transactions
-      ?.filter((item) => {
-        return item.attributes?.transfer?.data?.attributes?.payout_complete == false;
-      })
-      .map((item) => ({
-        id: item.attributes?.transfer?.data?.id,
-        senders: {
-          image:
-            item.attributes?.users_permissions_user?.data?.attributes?.image, // Replace with the actual path or URL to the user's image
-          name: item.attributes?.users_permissions_user?.data?.attributes
-            ?.username,
-        },
-        receiverName: item.attributes?.receiver_name,
-        phone: item.attributes?.users_permissions_user?.data?.attributes?.phone,
-        BaseAmount: item.attributes?.transfer_amount,
-        Totalamount: item.attributes?.amount_total,
-        TransactionFees: item.attributes?.transfer_fees,
-        Date: item.attributes?.transaction_date,
-        Currency: item.attributes?.currency,
-        // is payment complete from QuickT
-        payoutStatus: item.attributes?.transfer?.data?.attributes?.payout_complete,
-        transferStatus: item.attributes?.transfer?.data?.attributes?.status,
-        transactionNumber: item.id,
-      }))
+        ?.filter((item) => {
+          return (
+            item.attributes?.transfer?.data?.attributes?.payout_complete ==
+            false
+          );
+        })
+        .map((item) => ({
+          id: item.attributes?.transfer?.data?.id,
+          senders: {
+            image:
+              item.attributes?.users_permissions_user?.data?.attributes?.image, // Replace with the actual path or URL to the user's image
+            name: item.attributes?.users_permissions_user?.data?.attributes
+              ?.username,
+          },
+          receiverName: item.attributes?.receiver_name,
+          phone:
+            item.attributes?.users_permissions_user?.data?.attributes?.phone,
+          BaseAmount: item.attributes?.transfer_amount,
+          Totalamount: item.attributes?.amount_total,
+          TransactionFees: item.attributes?.transfer_fees,
+          Date: item.attributes?.transaction_date,
+          Currency: item.attributes?.currency,
+          // is payment complete from QuickT
+          payoutStatus:
+            item.attributes?.transfer?.data?.attributes?.payout_complete,
+          transferStatus: item.attributes?.transfer?.data?.attributes?.status,
+          transactionNumber: item.id,
+        }))
     : [];
 
   const columns = [
@@ -411,7 +423,7 @@ const TransactionMainContent = () => {
         // Handle the results if needed
         console.log(results);
         handleDeleteModalClose();
-        window.location.reload();
+        queryClient.invalidateQueries("allTransaction");
       })
       .catch((error) => {
         // Handle errors from any of the delete requests
@@ -433,8 +445,9 @@ const TransactionMainContent = () => {
         },
       })
       .then((response) => {
-        console.log(response, 'res');
-        window.location.reload();
+        console.log(response, "res");
+        queryClient.invalidateQueries("allTransaction");
+        handleClose();
       })
       .catch((err) => {
         console.error(err.message);
@@ -451,7 +464,8 @@ const TransactionMainContent = () => {
       )
       .then((response) => {
         // console.log(response);
-        window.location.reload();
+        queryClient.invalidateQueries("allTransaction");
+        handleClose();
       })
       .catch((err) => {
         console.error(err.message);
@@ -606,7 +620,6 @@ const TransactionMainContent = () => {
       </Tabs>
       <Dialog
         maxWidth="md"
-        
         fullWidth={selectedAction === "edit" ? true : false}
         open={open}
         onClose={handleClose}
@@ -771,7 +784,8 @@ const TabPanel = styled(BaseTabPanel)(
     font-size: 0.875rem;
     padding: 20px 12px;
     // background: ${theme.palette.mode === "dark" ? grey[900] : "#fff"};
-    // border: 1px solid ${theme.palette.mode === "dark" ? grey[700] : grey[200]
+    // border: 1px solid ${
+      theme.palette.mode === "dark" ? grey[700] : grey[200]
     };
     border-radius: 12px;
     `
@@ -787,7 +801,8 @@ const TabsList = styled(BaseTabsList)(
     align-items: center;
     justify-content: center;
     align-content: space-between;
-    // box-shadow: 0px 4px 30px ${theme.palette.mode === "dark" ? grey[900] : grey[200]
+    // box-shadow: 0px 4px 30px ${
+      theme.palette.mode === "dark" ? grey[900] : grey[200]
     };
     `
 );
