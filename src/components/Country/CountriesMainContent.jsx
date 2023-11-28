@@ -25,7 +25,7 @@ import { useState } from "react";
 import Switch from "react-switch";
 import IconImage from "../../assets/img/country/iconImage.png";
 import plusIcon from "../../assets/img/generalSettings/plus.svg";
-import { useQuery } from "react-query";
+import { useQuery, useQueryClient } from "react-query";
 import axios from "axios";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -33,6 +33,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 });
 
 const CountriesMainContent = () => {
+  const queryClient = useQueryClient()
   const [selectedRows, setSelectedRows] = useState([]);
   const [countryName, setCountryName] = useState("");
   const [countryCode, setCountryCode] = useState("");
@@ -375,7 +376,8 @@ const CountriesMainContent = () => {
         // Handle the results if needed
         console.log(results);
         handleDeleteModalClose();
-        window.location.reload();
+        queryClient.invalidateQueries("allCountry");
+        handleClose();
       })
       .catch((error) => {
         // Handle errors from any of the delete requests
@@ -428,7 +430,9 @@ const CountriesMainContent = () => {
         // Handle the results if needed
         console.log(results);
         handleDeleteModalClose();
-        window.location.reload();
+        queryClient.invalidateQueries("allCountry");
+        handleClose();
+
       })
       .catch((error) => {
         // Handle errors from any of the disable requests
@@ -466,7 +470,8 @@ const CountriesMainContent = () => {
         // Handle the results if needed
         console.log(results);
         handleEnableModalClose();
-        window.location.reload();
+        queryClient.invalidateQueries("allCountry");
+        handleClose();
       })
       .catch((error) => {
         // Handle errors from any of the enable requests

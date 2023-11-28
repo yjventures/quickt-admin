@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-
 export const AuthContext = React.createContext(null);
+
 
 const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     console.log(user)
     const [showForm, setShowForm] = useState('');
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [token, setToken] = useState(localStorage.getItem('jwt') || '');
     const [userId, setUserId] = useState(localStorage.getItem('userId') || '');
 
@@ -22,6 +21,7 @@ const AuthProvider = ({ children }) => {
 
     const fetchUserData = async (token, userId) => {
         try {
+            
             const response = await axios.get(`https://api.quickt.com.au/api/users/me`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -47,7 +47,7 @@ const AuthProvider = ({ children }) => {
 
             if (response.data) {
                 localStorage.setItem("jwt", response.data.jwt);
-                localStorage.setItem("user_id", response.data.user.id);
+                localStorage.setItem("userId", response.data.user.id);
                 const checkAdmin = await fetchUserData(response.data.jwt, response.data.user.id);
                 console.log(checkAdmin);
                 setLoading(false);
