@@ -18,7 +18,7 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import MailIcon from '@mui/icons-material/Mail';
-import { NavLink, Outlet, useLocation } from 'react-router-dom';
+import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 // logo and images
 import quicktLogo from '../../assets/img/quick-t-icon.svg';
 import dashboardIcon from '../../assets/img/drawer/dashboard.svg';
@@ -109,8 +109,9 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 
 
 export default function MiniDrawer() {
-    const { logout, user } = React.useContext(AuthContext)
+    const { user } = React.useContext(AuthContext)
     // console.log(user)
+    const navigate = useNavigate();
 
     const theme = useTheme();
     const [open, setOpen] = React.useState(true);
@@ -213,7 +214,8 @@ export default function MiniDrawer() {
                             width: '100%',
                         }}
                         onClick={() => {
-                            logout()
+                            localStorage.clear();
+                            navigate('/login');
                         }}
                     >
                         <ListItemIcon>

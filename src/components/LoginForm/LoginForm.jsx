@@ -13,17 +13,9 @@ const LoginForm = () => {
         e.preventDefault();
 
         // check if password is at least 6 characters long
-        if (e.target.password.value.length < 6) {
+        if (e.target.password.value.length < 8) {
             // console.log('Regex detected short password')
-            setError('Password must be at least 6 characters long');
-            return;
-        }
-
-        // check if email has @ and ends with .com
-        const emailRegex = /\S+@\S+\.\S+/;
-        if (!emailRegex.test(e.target.email.value)) {
-            console.log('Regex detected fake mail')
-            setError('Please enter a valid email');
+            setError('Password must be at least 8 characters long');
             return;
         }
 
@@ -33,8 +25,14 @@ const LoginForm = () => {
         }
 
         try {
-            await login(e.target.email.value, e.target.password.value);
-            navigate('/dashboard/generalSettings');
+            const result = await login(e.target.email.value, e.target.password.value);
+            console.log(result)
+            if(result.isAdmin) {
+                navigate('/dashboard/generalSettings');
+            } else {
+                alert('You are not an admin');
+                
+            }
         } catch (error) {
             setError(error.message);
         }
@@ -53,7 +51,7 @@ const LoginForm = () => {
 
             <button className={styles.button} type='submit'>
                 {
-                    loading ? <CircularProgress size={20}  sx={{color:"#fff"}} /> : 'Login'
+                    loading ? <CircularProgress size={20} sx={{ color: "#fff" }} /> : 'Login'
                 }
             </button>
             {

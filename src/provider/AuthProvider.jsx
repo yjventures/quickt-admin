@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 export const AuthContext = React.createContext(null);
 
@@ -17,19 +18,19 @@ const AuthProvider = ({ children }) => {
         } else {
             setLoading(false);
         }
-    }, []);
+    }, [userId, token]);
 
     const fetchUserData = async (token, userId) => {
         try {
-            const response = await axios.get(`https://api.quickt.com.au/api/users/me`, {
+            const response = await axios.get(`http://localhost:1337/api/users/me`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
             });
-            console.log(response.data)
-            const { first_name, email, isAdmin } = response.data;
+            const { isAdmin } = response.data;
             // set user
-            setUser({ name, email, isAdmin, userId, token });
+            setUser({ isAdmin, userId, token });
+            return { isAdmin, userId, token };
         } catch (error) {
             console.warn("Error fetching user data:", error);
         }
@@ -39,65 +40,36 @@ const AuthProvider = ({ children }) => {
     const login = async (email, password) => {
         setLoading(true);
         try {
-            const res = await axios.post("https://api.quickt.com.au/api/auth/local", {
+            const response = await axios.post("http://localhost:1337/api/auth/local", {
                 identifier: email,
                 password: password,
-            })
-                .then(async response => {
-                    console.log(response.data)
-                    if (response.data) {
-                        localStorage.setItem("jwt", response.data.jwt);
-                        localStorage.setItem("user_id", response.data.user.id);
-                        await fetchUserData(response.data.jwt, response.data.user.id);
-                    } else {
-                        showFailedAlert("Invalid Credentials");
-                    }
-                })
-                .catch(error => {
-                    console.log('Error:', error)
-                    alert("Invalid Credentials");
-                });
-            // const response = await axios.post('https://api.quickt.com.au/api/auth/local', {
-            //     identifier: email,
-            //     password: password,
-            // });
+            });
 
-            // if (response.data.status === 200) {
-            //     const data = response.data;
-            //     localStorage.setItem('jwt', data.jwt);
-            //     localStorage.setItem('userId', data.data._id);
-            //     setToken(data.jwt);
-            //     setUserId(data.data._id)
-            //     await fetchUserData(data.jwt, data.data._id);
-            // } else {
-            //     throw new Error(response.data.message);
-            // }
+            if (response.data) {
+                localStorage.setItem("jwt", response.data.jwt);
+                localStorage.setItem("user_id", response.data.user.id);
+                const checkAdmin = await fetchUserData(response.data.jwt, response.data.user.id);
+                console.log(checkAdmin);
+                setLoading(false);
+                return checkAdmin;
+            } else {
+                alert("Invalid Credentials");
+            }
         } catch (error) {
             console.error("Error during login:", error);
-            throw error;
+            alert("Something went wrong!");
         } finally {
             setLoading(false);
         }
     };
 
-    const logout = () => {
-        // invalidate token
-        fetch(`http://localhost:5000/logout?jwt=${token}`,)
-            .then(res => res.json())
-            .then(data => console.log(data))
-        setUser(null);
-    };
-
-
     const handleForm = (text) => {
         setShowForm(text)
     }
-
     const authInfo = {
         user,
         loading,
         login,
-        logout,
         handleForm,
         showForm
     };
