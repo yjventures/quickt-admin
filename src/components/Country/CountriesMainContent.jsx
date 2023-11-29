@@ -37,9 +37,15 @@ const CountriesMainContent = () => {
   const queryClient = useQueryClient()
   // get filtered data from filter component
   const { filterCountry } = useAuth();
+  const [isEnabled, setIsEnabled] = useState(null);
+  const [filterMood, setFilterMood] = useState(false);
+  // if filter country is not empty
   useEffect(() => {
-    console.log(filterCountry)
+    // console.log('test', filterCountry)
+    setFilterMood(filterCountry.filterMood)
+    setIsEnabled(filterCountry.isEnabled)
   }, [filterCountry])
+
   const [selectedRows, setSelectedRows] = useState([]);
   const [countryName, setCountryName] = useState("");
   const [countryCode, setCountryCode] = useState("");
@@ -49,7 +55,7 @@ const CountriesMainContent = () => {
   const [selectedAction, setSelectedAction] = React.useState("");
   const handleClickOpen = (action) => {
     setSelectedAction(action);
-    console.log(action);
+    // console.log(action);
     setOpen(true);
   };
 
@@ -88,7 +94,6 @@ const CountriesMainContent = () => {
     data: countries,
   } = useQuery("allCountry", fetchCounties);
   // Check if countries is an array before calling map
-  console.log();
   const allCountry = Array.isArray(countries)
     ? countries?.map((item) => ({
       id: item.id,
@@ -96,6 +101,7 @@ const CountriesMainContent = () => {
       code: item.attributes?.code,
       image: item.attributes?.icon,
       enabled: item.attributes?.enabled,
+      createdAt: item.attributes?.createdAt.slice(0, 10)
     }))
     : [];
   // get only enabled countries
@@ -108,6 +114,7 @@ const CountriesMainContent = () => {
         code: item.attributes?.code,
         image: item.attributes?.icon,
         enabled: item.attributes?.enabled,
+        createdAt: item.attributes?.createdAt.slice(0, 10)
       }))
     : [];
   // get only disabled countries
@@ -122,10 +129,11 @@ const CountriesMainContent = () => {
         code: item.attributes?.code,
         image: item.attributes?.icon,
         enabled: item.attributes?.enabled,
+        createdAt: item.attributes?.createdAt.slice(0, 10)
       }))
     : [];
 
-  // console.log(allCountry)
+  console.log(allCountry)
   ////////////////////////////////////////////////////////////////////////
   //upload image and show preview
   ////////////////////////////////////////////////////////////////////////
@@ -149,9 +157,9 @@ const CountriesMainContent = () => {
         axios
           .post("https://api.quickt.com.au/api/upload", formData)
           .then((response) => {
-            console.log("File uploaded successfully: ", response.data);
+            // console.log("File uploaded successfully: ", response.data);
             // showSuccessAlert("Image uploaded successfully");
-            console.log(response.data[0].url);
+            // console.log(response.data[0].url);
             setStrapiImage(response.data[0].url);
           })
           .catch((error) => {
@@ -176,20 +184,20 @@ const CountriesMainContent = () => {
       },
     };
 
-    console.log(data);
+    // console.log(data);
     axios.put(`https://api.quickt.com.au/api/countries/${selectedRows[0]?.id}`, data, {
       headers: {
         Authorization: `${localStorage.getItem("jwt")}`,
       },
     })
       .then((response) => {
-        console.log(response);
+        // console.log(response);
         alert("Country updated successfully");
         handleClose();
       })
       .catch((error) => {
         alert("Someting went wrong");
-        console.log(error);
+        // console.log(error);
       });
   };
   // columns for data grid
@@ -217,7 +225,6 @@ const CountriesMainContent = () => {
       sortable: false,
       filterable: false,
       disableColumnMenu: true,
-
       renderCell: (params) => (
         <img
           style={{
@@ -492,8 +499,13 @@ const CountriesMainContent = () => {
           <Tab onClick={handleClearRows} value={1}>
             All- {countries?.length}
           </Tab>
-          <Tab value={2}>Enabled - {enabledCountries?.length}</Tab>
-          <Tab value={3}>Disabled - {disabledCountries.length}</Tab>
+          {
+            filterMood !== true && <Tab value={2}>Enabled - {enabledCountries?.length}</Tab>
+          }
+          {
+            filterMood !== true && <Tab value={3}>Disabled - {disabledCountries.length}</Tab>
+          }
+
         </TabsList>
         {selectedRows.length > 1 && (
           <Box
@@ -693,75 +705,118 @@ const CountriesMainContent = () => {
             </Modal>
           </Box>
         )}
-        {/* all countries */}
-        <TabPanel value={1}>
-          <div style={{ height: "auto", width: "100%" }}>
-            <DataGrid
-              rows={allCountry}
-              columns={columns}
-              initialState={{
-                pagination: {
-                  paginationModel: { page: 0, pageSize: 10 },
-                },
-              }}
-              pageSizeOptions={[10, 20]}
-              checkboxSelection
-              // by default seleted row is first row
-              onRowSelectionModelChange={(ids) => {
-                const selectedIDs = new Set(ids);
-                const selectedRowData = countries.filter((row) =>
-                  // selectedIDs.has(row.id.toString())
-                  selectedIDs.has(row.id)
-                );
-                setSelectedRows(selectedRowData);
-              }}
-            />
-          </div>
-        </TabPanel>
-        {/* for enabled countries */}
-        <TabPanel value={2}>
-          <DataGrid
-            rows={enabledCountries}
-            columns={columns}
-            initialState={{
-              pagination: {
-                paginationModel: { page: 0, pageSize: 10 },
-              },
-            }}
-            pageSizeOptions={[10, 20]}
-            checkboxSelection
-            onRowSelectionModelChange={(ids) => {
-              const selectedIDs = new Set(ids);
-              const selectedRowData = enabledCountries.filter((row) =>
-                // selectedIDs.has(row.id.toString())
-                selectedIDs.has(row.id)
-              );
-              setSelectedRows(selectedRowData);
-            }}
-          />
-        </TabPanel>
-        {/* for enabled country */}
-        <TabPanel value={3}>
-          <DataGrid
-            rows={disabledCountries}
-            columns={columns}
-            initialState={{
-              pagination: {
-                paginationModel: { page: 0, pageSize: 10 },
-              },
-            }}
-            pageSizeOptions={[10, 20]}
-            checkboxSelection
-            onRowSelectionModelChange={(ids) => {
-              const selectedIDs = new Set(ids);
-              const selectedRowData = disabledCountries.filter((row) =>
-                // selectedIDs.has(row.id.toString())
-                selectedIDs.has(row.id)
-              );
-              setSelectedRows(selectedRowData);
-            }}
-          />
-        </TabPanel>
+        {/* common component of tab countries */}
+        {/* {
+          filterMood == false && <>
+           
+          </>
+        } */}
+
+
+        {
+          filterMood == true ? (
+            <TabPanel value={1}>
+              <div style={{ height: "auto", width: "100%" }}>
+                <DataGrid
+                  rows={allCountry.filter(item => item.enabled == isEnabled && item.createdAt >= filterCountry.from && item.createdAt <= filterCountry.to)}
+                  columns={columns}
+                  initialState={{
+                    pagination: {
+                      paginationModel: { page: 0, pageSize: 10 },
+                    },
+                  }}
+                  noRowsOverlay={
+                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%", width: "100%" }}>
+                      <h1 style={{ fontSize: "30px", color: "#AC1616" }}>No data available</h1>
+                    </div>
+                  }
+                  pageSizeOptions={[10, 20]}
+                  checkboxSelection
+                  onRowSelectionModelChange={(ids) => {
+                    const selectedIDs = new Set(ids);
+                    const selectedRowData = allCountry.filter((row) =>
+                      selectedIDs.has(row.id)
+                    );
+                    setSelectedRows(selectedRowData);
+                  }}
+                />
+              </div>
+            </TabPanel>
+
+          ) : <>
+            {/* for enabled countries */}
+            <TabPanel value={1}>
+              <div style={{ height: "auto", width: "100%" }}>
+                <DataGrid
+                  rows={allCountry}
+                  columns={columns}
+                  initialState={{
+                    pagination: {
+                      paginationModel: { page: 0, pageSize: 10 },
+                    },
+                  }}
+                  pageSizeOptions={[10, 20]}
+                  checkboxSelection
+                  // by default seleted row is first row
+                  onRowSelectionModelChange={(ids) => {
+                    const selectedIDs = new Set(ids);
+                    const selectedRowData = countries.filter((row) =>
+                      // selectedIDs.has(row.id.toString())
+                      selectedIDs.has(row.id)
+                    );
+                    setSelectedRows(selectedRowData);
+                  }}
+                />
+              </div>
+            </TabPanel>
+            {/* for enabled countries */}
+            <TabPanel value={2}>
+              <DataGrid
+                rows={enabledCountries}
+                columns={columns}
+                initialState={{
+                  pagination: {
+                    paginationModel: { page: 0, pageSize: 10 },
+                  },
+                }}
+                pageSizeOptions={[10, 20]}
+                checkboxSelection
+                onRowSelectionModelChange={(ids) => {
+                  const selectedIDs = new Set(ids);
+                  const selectedRowData = enabledCountries.filter((row) =>
+                    // selectedIDs.has(row.id.toString())
+                    selectedIDs.has(row.id)
+                  );
+                  setSelectedRows(selectedRowData);
+                }}
+              />
+            </TabPanel>
+            {/* for enabled country */}
+            <TabPanel value={3}>
+              <DataGrid
+                rows={disabledCountries}
+                columns={columns}
+                initialState={{
+                  pagination: {
+                    paginationModel: { page: 0, pageSize: 10 },
+                  },
+                }}
+                pageSizeOptions={[10, 20]}
+                checkboxSelection
+                onRowSelectionModelChange={(ids) => {
+                  const selectedIDs = new Set(ids);
+                  const selectedRowData = disabledCountries.filter((row) =>
+                    // selectedIDs.has(row.id.toString())
+                    selectedIDs.has(row.id)
+                  );
+                  setSelectedRows(selectedRowData);
+                }}
+              />
+            </TabPanel>
+
+          </>
+        }
+
       </Tabs>
       <Dialog
         maxWidth="md"
@@ -954,7 +1009,6 @@ const grey = {
   800: "#303740",
   900: "#1C2025",
 };
-
 const Tab = styled(BaseTab)`
   font-family: "IBM Plex Sans", sans-serif;
   color: #1d1929;
@@ -968,7 +1022,7 @@ const Tab = styled(BaseTab)`
   border: none;
   border-radius: 7px;
   display: flex;
-  justify-content: flex-start;
+  justify-content: center;
 
   &:hover {
     //   background-color: ${blue[400]};
@@ -999,7 +1053,6 @@ const TabPanel = styled(BaseTabPanel)(
     font-family: IBM Plex Sans, sans-serif;
     font-size: 0.875rem;
     padding: 20px 12px;
-    text-align: start;
     // background: ${theme.palette.mode === "dark" ? grey[900] : "#fff"};
     // border: 1px solid ${theme.palette.mode === "dark" ? grey[700] : grey[200]
     };
@@ -1009,7 +1062,7 @@ const TabPanel = styled(BaseTabPanel)(
 
 const TabsList = styled(BaseTabsList)(
   ({ theme }) => `
-    max-width: 360px;
+    max-width: 500px;
     // background-color: ${blue[500]};
     border-radius: 12px;
     margin-bottom: 16px;

@@ -76,6 +76,7 @@ const AuthProvider = ({ children }) => {
     const authInfo = {
         user,
         loading,
+        login,
         handleFilterCountry,
         filterCountry
     };

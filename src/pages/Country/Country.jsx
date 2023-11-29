@@ -47,7 +47,7 @@ const FilterStyle = {
 const Country = () => {
   // set data to global state
   const { handleFilterCountry, filterCountry } = useAuth();
-  console.log(filterCountry)
+  // console.log(filterCountry)
   const path = window.location.pathname.split("/")[2].toUpperCase();
   const [open, setOpen] = React.useState(false);
 
@@ -128,10 +128,29 @@ const Country = () => {
   const [filterOpen, setFilterOpen] = useState(false);
   const handleFilterOpen = () => setFilterOpen(true);
   const handleFilterClose = () => setFilterOpen(false);
-  const [countryStatus, setCountryStatus] = useState('enable');
+  // const [countryStatus, setCountryStatus] = useState(null);
+  const cuntryRef = React.useRef();
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
-
+  const handleStatusUpdate = (e) => {
+    setCountryStatus(e.target.value);
+    console.log(countryStatus)
+  };
+  const handleFilterUpdate = () => {
+    if (fromDate == "" || toDate == "") {
+      alert("Please select from date and to date");
+      return;
+    }
+    handleFilterCountry({
+      filterMood: true,
+      from: fromDate,
+      to: toDate,
+      // isEnabled: cuntryRef.current.value
+      // convert string to boolean
+      isEnabled: cuntryRef.current.value == "true" ? true : false
+    });
+    handleFilterClose();
+  };
   return (
     <Box sx={{ height: "100vh", px: 3, overflow: "scroll" }}>
       {/* pathname */}
@@ -196,7 +215,7 @@ const Country = () => {
 
         </Box>
         {/* remove filter if filterCountry.filterMood is true */}
-        {filterCountry.filterMood && (
+        {filterCountry.filterMood == true && (
           <button
             onClick={() => {
               handleFilterCountry({
@@ -424,25 +443,16 @@ const Country = () => {
             <select
               name="kyc Status"
               className={senderStyle.textInput}
-              value={countryStatus}
-              onChange={(e) => {
-                setCountryStatus(e.target.value);
-              }}
+              // value={countryStatus}
+              // onChange={handleStatusUpdate}
+              ref={cuntryRef}
             >
-              <option value="enable">Enable </option>
-              <option value="disable">Disable </option>
+              <option value="true">Enable </option>
+              <option value="false">Disable </option>
             </select>
 
 
-            <button className={senderStyle.button} onClick={() => {
-              handleFilterCountry({
-                filterMood: true,
-                from: fromDate,
-                to: toDate,
-                isEnabled: countryStatus
-              });
-              handleFilterClose();
-            }}>
+            <button className={senderStyle.button} onClick={handleFilterUpdate}>
               Apply Filters <img src={plusIcon} alt="icon" />{" "}
             </button>
           </Typography>
