@@ -5,12 +5,12 @@ export const AuthContext = React.createContext(null);
 
 const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
-    console.log(user)
-    const [showForm, setShowForm] = useState('');
+    // console.log(user)
     const [loading, setLoading] = useState(false);
     const [token, setToken] = useState(localStorage.getItem('jwt') || '');
     const [userId, setUserId] = useState(localStorage.getItem('userId') || '');
-
+    const [filterCountry, setFilterCountry] = useState({});
+    
     useEffect(() => {
         if (token && userId) {
             fetchUserData(token, userId);
@@ -21,7 +21,7 @@ const AuthProvider = ({ children }) => {
 
     const fetchUserData = async (token, userId) => {
         try {
-            
+
             const response = await axios.get(`https://api.quickt.com.au/api/users/me`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -63,15 +63,21 @@ const AuthProvider = ({ children }) => {
         }
     };
 
-    const handleForm = (text) => {
-        setShowForm(text)
+    // global checking for filter country
+    const handleFilterCountry = (text) => {
+        setFilterCountry({
+            filterMood: text.filterMood,
+            from: text.from,
+            to: text.to,
+            isEnabled: text.isEnabled
+        })
+
     }
     const authInfo = {
         user,
         loading,
-        login,
-        handleForm,
-        showForm
+        handleFilterCountry,
+        filterCountry
     };
 
     return (

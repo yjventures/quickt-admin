@@ -1,12 +1,11 @@
 .textInput {
-  width: 90%;
+  width: 100%;
   padding: 12px 16px;
   border-radius: 8px;
   font-size: 14px;
   margin-right: 30px;
   outline: none;
   border: 1px solid #999;
-  background-color: #f0eeee;
 }
 .textInput::selection {
   padding: 10px;
@@ -24,4 +23,5 @@
   margin-top: 20px;
   margin-bottom: 10px;
   cursor: pointer;
+  border: none;
 }

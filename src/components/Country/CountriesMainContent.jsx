@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Box } from "@mui/system";
 import styles from "../../assets/css/country.module.css";
 import { styled } from "@mui/system";
@@ -27,6 +27,7 @@ import IconImage from "../../assets/img/country/iconImage.png";
 import plusIcon from "../../assets/img/generalSettings/plus.svg";
 import { useQuery, useQueryClient } from "react-query";
 import axios from "axios";
+import useAuth from "../../hook/useAuth";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -34,10 +35,15 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 
 const CountriesMainContent = () => {
   const queryClient = useQueryClient()
+  // get filtered data from filter component
+  const { filterCountry } = useAuth();
+  useEffect(() => {
+    console.log(filterCountry)
+  }, [filterCountry])
   const [selectedRows, setSelectedRows] = useState([]);
   const [countryName, setCountryName] = useState("");
   const [countryCode, setCountryCode] = useState("");
-  console.log(selectedRows);
+  // console.log(selectedRows);
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const [selectedAction, setSelectedAction] = React.useState("");
@@ -69,7 +75,7 @@ const CountriesMainContent = () => {
     const data = await response.json();
     // return data.data
     if (data.data) {
-      console.log(data.data)
+      // console.log(data.data)
       return data.data;
     } else {
       return [];
@@ -158,7 +164,7 @@ const CountriesMainContent = () => {
   };
   const handleCountryUpdate = () => {
     // if empty field
-    if(countryName === "" || countryCode === ""){
+    if (countryName === "" || countryCode === "") {
       alert("Please fill all the fields");
       return;
     }
@@ -166,10 +172,10 @@ const CountriesMainContent = () => {
       "data": {
         "name": countryName,
         "code": countryCode,
-        "icon": strapiImage 
+        "icon": strapiImage
       },
     };
-    
+
     console.log(data);
     axios.put(`https://api.quickt.com.au/api/countries/${selectedRows[0]?.id}`, data, {
       headers: {
@@ -759,7 +765,7 @@ const CountriesMainContent = () => {
       </Tabs>
       <Dialog
         maxWidth="md"
-        fullWidth= {selectedAction == "edit" ? true : false}
+        fullWidth={selectedAction == "edit" ? true : false}
         open={open}
         onClose={handleClose}
         TransitionComponent={Transition}

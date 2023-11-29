@@ -15,6 +15,7 @@ import IconImage from "../../assets/img/country/iconImage.png";
 import Switch from "react-switch";
 import axios from "axios";
 import senderStyle from "../../assets/css/sender.module.css";
+import useAuth from "../../hook/useAuth";
 
 const style = {
   position: "absolute",
@@ -44,8 +45,12 @@ const FilterStyle = {
 };
 
 const Country = () => {
+  // set data to global state
+  const { handleFilterCountry, filterCountry } = useAuth();
+  console.log(filterCountry)
   const path = window.location.pathname.split("/")[2].toUpperCase();
   const [open, setOpen] = React.useState(false);
+
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
   const [checked, setChecked] = useState(true);
@@ -123,8 +128,10 @@ const Country = () => {
   const [filterOpen, setFilterOpen] = useState(false);
   const handleFilterOpen = () => setFilterOpen(true);
   const handleFilterClose = () => setFilterOpen(false);
-  const [kycStatus, setKycStatus] = useState("");
-  const [userStatus, setUserStatus] = useState("");
+  const [countryStatus, setCountryStatus] = useState('enable');
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
+
   return (
     <Box sx={{ height: "100vh", px: 3, overflow: "scroll" }}>
       {/* pathname */}
@@ -186,7 +193,35 @@ const Country = () => {
               cursor: "pointer",
             }}
           />
+
         </Box>
+        {/* remove filter if filterCountry.filterMood is true */}
+        {filterCountry.filterMood && (
+          <button
+            onClick={() => {
+              handleFilterCountry({
+                filterMood: false,
+                from: "",
+                to: "",
+                isEnabled: ""
+              });
+            }}
+            style={{
+              height: "40px",
+              width: "130px",
+              borderRadius: "25px",
+              border: "1px solid #E9E9EA",
+              color: "red",
+              outline: "none",
+              padding: "0 20px",
+              backgroundColor: "#fff",
+              cursor: "pointer",
+              position: 'absolute',
+            }}
+          >
+            Remove Filter
+          </button>
+        )}
         <Box sx={{ display: "flex", alignItems: "center" }}>
           <ExportButton />
           <span style={{ marginLeft: "10px" }}></span>
@@ -290,140 +325,129 @@ const Country = () => {
         </Box>
       </Box>
       <Modal
-            open={filterOpen}
-            onClose={handleFilterClose}
-            aria-labelledby="modal-modal-title"
-            aria-describedby="modal-modal-description"
-          >
-            <Box sx={FilterStyle}>
-              <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+        open={filterOpen}
+        onClose={handleFilterClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={FilterStyle}>
+          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+            <p
+              style={{
+                fontSize: "14px",
+                fontWeight: "700",
+                color: "#262E36",
+              }}
+            >
+              Filter by created date
+            </p>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <div>
                 <p
                   style={{
                     fontSize: "14px",
-                    fontWeight: "700",
-                    color: "#262E36",
-                  }}
-                >
-                  Filter by created date
-                </p>
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <div>
-                    <p
-                      style={{
-                        fontSize: "14px",
-                        fontWeight: "400",
-                        marginTop: "18px",
-                        marginBottom: "10px",
-                      }}
-                    >
-                      From
-                    </p>
-                    <input
-                      type="date"
-                      placeholder="D/M/YYYY H:MM M"
-                      style={{
-                        paddingRight: "20px",
-                        paddingLeft: "10px",
-                        paddingTop: "10px",
-                        paddingBottom: "10px",
-                        borderRadius: "10px",
-                        width: "200px",
-                        outline: "none",
-                        border: "1px solid #999",
-                        fontSize: "14px",
-                      }}
-                    />
-                  </div>
-                  <div>
-                    <p
-                      style={{
-                        fontSize: "14px",
-                        fontWeight: "400",
-                        marginTop: "18px",
-                        marginBottom: "10px",
-                      }}
-                    >
-                      To
-                    </p>
-                    <input
-                      type="date"
-                      placeholder="D/M/YYYY H:MM M"
-                      style={{
-                        paddingRight: "20px",
-                        paddingLeft: "10px",
-                        paddingTop: "10px",
-                        paddingBottom: "10px",
-                        borderRadius: "10px",
-                        width: "200px",
-                        outline: "none",
-                        border: "1px solid #999",
-                        fontSize: "14px",
-                      }}
-                    />
-                  </div>
-                </div>
-                <p
-                  style={{
-                    fontSize: "14px",
-                    fontWeight: "700",
-                    color: "#262E36",
+                    fontWeight: "400",
+                    marginTop: "18px",
                     marginBottom: "10px",
-                    marginTop: "20px",
                   }}
                 >
-                  Filter by KYC Status
+                  From
                 </p>
-
-                <select
-                  name="kyc Status"
-                  className={senderStyle.textInput}
-                  value={kycStatus}
+                <input
+                  type="date"
+                  placeholder="D/M/YYYY H:MM M"
                   onChange={(e) => {
-                    setKycStatus(e.target.value);
-                    // setBox(e.target.value)
+                    setFromDate(e.target.value);
                   }}
-                >
-                  <option value="complete">Complete </option>
-                  <option value="pending">Pending </option>
-                </select>
-
+                  style={{
+                    paddingRight: "20px",
+                    paddingLeft: "10px",
+                    paddingTop: "10px",
+                    paddingBottom: "10px",
+                    borderRadius: "10px",
+                    width: "200px",
+                    outline: "none",
+                    border: "1px solid #999",
+                    fontSize: "14px",
+                  }}
+                />
+              </div>
+              <div>
                 <p
                   style={{
                     fontSize: "14px",
-                    fontWeight: "700",
-                    color: "#262E36",
+                    fontWeight: "400",
+                    marginTop: "18px",
                     marginBottom: "10px",
-                    marginTop: "20px",
                   }}
                 >
-                  Filter by User Status
+                  To
                 </p>
-
-                <select
-                  name="user Status"
-                  className={senderStyle.textInput}
-                  value={userStatus}
+                <input
+                  type="date"
+                  placeholder="D/M/YYYY H:MM M"
                   onChange={(e) => {
-                    setUserStatus(e.target.value);
-                    // setBox(e.target.value)
+                    setToDate(e.target.value);
                   }}
-                >
-                  <option value="complete">Complete </option>
-                  <option value="pending">Pending </option>
-                </select>
+                  style={{
+                    paddingRight: "20px",
+                    paddingLeft: "10px",
+                    paddingTop: "10px",
+                    paddingBottom: "10px",
+                    borderRadius: "10px",
+                    width: "200px",
+                    outline: "none",
+                    border: "1px solid #999",
+                    fontSize: "14px",
+                  }}
+                />
+              </div>
+            </div>
+            <p
+              style={{
+                fontSize: "14px",
+                fontWeight: "700",
+                color: "#262E36",
+                marginBottom: "10px",
+                marginTop: "20px",
+              }}
+            >
+              Filter by Country Status
+            </p>
 
-                <button className={senderStyle.button}>
-                  Apply Filters <img src={plusIcon} alt="icon" />{" "}
-                </button>
-              </Typography>
-            </Box>
-          </Modal>
+            <select
+              name="kyc Status"
+              className={senderStyle.textInput}
+              value={countryStatus}
+              onChange={(e) => {
+                setCountryStatus(e.target.value);
+              }}
+            >
+              <option value="enable">Enable </option>
+              <option value="disable">Disable </option>
+            </select>
+
+
+            <button className={senderStyle.button} onClick={() => {
+              handleFilterCountry({
+                filterMood: true,
+                from: fromDate,
+                to: toDate,
+                isEnabled: countryStatus
+              });
+              handleFilterClose();
+            }}>
+              Apply Filters <img src={plusIcon} alt="icon" />{" "}
+            </button>
+          </Typography>
+        </Box>
+      </Modal>
 
       {/* main contents */}
       <CountriesMainContent />
