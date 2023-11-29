@@ -1,5 +1,4 @@
 import { Box, Modal, Typography } from "@mui/material";
-import { light } from "@mui/material/styles/createPalette";
 import React, { useState } from "react";
 import PathName from "../../components/PathName/PathName";
 import ExportButton from "../../components/ExportButton/ExportButton";
@@ -9,14 +8,21 @@ import filterIcon from "../../assets/img/country/filter.svg";
 import SendersMainContent from "../../components/Senders/SendersMainContent";
 import quickStyle from "../../assets/css/sender.module.css";
 import plusIcon from "../../assets/img/generalSettings/plus.svg";
+import useAuth from "../../hook/useAuth";
 const Senders = () => {
   const path = window.location.pathname.split("/")[2].toUpperCase();
 
+  const { handleFilterSender, filterSender } = useAuth();
+  ////////////////////////////////
   //handle filter popup open
+  ////////////////////////////////
   const [filterOpen, setFilterOpen] = useState(false);
   const handleFilterOpen = () => setFilterOpen(true);
   const handleFilterClose = () => setFilterOpen(false);
-
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
+  const senderRef = React.useRef();
+  const kycRef = React.useRef();
   const FilterStyle = {
     position: "absolute",
     top: "50%",
@@ -29,8 +35,26 @@ const Senders = () => {
     borderRadius: "14px",
   };
 
-  const [kycStatus, setKycStatus] = useState("");
-  const [userStatus, setUserStatus] = useState("");
+  console.log(fromDate);
+  console.log(toDate);
+
+  const handleFilterUpdate = () => {
+    console.log(senderRef.current.value);
+    console.log(kycRef.current.value);
+    if (fromDate == "" || toDate == "") {
+      alert("Please select from date and to date");
+      return;
+    }
+    handleFilterSender({
+      filterMood: true,
+      from: fromDate,
+      to: toDate,
+      isStatus: senderRef.current.value === "true" ? true : false,
+      isKyc: kycRef.current.value === "true" ? true : false,
+    });
+    handleFilterClose();
+  };
+
   return (
     <Box sx={{ height: "100vh", px: 3, overflow: "scroll" }}>
       {/* pathname */}
@@ -92,7 +116,34 @@ const Senders = () => {
               cursor: "pointer",
             }}
           />
-
+          {/* remove filter if filterSender.filterMood is true */}
+          {filterSender.filterMood == true && (
+            <button
+              onClick={() => {
+                handleFilterSender({
+                  filterMood: false,
+                  from: "",
+                  to: "",
+                  isKyc: "",
+                  isStatus: "",
+                });
+              }}
+              style={{
+                height: "40px",
+                width: "130px",
+                borderRadius: "25px",
+                border: "1px solid #E9E9EA",
+                color: "red",
+                outline: "none",
+                padding: "0 20px",
+                backgroundColor: "#fff",
+                cursor: "pointer",
+                position: "absolute",
+              }}
+            >
+              Remove Filter
+            </button>
+          )}
           <Modal
             open={filterOpen}
             onClose={handleFilterClose}
@@ -131,6 +182,9 @@ const Senders = () => {
                     <input
                       type="date"
                       placeholder="D/M/YYYY H:MM M"
+                      onChange={(e) => {
+                        setFromDate(e.target.value);
+                      }}
                       style={{
                         paddingRight: "20px",
                         paddingLeft: "10px",
@@ -158,6 +212,9 @@ const Senders = () => {
                     <input
                       type="date"
                       placeholder="D/M/YYYY H:MM M"
+                      onChange={(e) => {
+                        setToDate(e.target.value);
+                      }}
                       style={{
                         paddingRight: "20px",
                         paddingLeft: "10px",
@@ -187,14 +244,10 @@ const Senders = () => {
                 <select
                   name="kyc Status"
                   className={quickStyle.textInput}
-                  value={kycStatus}
-                  onChange={(e) => {
-                    setKycStatus(e.target.value);
-                    // setBox(e.target.value)
-                  }}
+                  ref={kycRef}
                 >
-                  <option value="complete">Complete </option>
-                  <option value="pending">Pending </option>
+                  <option value="true">Approve </option>
+                  <option value="flase">Decline </option>
                 </select>
 
                 <p
@@ -212,17 +265,16 @@ const Senders = () => {
                 <select
                   name="user Status"
                   className={quickStyle.textInput}
-                  value={userStatus}
-                  onChange={(e) => {
-                    setUserStatus(e.target.value);
-                    // setBox(e.target.value)
-                  }}
+                  ref={senderRef}
                 >
-                  <option value="complete">Complete </option>
-                  <option value="pending">Pending </option>
+                  <option value="false">Enable </option>
+                  <option value="true">Disable </option>
                 </select>
 
-                <button className={quickStyle.button}>
+                <button
+                  className={quickStyle.button}
+                  onClick={handleFilterUpdate}
+                >
                   Apply Filters <img src={plusIcon} alt="icon" />{" "}
                 </button>
               </Typography>
@@ -234,7 +286,7 @@ const Senders = () => {
           <span style={{ marginLeft: "10px" }}></span>
           <PrintButton />
           <span style={{ marginLeft: "10px" }}></span>
-          {/* <CreateNewButton text={"Country"} /> */}
+          {/* <CreateNewButton text={"sender"} /> */}
         </Box>
       </Box>
 

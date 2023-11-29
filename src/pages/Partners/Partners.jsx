@@ -16,6 +16,7 @@ import Switch from "react-switch";
 import axios from "axios";
 import PartnersMainContent from "../../components/Partners/PartnersMainContent";
 import senderStyle from "../../assets/css/sender.module.css";
+import { useQueryClient } from "react-query";
 const style = {
   position: "absolute",
   top: "50%",
@@ -44,6 +45,7 @@ const FilterStyle = {
 };
 
 const Partners = () => {
+  const queryClient = useQueryClient();
   const path = window.location.pathname.split("/")[2].toUpperCase();
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
@@ -116,7 +118,8 @@ const Partners = () => {
       )
       .then((res) => {
         console.log(res);
-        window.location.reload();
+        queryClient.invalidateQueries("allPartners");
+        handleClose();
       })
       .catch((error) => console.error(error));
   };

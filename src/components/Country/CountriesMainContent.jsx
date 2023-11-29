@@ -17,14 +17,9 @@ import editIcon from "../../assets/img/country/edit.svg";
 import deleteIcon from "../../assets/img/country/delete.svg";
 import Dialog from "@mui/material/Dialog";
 import { Modal, Typography } from "@mui/material";
-import IconButton from "@mui/material/IconButton";
-
-import CloseIcon from "@mui/icons-material/Close";
 import Slide from "@mui/material/Slide";
 import { useState } from "react";
-import Switch from "react-switch";
 import IconImage from "../../assets/img/country/iconImage.png";
-import plusIcon from "../../assets/img/generalSettings/plus.svg";
 import { useQuery, useQueryClient } from "react-query";
 import axios from "axios";
 import useAuth from "../../hook/useAuth";

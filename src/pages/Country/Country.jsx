@@ -47,7 +47,7 @@ const FilterStyle = {
 const Country = () => {
   // set data to global state
   const { handleFilterCountry, filterCountry } = useAuth();
-  // console.log(filterCountry)
+  
   const path = window.location.pathname.split("/")[2].toUpperCase();
   const [open, setOpen] = React.useState(false);
 

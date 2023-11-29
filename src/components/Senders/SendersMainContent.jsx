@@ -14,22 +14,32 @@ import disableIcon from "../../assets/img/country/disable.svg";
 import editIcon from "../../assets/img/country/edit.svg";
 import deleteIcon from "../../assets/img/country/delete.svg";
 import Dialog from "@mui/material/Dialog";
-import IconButton from "@mui/material/IconButton";
-import CloseIcon from "@mui/icons-material/Close";
 import Slide from "@mui/material/Slide";
 import { useState } from "react";
 import { useQuery } from "react-query";
-import avatarDemo from "../../assets/img/senders/avatarDemo.png";
 import enableIcon from "../../assets/img/country/enable.svg";
 import axios from "axios";
 import { useEffect } from "react";
 import { useQueryClient } from "react-query";
+import useAuth from "../../hook/useAuth";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 const SendersMainContent = () => {
   const queryClient = useQueryClient();
+
+  const { filterSender } = useAuth();
+  const [isStatus, setIsStatus] = useState(null);
+  const [isKyc, setIsKyc] = useState(null);
+  const [filterMood, setFilterMood] = useState(false);
+
+  useEffect(() => {
+    // console.log('test', filterCountry)
+    setFilterMood(filterSender.filterMood);
+    setIsStatus(filterSender.isStatus);
+    setIsKyc(filterSender.isKyc);
+  }, [filterSender]);
   ////////////////////////////////////////////////////////////////
   //for focusing image
   ////////////////////////////////////////////////////////////////
@@ -112,6 +122,7 @@ const SendersMainContent = () => {
         DOB: item.dob,
         kyc: item.kyc_complete,
         status: item.blocked,
+        createdAt: item.createdAt.slice(0, 10),
       }))
     : [];
 
@@ -130,6 +141,7 @@ const SendersMainContent = () => {
           DOB: item.dob,
           kyc: item.kyc_complete,
           status: item.blocked,
+          createdAt: item.createdAt.slice(0, 10),
         }))
     : [];
 
@@ -148,6 +160,7 @@ const SendersMainContent = () => {
           DOB: item.dob,
           kyc: item.kyc_complete,
           status: item.blocked,
+          createdAt: item.createdAt.slice(0, 10),
         }))
     : [];
 
@@ -425,7 +438,7 @@ const SendersMainContent = () => {
   };
 
   ////////////////////////////////////////////////////////////////
-  //for Enalbe the countries with multirow
+  //for Enable the sender with multirow
   ////////////////////////////////////////////////////////////////
   const [enableModalOpen, setEnableModalOpen] = React.useState(false);
   const handleEnableModalOpen = () => setEnableModalOpen(true);
@@ -523,6 +536,25 @@ const SendersMainContent = () => {
       });
   };
 
+  console.log("isEnabled:", isStatus);
+  console.log("isKyc:", isKyc);
+  console.log("fromDate:", filterSender.from);
+  console.log("toDate:", filterSender.to);
+
+  console.log(
+    "Status values in allSenders:",
+    allSenders.map((item) => item.status)
+  );
+  console.log(
+    "Filtered Senders:",
+    allSenders.filter(
+      (item) =>
+        item.kyc === isKyc &&
+        item.createdAt >= filterSender.from &&
+        item.createdAt <= filterSender.to 
+        
+    )
+  );
   return (
     <div className={styles.parent} style={{ position: "relative" }}>
       <Tabs defaultValue={1}>
@@ -530,8 +562,14 @@ const SendersMainContent = () => {
           <Tab value={1} onClick={handleClearRows}>
             All - {senders?.length}
           </Tab>
-          <Tab value={2}>Enabled - {enabledSender?.length}</Tab>
-          <Tab value={3}>Disabled - {disabledSender?.length}</Tab>
+          {filterMood !== true && (
+            <Tab value={2}>Enabled - {enabledSender?.length}</Tab>
+          )}
+          {filterMood !== true && (
+            <Tab value={3}>Disabled - {disabledSender.length}</Tab>
+          )}
+          {/* <Tab value={2}>Enabled - {enabledSender?.length}</Tab>
+          <Tab value={3}>Disabled - {disabledSender?.length}</Tab> */}
         </TabsList>
         {selectedRows.length > 1 && (
           <Box
@@ -728,72 +766,108 @@ const SendersMainContent = () => {
             </Modal>
           </Box>
         )}
-        <TabPanel value={1}>
-          <div style={{ height: "auto", width: "100%" }}>
-            <DataGrid
-              rows={allSenders}
-              columns={columns}
-              initialState={{
-                pagination: {
-                  paginationModel: { page: 0, pageSize: 10 },
-                },
-              }}
-              pageSizeOptions={[10, 20]}
-              checkboxSelection
-              // by default seleted row is first row
-              onRowSelectionModelChange={(ids) => {
-                const selectedIDs = new Set(ids);
-                const selectedRowData = allSenders.filter((row) =>
-                  // selectedIDs.has(row.id.toString())
-                  selectedIDs.has(row.id)
-                );
-                setSelectedRows(selectedRowData);
-              }}
-            />
-          </div>
-        </TabPanel>
-        <TabPanel value={2}>
-          <DataGrid
-            rows={enabledSender}
-            columns={columns}
-            initialState={{
-              pagination: {
-                paginationModel: { page: 0, pageSize: 10 },
-              },
-            }}
-            pageSizeOptions={[10, 20]}
-            checkboxSelection
-            onRowSelectionModelChange={(ids) => {
-              const selectedIDs = new Set(ids);
-              const selectedRowData = enabledSender.filter((row) =>
-                // selectedIDs.has(row.id.toString())
-                selectedIDs.has(row.id)
-              );
-              setSelectedRows(selectedRowData);
-            }}
-          />
-        </TabPanel>
-        <TabPanel value={3}>
-          <DataGrid
-            rows={disabledSender}
-            columns={columns}
-            initialState={{
-              pagination: {
-                paginationModel: { page: 0, pageSize: 10 },
-              },
-            }}
-            pageSizeOptions={[10, 20]}
-            checkboxSelection
-            onRowSelectionModelChange={(ids) => {
-              const selectedIDs = new Set(ids);
-              const selectedRowData = disabledSender.filter((row) =>
-                // selectedIDs.has(row.id.toString())
-                selectedIDs.has(row.id)
-              );
-              setSelectedRows(selectedRowData);
-            }}
-          />
-        </TabPanel>
+
+        {filterMood === true ? (
+          <TabPanel value={1}>
+            <div style={{ height: "auto", width: "100%" }}>
+              <DataGrid
+                rows={allSenders.filter(
+                  (item) =>
+                    item.status == isStatus &&
+                    item.kyc == isKyc &&
+                    item.createdAt >= filterSender.from &&
+                    item.createdAt <= filterSender.to
+                )}
+                columns={columns}
+                initialState={{
+                  pagination: {
+                    paginationModel: { page: 0, pageSize: 10 },
+                  },
+                }}
+                pageSizeOptions={[10, 20]}
+                checkboxSelection
+                // by default seleted row is first row
+                onRowSelectionModelChange={(ids) => {
+                  const selectedIDs = new Set(ids);
+                  const selectedRowData = allSenders.filter((row) =>
+                    // selectedIDs.has(row.id.toString())
+                    selectedIDs.has(row.id)
+                  );
+                  setSelectedRows(selectedRowData);
+                }}
+              />
+            </div>
+          </TabPanel>
+        ) : (
+          <>
+            <TabPanel value={1}>
+              <div style={{ height: "auto", width: "100%" }}>
+                <DataGrid
+                  rows={allSenders}
+                  columns={columns}
+                  initialState={{
+                    pagination: {
+                      paginationModel: { page: 0, pageSize: 10 },
+                    },
+                  }}
+                  pageSizeOptions={[10, 20]}
+                  checkboxSelection
+                  // by default seleted row is first row
+                  onRowSelectionModelChange={(ids) => {
+                    const selectedIDs = new Set(ids);
+                    const selectedRowData = allSenders.filter((row) =>
+                      // selectedIDs.has(row.id.toString())
+                      selectedIDs.has(row.id)
+                    );
+                    setSelectedRows(selectedRowData);
+                  }}
+                />
+              </div>
+            </TabPanel>
+            <TabPanel value={2}>
+              <DataGrid
+                rows={enabledSender}
+                columns={columns}
+                initialState={{
+                  pagination: {
+                    paginationModel: { page: 0, pageSize: 10 },
+                  },
+                }}
+                pageSizeOptions={[10, 20]}
+                checkboxSelection
+                onRowSelectionModelChange={(ids) => {
+                  const selectedIDs = new Set(ids);
+                  const selectedRowData = enabledSender.filter((row) =>
+                    // selectedIDs.has(row.id.toString())
+                    selectedIDs.has(row.id)
+                  );
+                  setSelectedRows(selectedRowData);
+                }}
+              />
+            </TabPanel>
+            <TabPanel value={3}>
+              <DataGrid
+                rows={disabledSender}
+                columns={columns}
+                initialState={{
+                  pagination: {
+                    paginationModel: { page: 0, pageSize: 10 },
+                  },
+                }}
+                pageSizeOptions={[10, 20]}
+                checkboxSelection
+                onRowSelectionModelChange={(ids) => {
+                  const selectedIDs = new Set(ids);
+                  const selectedRowData = disabledSender.filter((row) =>
+                    // selectedIDs.has(row.id.toString())
+                    selectedIDs.has(row.id)
+                  );
+                  setSelectedRows(selectedRowData);
+                }}
+              />
+            </TabPanel>
+          </>
+        )}
       </Tabs>
       <Dialog
         maxWidth="md"
