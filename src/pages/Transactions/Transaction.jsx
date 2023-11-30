@@ -10,7 +10,7 @@ import TransactionMainContent from "../../components/Transaction/TransactionMain
 import { useState } from "react";
 import plusIcon from "../../assets/img/generalSettings/plus.svg";
 import senderStyle from "../../assets/css/sender.module.css";
-
+import useAuth from "../../hook/useAuth";
 
 const FilterStyle = {
   position: "absolute",
@@ -25,6 +25,7 @@ const FilterStyle = {
 };
 const Transaction = () => {
   const path = window.location.pathname.split("/")[2].toUpperCase();
+  const { handleFilterTransaction, filterTransaction } = useAuth();
 
   //handle filter popup open
   const [filterOpen, setFilterOpen] = useState(false);
@@ -32,6 +33,26 @@ const Transaction = () => {
   const handleFilterClose = () => setFilterOpen(false);
   const [kycStatus, setKycStatus] = useState("");
   const [userStatus, setUserStatus] = useState("");
+  const payoutStatusRef = React.useRef();
+  const transferStatusRef = React.useRef();
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
+  const handleFilterUpdate = () => {
+    if (fromDate == "" || toDate == "") {
+      alert("Please select from date and to date");
+      return;
+    }
+
+    handleFilterTransaction({
+      filterMood: true,
+      from: fromDate,
+      to: toDate,
+      isPayoutStatus: payoutStatusRef.current.value === "true" ? true : false,
+      isTransferStatus:
+        transferStatusRef.current.value === "complete" ? "complete" : "pending",
+    });
+    handleFilterClose();
+  };
   return (
     <Box sx={{ height: "100vh", px: 3, overflow: "scroll" }}>
       {/* pathname */}
@@ -94,6 +115,33 @@ const Transaction = () => {
             }}
           />
         </Box>
+        {filterTransaction.filterMood == true && (
+          <button
+            onClick={() => {
+              handleFilterTransaction({
+                filterMood: false,
+                from: "",
+                to: "",
+                istransferStatus: "",
+                isPayoutStatus: "",
+              });
+            }}
+            style={{
+              height: "40px",
+              width: "130px",
+              borderRadius: "25px",
+              border: "1px solid #E9E9EA",
+              color: "red",
+              outline: "none",
+              padding: "0 20px",
+              backgroundColor: "#fff",
+              cursor: "pointer",
+              position: "absolute",
+            }}
+          >
+            Remove Filter
+          </button>
+        )}
         <Box sx={{ display: "flex", alignItems: "center" }}>
           <ExportButton />
           <span style={{ marginLeft: "10px" }}></span>
@@ -139,6 +187,7 @@ const Transaction = () => {
                 </p>
                 <input
                   type="date"
+                  onChange={(e) => setFromDate(e.target.value)}
                   placeholder="D/M/YYYY H:MM M"
                   style={{
                     paddingRight: "20px",
@@ -166,6 +215,7 @@ const Transaction = () => {
                 </p>
                 <input
                   type="date"
+                  onChange={(e) => setToDate(e.target.value)}
                   placeholder="D/M/YYYY H:MM M"
                   style={{
                     paddingRight: "20px",
@@ -190,20 +240,16 @@ const Transaction = () => {
                 marginTop: "20px",
               }}
             >
-              Filter by KYC Status
+              Filter by Payout Status
             </p>
 
             <select
-              name="kyc Status"
+              name="payout Status"
               className={senderStyle.textInput}
-              value={kycStatus}
-              onChange={(e) => {
-                setKycStatus(e.target.value);
-                // setBox(e.target.value)
-              }}
+              ref={payoutStatusRef}
             >
-              <option value="complete">Complete </option>
-              <option value="pending">Pending </option>
+              <option value="true">Complete </option>
+              <option value="false">Pending </option>
             </select>
 
             <p
@@ -215,23 +261,19 @@ const Transaction = () => {
                 marginTop: "20px",
               }}
             >
-              Filter by User Status
+              Filter by Transfer Status
             </p>
 
             <select
               name="user Status"
               className={senderStyle.textInput}
-              value={userStatus}
-              onChange={(e) => {
-                setUserStatus(e.target.value);
-                // setBox(e.target.value)
-              }}
+              ref={transferStatusRef}
             >
               <option value="complete">Complete </option>
               <option value="pending">Pending </option>
             </select>
 
-            <button className={senderStyle.button}>
+            <button className={senderStyle.button} onClick={handleFilterUpdate}>
               Apply Filters <img src={plusIcon} alt="icon" />{" "}
             </button>
           </Typography>

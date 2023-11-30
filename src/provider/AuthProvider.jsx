@@ -10,6 +10,10 @@ const AuthProvider = ({ children }) => {
   const [userId, setUserId] = useState(localStorage.getItem("userId") || "");
   const [filterCountry, setFilterCountry] = useState({});
   const [filterSender, setFilterSender] = useState({});
+  const [filterReceiver, setFilterReceiver] = useState({});
+  const [filterRevenue, setFilterRevenue] = useState({});
+  const [filterTransaction, setFilterTransaction] = useState({});
+  const [filterPartner, setFilterPartner] = useState({});
 
   useEffect(() => {
     if (token && userId) {
@@ -91,6 +95,40 @@ const AuthProvider = ({ children }) => {
       isStatus: text.isStatus,
     });
   };
+
+  const handleFilterReceiver = (text) => {
+    setFilterReceiver({
+      filterMood: text.filterMood,
+      from: text.from,
+      to: text.to,
+    });
+  };
+
+  const handleFilterRevenue = (text) => {
+    setFilterRevenue({
+      filterMood: text.filterMood,
+      from: text.from,
+      to: text.to,
+      isWhish: text.isWhish,
+      isPartner: text.isPartner,
+    });
+  };
+  const handleFilterTransaction = (text) => {
+    setFilterTransaction({
+      filterMood: text.filterMood,
+      from: text.from,
+      to: text.to,
+      isTransferStatus: text.isTransferStatus,
+      isPayoutStatus: text.isPayoutStatus,
+    });
+  };
+  const handleFilterPartner = (text) => {
+    setFilterPartner({
+      filterMood: text.filterMood,
+      from: text.from,
+      to: text.to,
+    });
+  };
   const authInfo = {
     user,
     loading,
@@ -99,6 +137,14 @@ const AuthProvider = ({ children }) => {
     filterCountry,
     handleFilterSender,
     filterSender,
+    handleFilterReceiver,
+    filterReceiver,
+    handleFilterRevenue,
+    filterRevenue,
+    handleFilterTransaction,
+    filterTransaction,
+    handleFilterPartner,
+    filterPartner,
   };
 
   return (

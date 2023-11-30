@@ -9,6 +9,7 @@ import filterIcon from "../../assets/img/country/filter.svg";
 import RevenueMainContent from "../../components/Revenue/RevenueMainContent";
 import plusIcon from "../../assets/img/generalSettings/plus.svg";
 import senderStyle from "../../assets/css/sender.module.css";
+import useAuth from "../../hook/useAuth";
 
 const FilterStyle = {
   position: "absolute",
@@ -23,13 +24,32 @@ const FilterStyle = {
 };
 const TotalRevenue = () => {
   const path = window.location.pathname.split("/")[2].toUpperCase();
+  const { handleFilterRevenue, filterRevenue } = useAuth();
 
   //handle filter popup open
   const [filterOpen, setFilterOpen] = useState(false);
   const handleFilterOpen = () => setFilterOpen(true);
   const handleFilterClose = () => setFilterOpen(false);
-  const [kycStatus, setKycStatus] = useState("");
-  const [userStatus, setUserStatus] = useState("");
+  const whishRef = React.useRef();
+  const partnerRef = React.useRef();
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
+  const handleFilterUpdate = () => {
+    if (fromDate == "" || toDate == "") {
+      alert("Please select from date and to date");
+      return;
+    }
+
+    handleFilterRevenue({
+      filterMood: true,
+      from: fromDate,
+      to: toDate,
+      isPartner:
+        partnerRef.current.value === "complete" ? "complete" : "pending",
+      isWhish: whishRef.current.value === "true" ? true : false,
+    });
+    handleFilterClose();
+  };
   return (
     <Box sx={{ height: "100vh", px: 3, overflow: "scroll" }}>
       {/* pathname */}
@@ -92,6 +112,32 @@ const TotalRevenue = () => {
             }}
           />
         </Box>
+        {filterRevenue.filterMood == true && (
+          <button
+            onClick={() => {
+              handleFilterRevenue({
+                filterMood: false,
+                from: "",
+                to: "",
+                isEnabled: "",
+              });
+            }}
+            style={{
+              height: "40px",
+              width: "130px",
+              borderRadius: "25px",
+              border: "1px solid #E9E9EA",
+              color: "red",
+              outline: "none",
+              padding: "0 20px",
+              backgroundColor: "#fff",
+              cursor: "pointer",
+              position: "absolute",
+            }}
+          >
+            Remove Filter
+          </button>
+        )}
         <Box sx={{ display: "flex", alignItems: "center" }}>
           <ExportButton />
           <span style={{ marginLeft: "10px" }}></span>
@@ -137,6 +183,9 @@ const TotalRevenue = () => {
                 </p>
                 <input
                   type="date"
+                  onChange={(e) => {
+                    setFromDate(e.target.value);
+                  }}
                   placeholder="D/M/YYYY H:MM M"
                   style={{
                     paddingRight: "20px",
@@ -164,6 +213,9 @@ const TotalRevenue = () => {
                 </p>
                 <input
                   type="date"
+                  onChange={(e) => {
+                    setToDate(e.target.value);
+                  }}
                   placeholder="D/M/YYYY H:MM M"
                   style={{
                     paddingRight: "20px",
@@ -188,20 +240,16 @@ const TotalRevenue = () => {
                 marginTop: "20px",
               }}
             >
-              Filter by KYC Status
+              Filter by Whish Status
             </p>
 
             <select
-              name="kyc Status"
+              name="whish Status"
               className={senderStyle.textInput}
-              value={kycStatus}
-              onChange={(e) => {
-                setKycStatus(e.target.value);
-                // setBox(e.target.value)
-              }}
+              ref={whishRef}
             >
-              <option value="complete">Complete </option>
-              <option value="pending">Pending </option>
+              <option value="true">Complete </option>
+              <option value="false">Pending </option>
             </select>
 
             <p
@@ -213,23 +261,19 @@ const TotalRevenue = () => {
                 marginTop: "20px",
               }}
             >
-              Filter by User Status
+              Filter by Partner Status
             </p>
 
             <select
-              name="user Status"
+              name="Partner Status"
               className={senderStyle.textInput}
-              value={userStatus}
-              onChange={(e) => {
-                setUserStatus(e.target.value);
-                // setBox(e.target.value)
-              }}
+              ref={partnerRef}
             >
-              <option value="complete">Complete </option>
-              <option value="pending">Pending </option>
+              <option value="complete">Complete</option>
+              <option value="pending">Pending</option>
             </select>
 
-            <button className={senderStyle.button}>
+            <button className={senderStyle.button} onClick={handleFilterUpdate}>
               Apply Filters <img src={plusIcon} alt="icon" />{" "}
             </button>
           </Typography>

@@ -12,9 +12,18 @@ import { useQuery } from "react-query";
 import { Button, Modal, Typography } from "@mui/material";
 import axios from "axios";
 import { useQueryClient } from "react-query";
+import useAuth from "../../hook/useAuth";
+import { useEffect } from "react";
 
 const ReceiversMainContent = () => {
   const queryClient = useQueryClient();
+  const { filterReceiver } = useAuth();
+  const [filterMood, setFilterMood] = useState(false);
+  // if filter country is not empty
+  useEffect(() => {
+    // console.log('test', filterReceiver)
+    setFilterMood(filterReceiver.filterMood);
+  }, [filterReceiver]);
   const [selectedRows, setSelectedRows] = useState([]);
   const handleClearRows = () => {
     setSelectedRows([]);
@@ -60,6 +69,7 @@ const ReceiversMainContent = () => {
           name: item.attributes?.users_permissions_user?.data?.attributes
             ?.username,
         },
+        createdAt: item.attributes?.createdAt.slice(0, 10),
       }))
     : [];
 
@@ -150,6 +160,7 @@ const ReceiversMainContent = () => {
         console.error(error);
       });
   };
+
   return (
     <div className={styles.parent} style={{ position: "relative" }}>
       <Tabs defaultValue={1}>
@@ -229,30 +240,64 @@ const ReceiversMainContent = () => {
             </Modal>
           </Box>
         )}
-        <TabPanel value={1} onClick={handleClearRows}>
-          <div style={{ height: "auto", width: "100%" }}>
-            <DataGrid
-              rows={allReceivers}
-              columns={columns}
-              initialState={{
-                pagination: {
-                  paginationModel: { page: 0, pageSize: 10 },
-                },
-              }}
-              pageSizeOptions={[10, 20]}
-              checkboxSelection
-              // by default seleted row is first row
-              onRowSelectionModelChange={(ids) => {
-                const selectedIDs = new Set(ids);
-                const selectedRowData = allReceivers.filter((row) =>
-                  // selectedIDs.has(row.id.toString())
-                  selectedIDs.has(row.id)
-                );
-                setSelectedRows(selectedRowData);
-              }}
-            />
-          </div>
-        </TabPanel>
+        
+        {filterMood == true ? (
+          <TabPanel value={1} onClick={handleClearRows}>
+            <div style={{ height: "auto", width: "100%" }}>
+              <DataGrid
+                rows={allReceivers.filter(
+                  (item) =>
+                    item.createdAt >= filterReceiver.from &&
+                    item.createdAt <= filterReceiver.to
+                )}
+                columns={columns}
+                initialState={{
+                  pagination: {
+                    paginationModel: { page: 0, pageSize: 10 },
+                  },
+                }}
+                pageSizeOptions={[10, 20]}
+                checkboxSelection
+                // by default seleted row is first row
+                onRowSelectionModelChange={(ids) => {
+                  const selectedIDs = new Set(ids);
+                  const selectedRowData = allReceivers.filter((row) =>
+                    // selectedIDs.has(row.id.toString())
+                    selectedIDs.has(row.id)
+                  );
+                  setSelectedRows(selectedRowData);
+                }}
+              />
+            </div>
+          </TabPanel>
+        ) : (
+          <>
+            <TabPanel value={1} onClick={handleClearRows}>
+              <div style={{ height: "auto", width: "100%" }}>
+                <DataGrid
+                  rows={allReceivers}
+                  columns={columns}
+                  initialState={{
+                    pagination: {
+                      paginationModel: { page: 0, pageSize: 10 },
+                    },
+                  }}
+                  pageSizeOptions={[10, 20]}
+                  checkboxSelection
+                  // by default seleted row is first row
+                  onRowSelectionModelChange={(ids) => {
+                    const selectedIDs = new Set(ids);
+                    const selectedRowData = allReceivers.filter((row) =>
+                      // selectedIDs.has(row.id.toString())
+                      selectedIDs.has(row.id)
+                    );
+                    setSelectedRows(selectedRowData);
+                  }}
+                />
+              </div>
+            </TabPanel>
+          </>
+        )}
       </Tabs>
     </div>
   );

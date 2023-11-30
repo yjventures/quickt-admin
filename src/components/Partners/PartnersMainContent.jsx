@@ -25,6 +25,7 @@ import IconImage from "../../assets/img/country/iconImage.png";
 import plusIcon from "../../assets/img/generalSettings/plus.svg";
 import axios from "axios";
 import { useQuery } from "react-query";
+import useAuth from "../../hook/useAuth";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -32,6 +33,12 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 
 const PartnersMainContent = () => {
   const queryClient = useQueryClient();
+  const { filterPartner } = useAuth();
+  const [filterMood, setFilterMood] = useState(false);
+  useEffect(() => {
+    // console.log('test', filterPartner)
+    setFilterMood(filterPartner.filterMood);
+  }, [filterPartner]);
 
   const [open, setOpen] = React.useState(false);
   const [selectedRows, setSelectedRows] = useState([]);
@@ -88,6 +95,7 @@ const PartnersMainContent = () => {
         image: `https://api.quickt.com.au` + item.attributes?.image,
         location: item.attributes?.location,
         percentage: item.attributes?.partner_percentage,
+        createdAt: item.attributes?.createdAt.slice(0, 10),
         details: {
           image:
             item.attributes?.users_permissions_users?.data[0]?.attributes
@@ -471,30 +479,63 @@ const PartnersMainContent = () => {
             </Modal>
           </Box>
         )}
-        <TabPanel value={1} onClick={handleClearRows}>
-          <div style={{ height: "auto", width: "100%" }}>
-            <DataGrid
-              rows={allPartners}
-              columns={columns}
-              initialState={{
-                pagination: {
-                  paginationModel: { page: 0, pageSize: 10 },
-                },
-              }}
-              pageSizeOptions={[10, 20]}
-              checkboxSelection
-              // by default seleted row is first row
-              onRowSelectionModelChange={(ids) => {
-                const selectedIDs = new Set(ids);
-                const selectedRowData = allPartners.filter((row) =>
-                  // selectedIDs.has(row.id.toString())
-                  selectedIDs.has(row.id)
-                );
-                setSelectedRows(selectedRowData);
-              }}
-            />
-          </div>
-        </TabPanel>
+        {filterMood == true ? (
+          <TabPanel value={1} onClick={handleClearRows}>
+            <div style={{ height: "auto", width: "100%" }}>
+              <DataGrid
+                rows={allPartners.filter(
+                  (item) =>
+                    item.createdAt >= filterPartner.from &&
+                    item.createdAt <= filterPartner.to
+                )}
+                columns={columns}
+                initialState={{
+                  pagination: {
+                    paginationModel: { page: 0, pageSize: 10 },
+                  },
+                }}
+                pageSizeOptions={[10, 20]}
+                checkboxSelection
+                // by default seleted row is first row
+                onRowSelectionModelChange={(ids) => {
+                  const selectedIDs = new Set(ids);
+                  const selectedRowData = allPartners.filter((row) =>
+                    // selectedIDs.has(row.id.toString())
+                    selectedIDs.has(row.id)
+                  );
+                  setSelectedRows(selectedRowData);
+                }}
+              />
+            </div>
+          </TabPanel>
+        ) : (
+          <>
+            <TabPanel value={1} onClick={handleClearRows}>
+              <div style={{ height: "auto", width: "100%" }}>
+                <DataGrid
+                  rows={allPartners}
+                  columns={columns}
+                  initialState={{
+                    pagination: {
+                      paginationModel: { page: 0, pageSize: 10 },
+                    },
+                  }}
+                  pageSizeOptions={[10, 20]}
+                  checkboxSelection
+                  // by default seleted row is first row
+                  onRowSelectionModelChange={(ids) => {
+                    const selectedIDs = new Set(ids);
+                    const selectedRowData = allPartners.filter((row) =>
+                      // selectedIDs.has(row.id.toString())
+                      selectedIDs.has(row.id)
+                    );
+                    setSelectedRows(selectedRowData);
+                  }}
+                />
+              </div>
+            </TabPanel>
+          </>
+        )}
       </Tabs>
       <Dialog
         maxWidth="md"

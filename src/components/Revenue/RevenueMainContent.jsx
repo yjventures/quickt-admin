@@ -19,6 +19,8 @@ import Slide from "@mui/material/Slide";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
 import quickStyle from "../../assets/css/quickTransfer.module.css";
+import useAuth from "../../hook/useAuth";
+import { useEffect } from "react";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -26,6 +28,18 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 
 const RevenueMainContent = () => {
   const queryClient = useQueryClient();
+  const { filterRevenue } = useAuth();
+  const [isWhish, setIsWhish] = useState(null);
+  const [isPartner, setIsPartner] = useState(null);
+  const [filterMood, setFilterMood] = useState(false);
+  // if filter country is not empty
+  useEffect(() => {
+    // console.log('test', filterCountry)
+    setFilterMood(filterRevenue.filterMood);
+    setIsWhish(filterRevenue.isWhish);
+    setIsPartner(filterRevenue.isPartner);
+  }, [filterRevenue]);
+
   const [selectedRows, setSelectedRows] = useState([]);
   console.log(selectedRows);
   const [open, setOpen] = React.useState(false);
@@ -92,6 +106,7 @@ const RevenueMainContent = () => {
           item.attributes?.transfer?.data?.attributes?.payout_complete,
         transferStatus: item.attributes?.transfer?.data?.attributes?.status,
         transactionNumber: item.id,
+        createdAt: item.attributes?.createdAt.slice(0, 10),
       }))
     : [];
   const completeCountries = Array.isArray(transactions)
@@ -121,6 +136,7 @@ const RevenueMainContent = () => {
             item.attributes?.transfer?.data?.attributes?.payout_complete,
           transferStatus: item.attributes?.transfer?.data?.attributes?.status,
           transactionNumber: item.id,
+          createdAt: item.attributes?.createdAt.slice(0, 10),
         }))
     : [];
   // get only pending countries
@@ -155,6 +171,7 @@ const RevenueMainContent = () => {
           transactionNumber: item.id,
           // partnerAmount is 1.005% of total amount
           partnerAmount: item.attributes?.amount_total * 0.01005,
+          createdAt: item.attributes?.createdAt.slice(0, 10),
           // quicktAmount is total amount - (2.5% of partnerAmount)
           quicktAmount:
             parseFloat(item.attributes?.amount_total) -
@@ -457,17 +474,37 @@ const RevenueMainContent = () => {
       });
   };
 
+  const result = allTransaction.filter((item) => {
+    console.log("Item transferStatus:", item.transferStatus); // Check the case of "pending"
+    console.log("Expected isPartner:", isPartner);
+
+    return (
+      item.transferStatus === isPartner &&
+      item.payoutStatus === isWhish &&
+      item.createdAt >= filterRevenue.from &&
+      item.createdAt <= filterRevenue.to
+    );
+  });
+
+  console.log(result);
+
   return (
     <div className={styles.parent} style={{ position: "relative" }}>
       <Tabs defaultValue={1}>
         <TabsList>
           <Tab value={1}>All - {allTransaction?.length}</Tab>
-          <Tab value={2}>Complete - {completeCountries?.length}</Tab>
-          <Tab value={3}>Pending - {pendingCountries?.length}</Tab>
+
+          {filterMood !== true && (
+            <Tab value={2}>Complete - {completeCountries?.length}</Tab>
+          )}
+          {filterMood !== true && (
+            <Tab value={3}>Pending - {pendingCountries.length}</Tab>
+          )}
         </TabsList>
         {/* {selectedRows.length > 0 && (
           
         )} */}
+
         <Box
           sx={{
             display: "flex",
@@ -566,72 +603,108 @@ const RevenueMainContent = () => {
             </Box>
           </Modal>
         </Box>
-        <TabPanel value={1} onClick={handleClearRows}>
-          <div style={{ height: "auto", width: "100%" }}>
-            <DataGrid
-              rows={allTransaction}
-              columns={columns}
-              initialState={{
-                pagination: {
-                  paginationModel: { page: 0, pageSize: 10 },
-                },
-              }}
-              pageSizeOptions={[10, 20]}
-              checkboxSelection
-              // by default seleted row is first row
-              onRowSelectionModelChange={(ids) => {
-                const selectedIDs = new Set(ids);
-                const selectedRowData = allTransaction.filter((row) =>
-                  // selectedIDs.has(row.id.toString())
-                  selectedIDs.has(row.id)
-                );
-                setSelectedRows(selectedRowData);
-              }}
-            />
-          </div>
-        </TabPanel>
-        <TabPanel value={2}>
-          <DataGrid
-            rows={completeCountries}
-            columns={columns}
-            initialState={{
-              pagination: {
-                paginationModel: { page: 0, pageSize: 10 },
-              },
-            }}
-            pageSizeOptions={[10, 20]}
-            checkboxSelection
-            onRowSelectionModelChange={(ids) => {
-              const selectedIDs = new Set(ids);
-              const selectedRowData = completeCountries.filter((row) =>
-                // selectedIDs.has(row.id.toString())
-                selectedIDs.has(row.id)
-              );
-              setSelectedRows(selectedRowData);
-            }}
-          />
-        </TabPanel>
-        <TabPanel value={3}>
-          <DataGrid
-            rows={pendingCountries}
-            columns={columns}
-            initialState={{
-              pagination: {
-                paginationModel: { page: 0, pageSize: 10 },
-              },
-            }}
-            pageSizeOptions={[10, 20]}
-            checkboxSelection
-            onRowSelectionModelChange={(ids) => {
-              const selectedIDs = new Set(ids);
-              const selectedRowData = pendingCountries.filter((row) =>
-                // selectedIDs.has(row.id.toString())
-                selectedIDs.has(row.id)
-              );
-              setSelectedRows(selectedRowData);
-            }}
-          />
-        </TabPanel>
+
+        {filterMood == true ? (
+          <TabPanel value={1} onClick={handleClearRows}>
+            <div style={{ height: "auto", width: "100%" }}>
+              <DataGrid
+                rows={allTransaction.filter(
+                  (item) =>
+                    item.transferStatus === isPartner &&
+                    item.payoutStatus === isWhish &&
+                    item.createdAt >= filterRevenue.from &&
+                    item.createdAt <= filterRevenue.to
+                )}
+                columns={columns}
+                initialState={{
+                  pagination: {
+                    paginationModel: { page: 0, pageSize: 10 },
+                  },
+                }}
+                pageSizeOptions={[10, 20]}
+                checkboxSelection
+                // by default seleted row is first row
+                onRowSelectionModelChange={(ids) => {
+                  const selectedIDs = new Set(ids);
+                  const selectedRowData = allTransaction.filter((row) =>
+                    // selectedIDs.has(row.id.toString())
+                    selectedIDs.has(row.id)
+                  );
+                  setSelectedRows(selectedRowData);
+                }}
+              />
+            </div>
+          </TabPanel>
+        ) : (
+          <>
+            <TabPanel value={1} onClick={handleClearRows}>
+              <div style={{ height: "auto", width: "100%" }}>
+                <DataGrid
+                  rows={allTransaction}
+                  columns={columns}
+                  initialState={{
+                    pagination: {
+                      paginationModel: { page: 0, pageSize: 10 },
+                    },
+                  }}
+                  pageSizeOptions={[10, 20]}
+                  checkboxSelection
+                  // by default seleted row is first row
+                  onRowSelectionModelChange={(ids) => {
+                    const selectedIDs = new Set(ids);
+                    const selectedRowData = allTransaction.filter((row) =>
+                      // selectedIDs.has(row.id.toString())
+                      selectedIDs.has(row.id)
+                    );
+                    setSelectedRows(selectedRowData);
+                  }}
+                />
+              </div>
+            </TabPanel>
+            <TabPanel value={2}>
+              <DataGrid
+                rows={completeCountries}
+                columns={columns}
+                initialState={{
+                  pagination: {
+                    paginationModel: { page: 0, pageSize: 10 },
+                  },
+                }}
+                pageSizeOptions={[10, 20]}
+                checkboxSelection
+                onRowSelectionModelChange={(ids) => {
+                  const selectedIDs = new Set(ids);
+                  const selectedRowData = completeCountries.filter((row) =>
+                    // selectedIDs.has(row.id.toString())
+                    selectedIDs.has(row.id)
+                  );
+                  setSelectedRows(selectedRowData);
+                }}
+              />
+            </TabPanel>
+            <TabPanel value={3}>
+              <DataGrid
+                rows={pendingCountries}
+                columns={columns}
+                initialState={{
+                  pagination: {
+                    paginationModel: { page: 0, pageSize: 10 },
+                  },
+                }}
+                pageSizeOptions={[10, 20]}
+                checkboxSelection
+                onRowSelectionModelChange={(ids) => {
+                  const selectedIDs = new Set(ids);
+                  const selectedRowData = pendingCountries.filter((row) =>
+                    // selectedIDs.has(row.id.toString())
+                    selectedIDs.has(row.id)
+                  );
+                  setSelectedRows(selectedRowData);
+                }}
+              />
+            </TabPanel>
+          </>
+        )}
       </Tabs>
       <Dialog
         maxWidth="md"

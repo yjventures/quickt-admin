@@ -17,6 +17,7 @@ import axios from "axios";
 import PartnersMainContent from "../../components/Partners/PartnersMainContent";
 import senderStyle from "../../assets/css/sender.module.css";
 import { useQueryClient } from "react-query";
+import useAuth from "../../hook/useAuth";
 const style = {
   position: "absolute",
   top: "50%",
@@ -57,6 +58,23 @@ const Partners = () => {
     setChecked(isChecked);
   };
 
+  const { handleFilterPartner, filterPartner } = useAuth();
+
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
+
+  const handleFilterUpdate = () => {
+    if (fromDate == "" || toDate == "") {
+      alert("Please select from date and to date");
+      return;
+    }
+    handleFilterPartner({
+      filterMood: true,
+      from: fromDate,
+      to: toDate,
+    });
+    handleFilterClose();
+  };
   ////////////////////////////////////////////////////////////////////////
   //upload image and show preview
   ////////////////////////////////////////////////////////////////////////
@@ -195,6 +213,31 @@ const Partners = () => {
             }}
           />
         </Box>
+        {filterPartner.filterMood == true && (
+          <button
+            onClick={() => {
+              handleFilterPartner({
+                filterMood: false,
+                from: "",
+                to: "",
+              });
+            }}
+            style={{
+              height: "40px",
+              width: "130px",
+              borderRadius: "25px",
+              border: "1px solid #E9E9EA",
+              color: "red",
+              outline: "none",
+              padding: "0 20px",
+              backgroundColor: "#fff",
+              cursor: "pointer",
+              position: "absolute",
+            }}
+          >
+            Remove Filter
+          </button>
+        )}
         <Box sx={{ display: "flex", alignItems: "center" }}>
           <ExportButton />
           <span style={{ marginLeft: "10px" }}></span>
@@ -350,6 +393,9 @@ const Partners = () => {
                 </p>
                 <input
                   type="date"
+                  onChange={(e) => {
+                    setFromDate(e.target.value);
+                  }}
                   placeholder="D/M/YYYY H:MM M"
                   style={{
                     paddingRight: "20px",
@@ -377,6 +423,9 @@ const Partners = () => {
                 </p>
                 <input
                   type="date"
+                  onChange={(e) => {
+                    setToDate(e.target.value);
+                  }}
                   placeholder="D/M/YYYY H:MM M"
                   style={{
                     paddingRight: "20px",
@@ -392,57 +441,8 @@ const Partners = () => {
                 />
               </div>
             </div>
-            <p
-              style={{
-                fontSize: "14px",
-                fontWeight: "700",
-                color: "#262E36",
-                marginBottom: "10px",
-                marginTop: "20px",
-              }}
-            >
-              Filter by KYC Status
-            </p>
 
-            <select
-              name="kyc Status"
-              className={senderStyle.textInput}
-              value={kycStatus}
-              onChange={(e) => {
-                setKycStatus(e.target.value);
-                // setBox(e.target.value)
-              }}
-            >
-              <option value="complete">Complete </option>
-              <option value="pending">Pending </option>
-            </select>
-
-            <p
-              style={{
-                fontSize: "14px",
-                fontWeight: "700",
-                color: "#262E36",
-                marginBottom: "10px",
-                marginTop: "20px",
-              }}
-            >
-              Filter by User Status
-            </p>
-
-            <select
-              name="user Status"
-              className={senderStyle.textInput}
-              value={userStatus}
-              onChange={(e) => {
-                setUserStatus(e.target.value);
-                // setBox(e.target.value)
-              }}
-            >
-              <option value="complete">Complete </option>
-              <option value="pending">Pending </option>
-            </select>
-
-            <button className={senderStyle.button}>
+            <button className={senderStyle.button} onClick={handleFilterUpdate}>
               Apply Filters <img src={plusIcon} alt="icon" />{" "}
             </button>
           </Typography>
