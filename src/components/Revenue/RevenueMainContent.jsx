@@ -475,8 +475,8 @@ const RevenueMainContent = () => {
   };
 
   const result = allTransaction.filter((item) => {
-    console.log("Item transferStatus:", item.transferStatus); // Check the case of "pending"
-    console.log("Expected isPartner:", isPartner);
+    // console.log("Item transferStatus:", item.transferStatus); // Check the case of "pending"
+    // console.log("Expected isPartner:", isPartner);
 
     return (
       item.transferStatus === isPartner &&
@@ -540,9 +540,8 @@ const RevenueMainContent = () => {
           </div>
           <button
             onClick={() => {
-              selectedRows.length === 0
-                ? alert("Please select transaction")
-                : handleDeleteModalOpen();
+              setTransferStatus("true")
+              handleUpdateTransferStatus();
             }}
             style={{
               display: "flex",
@@ -756,7 +755,10 @@ const RevenueMainContent = () => {
                     <Button
                       variant="contained"
                       color="success"
-                      onClick={handleUpdateTransferStatus}
+                      onClick={()=>{
+                        handleUpdateTransferStatus()
+                        handleClose()
+                      }}
                     >
                       Confim Update
                     </Button>

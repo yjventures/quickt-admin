@@ -242,7 +242,7 @@ const GeneralSettingsMainContent = () => {
       {
         data: {
           main_banner_title: mainTitle,
-          main_banner_description: mainDescription,
+          main_banner_desc: mainDescription,
         },
       },
       {
@@ -251,7 +251,7 @@ const GeneralSettingsMainContent = () => {
         },
       }
     );
-    console.log(res.data?.data?.id);
+    // console.log(res.data?.data);
     if (res.data?.data?.id) {
       setMainTitle("");
       setMainDescription("");
@@ -275,8 +275,8 @@ const GeneralSettingsMainContent = () => {
       serviceBoxData = {
         data: {
           service_box_one_title: serviceTitle,
-          service_box_one_descr: serviceDescription,
-          // "service_box_one_icon": strapiImage
+          service_box_one_desc: serviceDescription,
+          service_box_one_icon: strapiImage
         },
       };
     } else if (box === 2) {
@@ -284,7 +284,7 @@ const GeneralSettingsMainContent = () => {
         data: {
           service_box_two_title: serviceTitle,
           service_box_two_desc: serviceDescription,
-          // "service_box_two_icon": strapiImage
+          service_box_two_icon: strapiImage
         },
       };
     } else {
@@ -292,7 +292,7 @@ const GeneralSettingsMainContent = () => {
         data: {
           service_box_three_title: serviceTitle,
           service_box_three_desc: serviceDescription,
-          // "service_box_three_icon": strapiImage
+          service_box_three_icon: strapiImage
         },
       };
     }
@@ -308,7 +308,7 @@ const GeneralSettingsMainContent = () => {
         },
       }
     );
-    console.log(res.data?.data?.id);
+    console.log(res.data?.data);
     if (res.data?.data?.id) {
       setServiceTitle("");
       setServiceDescription("");
