@@ -120,7 +120,7 @@ const SendersMainContent = () => {
         email: item.email,
         phone: item.phone,
         DOB: item.dob,
-        kyc: item.kyc_complete,
+        kyc: item.kyc_approved,
         status: item.blocked,
         createdAt: item.createdAt.slice(0, 10),
       }))
@@ -139,7 +139,7 @@ const SendersMainContent = () => {
           email: item.email,
           phone: item.phone,
           DOB: item.dob,
-          kyc: item.kyc_complete,
+          kyc: item.kyc_approved,
           status: item.blocked,
           createdAt: item.createdAt.slice(0, 10),
         }))
@@ -158,7 +158,7 @@ const SendersMainContent = () => {
           email: item.email,
           phone: item.phone,
           DOB: item.dob,
-          kyc: item.kyc_complete,
+          kyc: item.kyc_approved,
           status: item.blocked,
           createdAt: item.createdAt.slice(0, 10),
         }))
@@ -514,7 +514,7 @@ const SendersMainContent = () => {
   const approveKyc = () => {
     axios
       .put(`https://api.quickt.com.au/api/users/${selectedRows[0]?.id}`, {
-        kyc_complete: true,
+        kyc_approved: true,
       })
       .then((res) => {
         // console.log(res)
@@ -527,7 +527,7 @@ const SendersMainContent = () => {
   const declineKyc = () => {
     axios
       .put(`https://api.quickt.com.au/api/users/${selectedRows[0]?.id}`, {
-        kyc_complete: false,
+        kyc_approved: false,
       })
       .then((res) => {
         // console.log(res)
@@ -551,8 +551,7 @@ const SendersMainContent = () => {
       (item) =>
         item.kyc === isKyc &&
         item.createdAt >= filterSender.from &&
-        item.createdAt <= filterSender.to 
-        
+        item.createdAt <= filterSender.to
     )
   );
   return (
@@ -964,7 +963,9 @@ const SendersMainContent = () => {
                         >
                           <div style={{ position: "relative" }}>
                             <img
-                              src={fetchKyc?.image}
+                              src={
+                                `https://api.quickt.com.au` + fetchKyc?.image
+                              }
                               alt="icon"
                               style={{
                                 height: "298px",
@@ -1205,7 +1206,10 @@ const SendersMainContent = () => {
                         </p>
                         <div style={{ position: "relative" }}>
                           <img
-                            src={fetchKyc?.kyc?.id_front}
+                            src={
+                              `https://api.quickt.com.au` +
+                              fetchKyc?.kyc?.id_front
+                            }
                             alt="icon"
                             style={{
                               height: isFrontFullSize ? "100%" : "286px",
@@ -1233,7 +1237,10 @@ const SendersMainContent = () => {
                               onClick={toggleFrontFullSize}
                             >
                               <img
-                                src={fetchKyc?.kyc?.id_front}
+                                src={
+                                  `https://api.quickt.com.au` +
+                                  fetchKyc?.kyc?.id_front
+                                }
                                 alt="icon"
                                 style={{
                                   maxHeight: "90%",
@@ -1286,7 +1293,10 @@ const SendersMainContent = () => {
                         </div>
                         <div style={{ position: "relative" }}>
                           <img
-                            src={fetchKyc?.kyc?.id_back}
+                            src={
+                              `https://api.quickt.com.au` +
+                              fetchKyc?.kyc?.id_back
+                            }
                             alt="icon"
                             style={{
                               height: isBackFullSize ? "100%" : "286px",
@@ -1314,7 +1324,10 @@ const SendersMainContent = () => {
                               onClick={toggleBackFullSize}
                             >
                               <img
-                                src={fetchKyc?.kyc?.id_back}
+                                src={
+                                  `https://api.quickt.com.au` +
+                                  fetchKyc?.kyc?.id_back
+                                }
                                 alt="icon"
                                 style={{
                                   maxHeight: "90%",
