@@ -26,12 +26,11 @@ const LoginForm = () => {
 
         try {
             const result = await login(e.target.email.value, e.target.password.value);
-            console.log(result)
-            if(result.isAdmin) {
+            // console.log(result)
+            if(result?.isAdmin) {
                 navigate('/dashboard/generalSettings');
             } else {
                 alert('You are not an admin');
-                
             }
         } catch (error) {
             setError(error.message);
