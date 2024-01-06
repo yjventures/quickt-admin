@@ -102,7 +102,9 @@ const ReceiversMainContent = () => {
       renderCell: (params) => (
         <div style={{ display: "flex", alignItems: "center" }}>
           <img
-            src={params.value.image} // Access the image property from the details object
+            src={params.value.image ? `https://api.quickt.com.au${params.value.image}` : 
+            "https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png"
+          } // Access the image property from the details object
             alt="User"
             style={{
               borderRadius: "50%",
@@ -112,7 +114,7 @@ const ReceiversMainContent = () => {
             }}
           />
           <div>
-            <p style={{ marginTop: "20px" }}>{params.value.name}</p>
+            <p style={{ marginTop: "20px" }}>{params.value.name ? params.value.name : 'None'}</p>
             <br />
             {/* Add other details as needed */}
           </div>

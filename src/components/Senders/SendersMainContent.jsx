@@ -33,6 +33,7 @@ const SendersMainContent = () => {
   const [isStatus, setIsStatus] = useState(null);
   const [isKyc, setIsKyc] = useState(null);
   const [filterMood, setFilterMood] = useState(false);
+  const [firstClick, setFirstClick] = useState(false);
 
   useEffect(() => {
     // console.log('test', filterCountry)
@@ -69,7 +70,6 @@ const SendersMainContent = () => {
   const [selectedAction, setSelectedAction] = React.useState("");
   const handleClickOpen = (action) => {
     setSelectedAction(action);
-    console.log(action);
     setOpen(true);
   };
 
@@ -96,7 +96,7 @@ const SendersMainContent = () => {
       },
     });
     const data = await response.json();
-    console.log(data);
+    // console.log(data);
     // return data.data
     if (data) {
       // console.log(data.data.data)
@@ -114,6 +114,25 @@ const SendersMainContent = () => {
 
   const allSenders = Array.isArray(senders)
     ? senders?.map((item) => ({
+      id: item.id,
+      firstName: item.first_name,
+      lastName: item.last_name,
+      email: item.email,
+      phone: item.phone,
+      DOB: item.dob,
+      kyc: item.kyc_approved,
+      status: item.blocked,
+      createdAt: item.createdAt.slice(0, 10),
+    }))
+    : [];
+
+  ////////////////////////////////////////////////////////////////
+  //for only status enabled list
+  ////////////////////////////////////////////////////////////////////////
+  const enabledSender = Array.isArray(senders)
+    ? senders
+      ?.filter((item) => item.blocked == false)
+      .map((item) => ({
         id: item.id,
         firstName: item.first_name,
         lastName: item.last_name,
@@ -129,40 +148,40 @@ const SendersMainContent = () => {
   ////////////////////////////////////////////////////////////////
   //for only status enabled list
   ////////////////////////////////////////////////////////////////////////
-  const enabledSender = Array.isArray(senders)
-    ? senders
-        ?.filter((item) => item.blocked == false)
-        .map((item) => ({
-          id: item.id,
-          firstName: item.first_name,
-          lastName: item.last_name,
-          email: item.email,
-          phone: item.phone,
-          DOB: item.dob,
-          kyc: item.kyc_approved,
-          status: item.blocked,
-          createdAt: item.createdAt.slice(0, 10),
-        }))
-    : [];
-
-  ////////////////////////////////////////////////////////////////
-  //for only status enabled list
-  ////////////////////////////////////////////////////////////////////////
   const disabledSender = Array.isArray(senders)
     ? senders
-        ?.filter((item) => item.blocked === true)
-        .map((item) => ({
-          id: item.id,
-          firstName: item.first_name,
-          lastName: item.last_name,
-          email: item.email,
-          phone: item.phone,
-          DOB: item.dob,
-          kyc: item.kyc_approved,
-          status: item.blocked,
-          createdAt: item.createdAt.slice(0, 10),
-        }))
+      ?.filter((item) => item.blocked === true)
+      .map((item) => ({
+        id: item.id,
+        firstName: item.first_name,
+        lastName: item.last_name,
+        email: item.email,
+        phone: item.phone,
+        DOB: item.dob,
+        kyc: item.kyc_approved,
+        status: item.blocked,
+        createdAt: item.createdAt.slice(0, 10),
+      }))
     : [];
+
+  // for only kyc pending list
+  ////////////////////////////////////////////////////////////////////////
+  const pendingKycSender = Array.isArray(senders)
+    ? senders
+      ?.filter((item) => item.kyc_approved === false)
+      .map((item) => ({
+        id: item.id,
+        firstName: item.first_name,
+        lastName: item.last_name,
+        email: item.email,
+        phone: item.phone,
+        DOB: item.dob,
+        kyc: item.kyc_approved,
+        status: item.blocked,
+        createdAt: item.createdAt.slice(0, 10),
+      }))
+    : [];
+
 
   // console.log(allSenders);
   const columns = [
@@ -208,9 +227,8 @@ const SendersMainContent = () => {
             alignItems: "center",
             height: "25px",
             width: "75px",
-            backgroundColor: `${
-              params.row.kyc == true ? "#DCFDD4" : "#FDD4D4"
-            }`,
+            backgroundColor: `${params.row.kyc == true ? "#DCFDD4" : "#FDD4D4"
+              }`,
             borderRadius: "15px",
             // border: `${params.row.enabled == true ? '1px solid #007FFF' : '1px solid #FFA800'}`,
             color: `${params.row.kyc == true ? "#4FAC16" : "#AC1616"}`,
@@ -219,7 +237,7 @@ const SendersMainContent = () => {
             fontStyle: "normal",
           }}
         >
-          {params.row.kyc == true ? "Enabled" : "Disabled"}
+          {params.row.kyc == true ? "Approved" : "Pending"}
         </div>
       ),
     },
@@ -239,9 +257,8 @@ const SendersMainContent = () => {
             alignItems: "center",
             height: "25px",
             width: "75px",
-            backgroundColor: `${
-              params.row.status == true ? "#FDD4D4" : "#DCFDD4"
-            }`,
+            backgroundColor: `${params.row.status == true ? "#FDD4D4" : "#DCFDD4"
+              }`,
             color: `${params.row.status == true ? "#AC1616" : "#4FAC16"}`,
             borderRadius: "15px",
             // border: `${params.row.enabled == true ? '1px solid #007FFF' : '1px solid #FFA800'}`,
@@ -252,6 +269,37 @@ const SendersMainContent = () => {
         >
           {params.row.status == false ? "Enabled" : "Disabled"}
         </div>
+      ),
+    },
+    {
+      field: "KYC",
+      headerName: "KYC",
+      // description: 'This column has a value getter and is not sortable.',
+      // sortable: false,
+      width: 160,
+      // disable sorting
+      sortable: false,
+      renderCell: (params) => (
+        <MenuItem
+          // disabled={selectedRows.length >= 1 ? true : false}
+          onClick={() => {
+            setFirstClick(true)
+            console.log(selectedRows)
+
+            if (selectedRows.length >= 1) {
+              alert("Please select only one sender to view KYC details")
+              return
+            }
+            handleClickOpen("edit")
+
+          }} >
+          <img
+            style={{ marginRight: "10px" }}
+            src={editIcon}
+            alt="icon"
+          />
+          View KYC
+        </MenuItem>
       ),
     },
     {
@@ -290,6 +338,7 @@ const SendersMainContent = () => {
               }}
               onClick={handleClick}
             >
+
               Action
               <img src={ArrowIcon} alt="icon" style={{ marginLeft: "10px" }} />
             </div>
@@ -303,7 +352,10 @@ const SendersMainContent = () => {
               }}
             >
               {params.row.status == true ? (
-                <MenuItem onClick={() => handleClickOpen("enable")}>
+                <MenuItem onClick={() => {
+
+                  handleClickOpen("enable")
+                }}>
                   <img
                     style={{
                       marginRight: "10px",
@@ -325,14 +377,14 @@ const SendersMainContent = () => {
                   Disable
                 </MenuItem>
               )}
-              <MenuItem onClick={() => handleClickOpen("edit")}>
+              {/* <MenuItem onClick={() => handleClickOpen("edit")}>
                 <img
                   style={{ marginRight: "10px" }}
                   src={editIcon}
                   alt="icon"
                 />
                 View KYC
-              </MenuItem>
+              </MenuItem> */}
               <MenuItem onClick={() => handleClickOpen("delete")}>
                 <img
                   style={{ marginRight: "10px" }}
@@ -379,6 +431,8 @@ const SendersMainContent = () => {
         console.log(results);
         handleDeleteModalClose();
         queryClient.invalidateQueries("allSenders");
+        // close the modal
+        handleClose();
       })
       .catch((error) => {
         console.error(error);
@@ -494,9 +548,15 @@ const SendersMainContent = () => {
   const [fetchKyc, setFetchKyc] = useState(null);
 
   useEffect(() => {
+    console.log(selectedRows)
+    console.log(selectedRows.length)
+    // if(selectedRows.length < 1){
+
+    // }
+    console.log(firstClick)
     axios
       .get(
-        `https://api.quickt.com.au/api/users/${selectedRows[0]?.id}?populate=*`,
+        `https://api.quickt.com.au/api/users/${selectedRows[selectedRows.length - 1]?.id}?populate=*`,
         {
           headers: {
             Authorization: `${localStorage.getItem("jwt")}`,
@@ -536,24 +596,24 @@ const SendersMainContent = () => {
       });
   };
 
-  console.log("isEnabled:", isStatus);
-  console.log("isKyc:", isKyc);
-  console.log("fromDate:", filterSender.from);
-  console.log("toDate:", filterSender.to);
+  // console.log("isEnabled:", isStatus);
+  // console.log("isKyc:", isKyc);
+  // console.log("fromDate:", filterSender.from);
+  // console.log("toDate:", filterSender.to);
 
-  console.log(
-    "Status values in allSenders:",
-    allSenders.map((item) => item.status)
-  );
-  console.log(
-    "Filtered Senders:",
-    allSenders.filter(
-      (item) =>
-        item.kyc === isKyc &&
-        item.createdAt >= filterSender.from &&
-        item.createdAt <= filterSender.to
-    )
-  );
+  // console.log(
+  //   "Status values in allSenders:",
+  //   allSenders.map((item) => item.status)
+  // );
+  // console.log(
+  //   "Filtered Senders:",
+  //   allSenders.filter(
+  //     (item) =>
+  //       item.kyc === isKyc &&
+  //       item.createdAt >= filterSender.from &&
+  //       item.createdAt <= filterSender.to
+  //   )
+  // );
   return (
     <div className={styles.parent} style={{ position: "relative" }}>
       <Tabs defaultValue={1}>
@@ -566,6 +626,9 @@ const SendersMainContent = () => {
           )}
           {filterMood !== true && (
             <Tab value={3}>Disabled - {disabledSender.length}</Tab>
+          )}
+          {filterMood !== true && (
+            <Tab value={4}>Pending KYC- {pendingKycSender.length}</Tab>
           )}
           {/* <Tab value={2}>Enabled - {enabledSender?.length}</Tab>
           <Tab value={3}>Disabled - {disabledSender?.length}</Tab> */}
@@ -865,6 +928,27 @@ const SendersMainContent = () => {
                 }}
               />
             </TabPanel>
+            <TabPanel value={4}>
+              <DataGrid
+                rows={pendingKycSender}
+                columns={columns}
+                initialState={{
+                  pagination: {
+                    paginationModel: { page: 0, pageSize: 10 },
+                  },
+                }}
+                pageSizeOptions={[10, 20]}
+                checkboxSelection
+                onRowSelectionModelChange={(ids) => {
+                  const selectedIDs = new Set(ids);
+                  const selectedRowData = pendingKycSender.filter((row) =>
+                    // selectedIDs.has(row.id.toString())
+                    selectedIDs.has(row.id)
+                  );
+                  setSelectedRows(selectedRowData);
+                }}
+              />
+            </TabPanel>
           </>
         )}
       </Tabs>
@@ -964,13 +1048,16 @@ const SendersMainContent = () => {
                           <div style={{ position: "relative" }}>
                             <img
                               src={
-                                `https://api.quickt.com.au` + fetchKyc?.image
+                                fetchKyc?.image ?
+                                  `https://api.quickt.com.au` + fetchKyc?.image :
+                                  disableIcon
                               }
                               alt="icon"
                               style={{
                                 height: "298px",
                                 width: "255px",
                                 borderRadius: "24px",
+                                objectFit: 'cover'
                               }}
                             />
                             <div
@@ -1207,8 +1294,9 @@ const SendersMainContent = () => {
                         <div style={{ position: "relative" }}>
                           <img
                             src={
+                              fetchKyc?.kyc?.id_front ?
                               `https://api.quickt.com.au` +
-                              fetchKyc?.kyc?.id_front
+                              fetchKyc?.kyc?.id_front : disableIcon
                             }
                             alt="icon"
                             style={{
@@ -1217,6 +1305,8 @@ const SendersMainContent = () => {
                               borderRadius: "24px",
                               marginBottom: "20px",
                               cursor: "pointer",
+                              objectFit: 'cover'
+
                             }}
                             onClick={toggleFrontFullSize}
                           />
@@ -1238,14 +1328,16 @@ const SendersMainContent = () => {
                             >
                               <img
                                 src={
+                                  fetchKyc?.kyc?.id_front ?
                                   `https://api.quickt.com.au` +
-                                  fetchKyc?.kyc?.id_front
+                                  fetchKyc?.kyc?.id_front : disableIcon
                                 }
                                 alt="icon"
                                 style={{
                                   maxHeight: "90%",
                                   maxWidth: "90%",
                                   borderRadius: "24px",
+                                  objectFit: 'cover'
                                 }}
                               />
                             </div>
@@ -1294,8 +1386,9 @@ const SendersMainContent = () => {
                         <div style={{ position: "relative" }}>
                           <img
                             src={
+                              fetchKyc?.kyc?.id_back ?
                               `https://api.quickt.com.au` +
-                              fetchKyc?.kyc?.id_back
+                              fetchKyc?.kyc?.id_back : disableIcon
                             }
                             alt="icon"
                             style={{
@@ -1304,6 +1397,7 @@ const SendersMainContent = () => {
                               borderRadius: "24px",
                               marginBottom: "20px",
                               cursor: "pointer",
+                              objectFit: 'cover'
                             }}
                             onClick={toggleBackFullSize}
                           />
@@ -1325,14 +1419,16 @@ const SendersMainContent = () => {
                             >
                               <img
                                 src={
+                                  fetchKyc?.kyc?.id_back ?
                                   `https://api.quickt.com.au` +
-                                  fetchKyc?.kyc?.id_back
+                                  fetchKyc?.kyc?.id_back : disableIcon
                                 }
                                 alt="icon"
                                 style={{
                                   maxHeight: "90%",
                                   maxWidth: "90%",
                                   borderRadius: "24px",
+                                  objectFit: 'cover'
                                 }}
                               />
                             </div>
@@ -1514,8 +1610,7 @@ const TabPanel = styled(BaseTabPanel)(
     font-size: 0.875rem;
     padding: 20px 12px;
     // background: ${theme.palette.mode === "dark" ? grey[900] : "#fff"};
-    // border: 1px solid ${
-      theme.palette.mode === "dark" ? grey[700] : grey[200]
+    // border: 1px solid ${theme.palette.mode === "dark" ? grey[700] : grey[200]
     };
     border-radius: 12px;
     `
@@ -1523,7 +1618,7 @@ const TabPanel = styled(BaseTabPanel)(
 
 const TabsList = styled(BaseTabsList)(
   ({ theme }) => `
-    max-width: 500px;
+    max-width: 600px;
     // background-color: ${blue[500]};
     border-radius: 12px;
     margin-bottom: 16px;
@@ -1531,8 +1626,7 @@ const TabsList = styled(BaseTabsList)(
     align-items: center;
     justify-content: center;
     align-content: space-between;
-    // box-shadow: 0px 4px 30px ${
-      theme.palette.mode === "dark" ? grey[900] : grey[200]
+    // box-shadow: 0px 4px 30px ${theme.palette.mode === "dark" ? grey[900] : grey[200]
     };
     `
 );

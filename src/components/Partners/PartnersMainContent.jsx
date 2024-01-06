@@ -90,20 +90,20 @@ const PartnersMainContent = () => {
 
   const allPartners = Array.isArray(partners)
     ? partners?.map((item) => ({
-        id: item.id,
-        name: item.attributes?.name,
-        image: `https://api.quickt.com.au` + item.attributes?.image,
-        location: item.attributes?.location,
-        percentage: item.attributes?.partner_percentage,
-        createdAt: item.attributes?.createdAt.slice(0, 10),
-        details: {
-          image:
-            item.attributes?.users_permissions_users?.data[0]?.attributes
-              ?.image,
-          name: item.attributes?.users_permissions_users?.data[0]?.attributes
-            ?.username,
-        },
-      }))
+      id: item.id,
+      name: item.attributes?.name,
+      image: `https://api.quickt.com.au` + item.attributes?.image,
+      location: item.attributes?.location,
+      percentage: item.attributes?.partner_percentage,
+      createdAt: item.attributes?.createdAt.slice(0, 10),
+      details: {
+        image:
+          item.attributes?.users_permissions_users?.data[0]?.attributes
+            ?.image,
+        name: item.attributes?.users_permissions_users?.data[0]?.attributes
+          ?.username,
+      },
+    }))
     : [];
   console.log(allPartners, "allPartners");
 
@@ -155,7 +155,9 @@ const PartnersMainContent = () => {
       renderCell: (params) => (
         <div style={{ display: "flex", alignItems: "center" }}>
           <img
-            src={params.value.image} // Access the image property from the details object
+            src={params.value.image ? `https://api.quickt.com.au${params.value.image}` :
+              "https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png"
+            } // Access the image property from the details object
             alt="User"
             style={{
               borderRadius: "50%",
@@ -165,7 +167,7 @@ const PartnersMainContent = () => {
             }}
           />
           <div>
-            <p style={{ marginTop: "20px" }}>{params.value.name}</p>
+            <p style={{ marginTop: "20px" }}>{params.value.name ? params.value.name: 'None'}</p>
             <br />
             {/* Add other details as needed */}
           </div>
@@ -567,11 +569,11 @@ const PartnersMainContent = () => {
                   <Typography id="modal-modal-description" sx={{ mt: 2 }}>
                     <p className="generalSettings_SubTextHeading">Image</p>
                     <img
-                      src={`https://api.quickt.com.au${
-                        partnerData?.attributes?.image ||
+                      src={`https://api.quickt.com.au${partnerData?.attributes?.image ||
                         `https://api.quickt.com.au${selectedImage}`
-                      }`}
+                        }`}
                       style={{
+                        
                         width: "270px",
                         height: "180px",
                         cursor: "pointer",
@@ -755,8 +757,7 @@ const TabPanel = styled(BaseTabPanel)(
     font-size: 0.875rem;
     padding: 20px 12px;
     // background: ${theme.palette.mode === "dark" ? grey[900] : "#fff"};
-    // border: 1px solid ${
-      theme.palette.mode === "dark" ? grey[700] : grey[200]
+    // border: 1px solid ${theme.palette.mode === "dark" ? grey[700] : grey[200]
     };
     border-radius: 12px;
     `
@@ -772,8 +773,7 @@ const TabsList = styled(BaseTabsList)(
     align-items: center;
     justify-content: center;
     align-content: space-between;
-    // box-shadow: 0px 4px 30px ${
-      theme.palette.mode === "dark" ? grey[900] : grey[200]
+    // box-shadow: 0px 4px 30px ${theme.palette.mode === "dark" ? grey[900] : grey[200]
     };
     `
 );
