@@ -21,8 +21,120 @@ import updateIcon from "../../assets/img/generalSettings/update.svg";
 import plusIcon from "../../assets/img/generalSettings/plus.svg";
 import axios from "axios";
 import { useQuery } from "react-query";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Modal,
+  Backdrop,
+  Fade,
+  TextField,
+  Button,
+  Typography,
+} from '@mui/material';
+
 
 const GeneralSettingsMainContent = () => {
+  const [serviceBoxes, setServiceBoxes] = useState([]);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editedServiceBox, setEditedServiceBox] = useState({});
+  // const classes = useStyles();
+  const openEditModal = (index) => {
+    let num = index + 1;
+    // convert number to one, two, three
+    if (num === 1) {
+      num = "one";
+    } else if (num === 2) {
+      num = "two";
+    } else if (num === 3) {
+      num = "three";
+    }
+
+    setEditedServiceBox({
+      title: serviceBoxes[index][`service_box_${num}_title`],
+      icon: `https://api.quickt.com.au${serviceBoxes[index][`service_box_${num}_icon`]}`,
+      description: serviceBoxes[index][`service_box_${num}_desc`],
+      index,
+    });
+
+    setModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setModalOpen(false);
+  };
+
+  const handleSaveChanges = async () => {
+    if (
+      editedServiceBox.title === "" ||
+      editedServiceBox.description === "" ||
+      editedServiceBox.icon === null
+    ) {
+      alert("Please enter title, description, and icon");
+      return;
+    }
+
+    let serviceBoxData = {};
+    if (editedServiceBox.index === 0) {
+      serviceBoxData = {
+        data: {
+          service_box_one_title: editedServiceBox.title,
+          service_box_one_desc: editedServiceBox.description,
+          service_box_one_icon: strapiImage ? strapiImage : editedServiceBox.icon,
+        },
+      };
+    } else if (editedServiceBox.index === 1) {
+      serviceBoxData = {
+        data: {
+          service_box_two_title: editedServiceBox.title,
+          service_box_two_desc: editedServiceBox.description,
+          service_box_two_icon: strapiImage ? strapiImage : editedServiceBox.icon,
+        },
+      };
+    } else {
+      serviceBoxData = {
+        data: {
+          service_box_three_title: editedServiceBox.title,
+          service_box_three_desc: editedServiceBox.description,
+          service_box_three_icon: strapiImage ? strapiImage : editedServiceBox.icon,
+        },
+      };
+    }
+
+    // Send the updated data to the server using axios.put
+    try {
+      const res = await axios.put(
+        `https://api.quickt.com.au/api/general-settings/1`,
+        serviceBoxData,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+          },
+        }
+      );
+
+      if (res.data?.data?.id) {
+        setServiceTitle("");
+        setServiceDescription("");
+        setSelectedImage(imageTemplate);
+        setStrapiImage(null);
+        alert("Service box updated successfully");
+      } else {
+        alert("Something went wrong");
+      }
+    } catch (error) {
+      console.error('Error updating service box:', error);
+      alert("Error updating service box");
+    }
+
+    // Close the modal after saving changes
+    setModalOpen(false);
+  };
+
   const [box, setBox] = React.useState(1);
   const [newTransfer, setNewTransfer] = useState(false);
   const handleChange = (event) => {
@@ -92,7 +204,7 @@ const GeneralSettingsMainContent = () => {
         },
       }
     );
-    // console.log(res.data.data.attributes)
+    console.log(res.data.data.attributes)
     return res.data.data.attributes;
   });
   // console.log(generalSettings?.transfer_percentage)
@@ -121,6 +233,27 @@ const GeneralSettingsMainContent = () => {
       setQuickFee(quickTransfers?.[box - 1]?.attributes?.fee);
     }
   }, [box, quickTransfers]);
+  React.useEffect(() => {
+    if (generalSettings) {
+      setServiceBoxes([
+        {
+          service_box_one_title: generalSettings?.service_box_one_title,
+          service_box_one_desc: generalSettings?.service_box_one_desc,
+          service_box_one_icon: generalSettings?.service_box_one_icon,
+        },
+        {
+          service_box_two_title: generalSettings?.service_box_two_title,
+          service_box_two_desc: generalSettings?.service_box_two_desc,
+          service_box_two_icon: generalSettings?.service_box_two_icon,
+        },
+        {
+          service_box_three_title: generalSettings?.service_box_three_title,
+          service_box_three_desc: generalSettings?.service_box_three_desc,
+          service_box_three_icon: generalSettings?.service_box_three_icon,
+        },
+      ]);
+    }
+  }, [generalSettings]);
   // console.log(quickTransfers.length)
   /////////////////////////////
   //image uploading
@@ -132,8 +265,7 @@ const GeneralSettingsMainContent = () => {
       return;
     }
     const res = await axios.put(
-      `https://api.quickt.com.au/api/quick-transfers/${
-        quickTransfers?.[box - 1]?.id
+      `https://api.quickt.com.au/api/quick-transfers/${quickTransfers?.[box - 1]?.id
       }`,
       {
         data: {
@@ -350,89 +482,145 @@ const GeneralSettingsMainContent = () => {
                 type="text"
                 value={mainTitle}
                 onChange={(e) => setMainTitle(e.target.value)}
-                placeholder={`Enter title here (We recommend title length less than 10 words)`}
+                placeholder={`Current title : ${generalSettings?.main_banner_title} || We recommend title length less than 10 words`}
                 style={{ border: "1px solid #999" }}
               />
               <p className="generalSettings_SubTextHeading">Description</p>
               <textarea
                 value={mainDescription}
                 onChange={(e) => setMainDescription(e.target.value)}
-                placeholder={`Enter description here (We recommend description length less than 15-20 words)`}
+                placeholder={`Current description : ${generalSettings?.main_banner_desc} || We recommend description length less than 15-20 words`}
                 rows={6}
                 cols={10}
               ></textarea>
               <button onClick={handleMainBannerUpdate}>Update</button>
             </div>
 
-            <div className="generalSettings_MainBanner">
-              <div className="generalSettings_serviceBox">
-                <div>
-                  <p className="generalSettings_TextHeading">
-                    Update Service box number {box}
-                  </p>
-                </div>
-                <div style={{ width: "200px" }}>
-                  <FormControl fullWidth>
-                    <InputLabel id="demo-simple-select-label">
-                      Select Box No
-                    </InputLabel>
-                    <Select
-                      labelId="demo-simple-select-label"
-                      id="demo-simple-select"
-                      value={box}
-                      label="Select Box No"
-                      onChange={handleChange}
-                    >
-                      {[1, 2, 3].map((item, index) => (
-                        <MenuItem key={index} value={item}>
-                          Service box {item}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                </div>
-              </div>
-              <p className="generalSettings_SubTextHeading">Title </p>
-              <input
-                value={serviceTitle}
-                onChange={(e) => setServiceTitle(e.target.value)}
-                type="text"
-                placeholder={`Enter title here (We recommend title length less than 10)`}
-                style={{ border: "1px solid #999" }}
-              />
-              <div className="generalSettings_MainServices">
-                <div>
-                  <p className="generalSettings_SubTextHeading">Icon</p>
-                  <img
-                    src={selectedImage}
-                    style={{
-                      width: "283px",
-                      height: "193px",
-                      borderRadius: "10px",
-                      cursor: "pointer",
-                    }}
-                    alt="icon"
-                    onClick={handleImageClick}
+            <h2 style={{ marginBottom: '10px' }}>Service Boxs</h2>
+            <TableContainer component={Paper}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Title</TableCell>
+                    <TableCell>Icon</TableCell>
+                    <TableCell>Description</TableCell>
+                    <TableCell>Action</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {serviceBoxes.map((serviceBox, index) => {
+                    let num = index + 1;
+                    // convert number to one, two, three
+                    if (num === 1) {
+                      num = "one";
+                    } else if (num === 2) {
+                      num = "two";
+                    } else if (num === 3) {
+                      num = "three";
+                    }
+
+                    return (
+                      <TableRow key={index}>
+                        <TableCell>{serviceBox[`service_box_${num}_title`]}</TableCell>
+                        <TableCell style={{
+
+                        }}>
+                          <img
+                            src={`https://api.quickt.com.au${serviceBox[`service_box_${num}_icon`]}`}
+                            alt="icon"
+                            style={{ width: "50px", height: "50px", borderRadius: "10px" }}
+                          />
+                        </TableCell>
+                        <TableCell >{serviceBox[`service_box_${num}_desc`]}</TableCell>
+                        <TableCell>
+                          <Button onClick={() => openEditModal(index)}>Edit</Button>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </TableContainer>
+            <Modal
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: '10px'
+              }}
+              open={modalOpen}
+              onClose={handleModalClose}
+              closeAfterTransition
+            >
+              <Fade in={modalOpen} style={{
+                borderRadius: '10px',
+              }}>
+                <div style={{
+                  backgroundColor: 'white',
+                  border: '2px solid #fff',
+                  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+                  padding: '16px',
+                  outline: 'none'
+                }}>
+                  <Typography variant="h6" sx={{ my: 2 }}>Edit Service Box</Typography>
+                  <TextField
+                    label="Title"
+                    fullWidth
+                    value={editedServiceBox.title}
+                    onChange={(e) => setEditedServiceBox({ ...editedServiceBox, title: e.target.value })}
                   />
+                  <div style={{
+                    width: '100%',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginTop: '10px',
+                    marginBottom: '10px',
+                    gap: '10px'
+                  }}>
+                    
+                    <div>
+                      <p>Current image </p>
+                      <img
+                        src={editedServiceBox.icon }
+                        alt="icon"
+                        style={{
+                          width: "283px", height: "193px", borderRadius: "10px", objectFit: 'cover', marginTop: '10px', marginBottom: '10px', 
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <p>Click here to update</p>
+                      <img
+                        src={selectedImage}
+                        onClick={handleImageClick}
+                        style={{
+                          width: "283px",
+                          height: "193px",
+                          borderRadius: "10px",
+                          cursor: "pointer",
+                          objectFit: "cover",
+                          border: "1px solid #999",
+                        }}
+                        alt="icon"
+
+                      />
+                    </div>
+                  </div>
+                  <TextField
+                    label="Description"
+                    fullWidth
+                    multiline
+                    rows={4}
+                    value={editedServiceBox.description}
+                    onChange={(e) => setEditedServiceBox({ ...editedServiceBox, description: e.target.value })}
+                  />
+                  <Button variant="contained" sx={{ mt: 2, ml: 'auto' }} color="success" onClick={handleSaveChanges}>
+                    Save Changes
+                  </Button>
                 </div>
-                <div>
-                  <p className="generalSettings_SubTextHeading">Description</p>
-                  <textarea
-                    value={serviceDescription}
-                    onChange={(e) => setServiceDescription(e.target.value)}
-                    placeholder="Enter description"
-                    rows={7}
-                    cols={60}
-                  ></textarea>
-                </div>
-              </div>
-              <button
-                className="generalSettings__serviceButton"
-                onClick={handleServiceBoxUpdate}
-              >
-                Update Service {box} <img src={plusIcon} alt="icon" />
-              </button>
-            </div>
+              </Fade>
+            </Modal>
           </div>
         </TabPanel>
         {/* quick transfer */}
@@ -688,8 +876,7 @@ const TabPanel = styled(BaseTabPanel)(
     padding: 20px 12px;
     text-align: start;
     // background: ${theme.palette.mode === "dark" ? grey[900] : "#fff"};
-    // border: 1px solid ${
-      theme.palette.mode === "dark" ? grey[700] : grey[200]
+    // border: 1px solid ${theme.palette.mode === "dark" ? grey[700] : grey[200]
     };
     border-radius: 12px;
     `
@@ -705,8 +892,7 @@ const TabsList = styled(BaseTabsList)(
     align-items: center;
     justify-content: center;
     align-content: space-between;
-    // box-shadow: 0px 4px 30px ${
-      theme.palette.mode === "dark" ? grey[900] : grey[200]
+    // box-shadow: 0px 4px 30px ${theme.palette.mode === "dark" ? grey[900] : grey[200]
     };
     `
 );
