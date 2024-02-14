@@ -226,6 +226,7 @@ const GeneralSettingsMainContent = () => {
     return res.data.data;
   });
 
+  console.log(quickTransfers && quickTransfers)
   React.useEffect(() => {
     if (quickTransfers) {
       setVisibility(quickTransfers?.[box - 1]?.attributes?.enabled);
@@ -578,14 +579,14 @@ const GeneralSettingsMainContent = () => {
                     marginBottom: '10px',
                     gap: '10px'
                   }}>
-                    
+
                     <div>
                       <p>Current image </p>
                       <img
-                        src={editedServiceBox.icon }
+                        src={editedServiceBox.icon}
                         alt="icon"
                         style={{
-                          width: "283px", height: "193px", borderRadius: "10px", objectFit: 'cover', marginTop: '10px', marginBottom: '10px', 
+                          width: "283px", height: "193px", borderRadius: "10px", objectFit: 'cover', marginTop: '10px', marginBottom: '10px',
                         }}
                       />
                     </div>
@@ -625,10 +626,145 @@ const GeneralSettingsMainContent = () => {
         </TabPanel>
         {/* quick transfer */}
         <TabPanel value={2}>
-          {/* header */}
+          <TableContainer component={Paper}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>ID</TableCell>
+                  <TableCell>Amount</TableCell>
+                  <TableCell>Fee</TableCell>
+                  <TableCell>Visibility</TableCell>
+                  <TableCell>Action</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {quickTransfers && quickTransfers
+                  ?.slice() // Create a shallow copy to avoid mutating the original array
+                  ?.sort((a, b) => a.id - b.id)
+                  ?.map((transfer, index) => (
+                    <TableRow key={transfer.id}>
+                      <TableCell>{index + 1}</TableCell>
+                      <TableCell>{transfer.attributes.amount}</TableCell>
+                      <TableCell>{transfer.attributes.fee}</TableCell>
+                      <TableCell>
+                        {
+                          transfer.attributes.enabled ?
+                            <span style={{
+                              background: '#0D52D7',
+                              padding: '5px 15px',
+                              borderRadius: '5px',
+                              color: 'white'
+                            }}>
+                              Visible
+                            </span> :
+                            <span
+                              style={{
+                                background: 'red',
+                                padding: '5px 15px',
+                                borderRadius: '5px',
+                                color: 'white'
+                              }}>
+                              Hidden
+                            </span>
+                        }
+                      </TableCell>
+                      <TableCell>
+                        <Button onClick={() => setBox(index + 1)}>Edit</Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+          {
+            box &&
+            <>
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginTop: '20px'
+              }}>
+                <p className={quickStyle.header}>Update Quick Transfers</p>
+                <button
+                  style={{
+                    background: 'red',
+                    color: 'white',
+                    padding: '10px 15px',
+                    borderRadius: '5px',
+                    border: 'none',
+                    cursor: 'pointer'
+                  }}
+                  onClick={() => {
+                    setBox(null)
+                  }}>
+                  Remove editing
+                </button>
+              </div>
+              <Box className={quickStyle.body}>
+                {/* upper inputs */}
+                <Box className={quickStyle.inputParent}>
+                  <div className={quickStyle.inputBox}>
+                    <label htmlFor="amount">Amount</label>
+                    <input
+                      type="text"
+                      className={quickStyle.textInput}
+                      value={quickAmount}
+                      onChange={(e) => handleW}
+                    />
+                  </div>
+                  {/* fee */}
+                  <div className={quickStyle.inputBox}>
+                    <label htmlFor="amount">Fee</label>
+                    <input
+                      type="text"
+                      className={quickStyle.textInput}
+                      value={quickFee}
+                      onChange={(e) => {
+                        setQuickFee(e.target.value);
+                      }}
+                    />
+                  </div>
+                </Box>
+                {/* lower inputs */}
+                <Box className={quickStyle.inputParent} sx={{ mt: 3 }}>
+                  <div
+                    className={quickStyle.inputBox}
+                    style={{ width: "50%", position: "relative" }}
+                  >
+                    <label htmlFor="amount">User Visibility</label>
+                    {/* <input type="text" className={quickStyle.textInput} /> */}
+                    <select
+                      name="visibility"
+                      className={quickStyle.textInput}
+                      value={visibility}
+                      onChange={(e) => {
+                        setVisibility(e.target.value);
+                        // setBox(e.target.value)
+                      }}
+                    >
+                      <option value="true">Visible </option>
+                      <option value="false">Invisible </option>
+                    </select>
+                    <div className={quickStyle.absDiv}>{/* asd */}</div>
+                  </div>
+                  {/* update button */}
+                  <button
+                    className={quickStyle.updateButton}
+                    onClick={updateQuickTransfer}
+                  >
+                    <span> Update quick transfer {box}</span>
+                    <img src={updateIcon} alt="icon" />
+                  </button>
+                </Box>
+              </Box>
+            </>
+
+          }
+
+
           <div className={quickStyle.headerBox}>
-            <p className={quickStyle.header}>Update Quick Transfers</p>
-            <div className="generalSettings_serviceBox">
+            {/* <div className="generalSettings_serviceBox">
               <div style={{ width: "230px" }}>
                 <FormControl
                   fullWidth
@@ -662,66 +798,9 @@ const GeneralSettingsMainContent = () => {
                   </Select>
                 </FormControl>
               </div>
-            </div>
+            </div> */}
           </div>
-          {/* update quickTransfer body */}
-          <Box className={quickStyle.body}>
-            {/* upper inputs */}
-            <Box className={quickStyle.inputParent}>
-              <div className={quickStyle.inputBox}>
-                <label htmlFor="amount">Amount</label>
-                <input
-                  type="text"
-                  className={quickStyle.textInput}
-                  value={quickAmount}
-                  onChange={(e) => handleW}
-                />
-              </div>
-              {/* fee */}
-              <div className={quickStyle.inputBox}>
-                <label htmlFor="amount">Fee</label>
-                <input
-                  type="text"
-                  className={quickStyle.textInput}
-                  value={quickFee}
-                  onChange={(e) => {
-                    setQuickFee(e.target.value);
-                  }}
-                />
-              </div>
-            </Box>
-            {/* lower inputs */}
-            <Box className={quickStyle.inputParent} sx={{ mt: 3 }}>
-              <div
-                className={quickStyle.inputBox}
-                style={{ width: "50%", position: "relative" }}
-              >
-                <label htmlFor="amount">User Visibility</label>
-                {/* <input type="text" className={quickStyle.textInput} /> */}
-                <select
-                  name="visibility"
-                  className={quickStyle.textInput}
-                  value={visibility}
-                  onChange={(e) => {
-                    setVisibility(e.target.value);
-                    // setBox(e.target.value)
-                  }}
-                >
-                  <option value="true">Visible </option>
-                  <option value="false">Invisible </option>
-                </select>
-                <div className={quickStyle.absDiv}>{/* asd */}</div>
-              </div>
-              {/* update button */}
-              <button
-                className={quickStyle.updateButton}
-                onClick={updateQuickTransfer}
-              >
-                <span> Update quick transfer {box}</span>
-                <img src={updateIcon} alt="icon" />
-              </button>
-            </Box>
-          </Box>
+
           {
             <button
               className={quickStyle.updateButton}
@@ -800,7 +879,7 @@ const GeneralSettingsMainContent = () => {
           )}
         </TabPanel>
       </Tabs>
-    </div>
+    </div >
   );
 };
 
