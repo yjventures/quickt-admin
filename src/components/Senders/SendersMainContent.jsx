@@ -22,6 +22,8 @@ import axios from "axios";
 import { useEffect } from "react";
 import { useQueryClient } from "react-query";
 import useAuth from "../../hook/useAuth";
+import ExportButton from "../ExportButton/ExportButton";
+import PrintButton from "../PrintButton/PrintButton";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -616,6 +618,13 @@ const SendersMainContent = () => {
   // );
   return (
     <div className={styles.parent} style={{ position: "relative" }}>
+      <Box sx={{ display: "flex", alignItems: "center", position: 'absolute', right: '0', top: '-55px' }}>
+          <ExportButton data={senders} />
+          <span style={{ marginLeft: "10px" }}></span>
+          <PrintButton data={senders} />
+          <span style={{ marginLeft: "10px" }}></span>
+          {/* <CreateNewButton text={"sender"} /> */}
+        </Box>
       <Tabs defaultValue={1}>
         <TabsList>
           <Tab value={1} onClick={handleClearRows}>

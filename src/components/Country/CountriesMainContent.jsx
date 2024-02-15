@@ -128,7 +128,8 @@ const CountriesMainContent = () => {
       }))
     : [];
 
-  console.log(allCountry)
+  // console.log(allCountry)
+  console.log(selectedRows)
   ////////////////////////////////////////////////////////////////////////
   //upload image and show preview
   ////////////////////////////////////////////////////////////////////////
@@ -227,6 +228,7 @@ const CountriesMainContent = () => {
             width: 35,
             borderRadius: "50%",
             marginRight: 10,
+            objectFit: 'cover'
           }}
           src={`https://api.quickt.com.au${params.row.image}`}
         // alt="user-image"
@@ -892,6 +894,7 @@ const CountriesMainContent = () => {
                         width: "270px",
                         height: "180px",
                         cursor: "pointer",
+                        objectFit: 'cover'
                       }}
                       alt="icon"
                       onClick={handleImageClick}

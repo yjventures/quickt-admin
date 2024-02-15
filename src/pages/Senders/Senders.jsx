@@ -35,8 +35,8 @@ const Senders = () => {
     borderRadius: "14px",
   };
 
-  console.log(fromDate);
-  console.log(toDate);
+  // console.log(fromDate);
+  // console.log(toDate);
 
   const handleFilterUpdate = () => {
     console.log(senderRef.current.value);
@@ -281,13 +281,12 @@ const Senders = () => {
             </Box>
           </Modal>
         </Box>
-        <Box sx={{ display: "flex", alignItems: "center" }}>
+        {/* <Box sx={{ display: "flex", alignItems: "center" }}>
           <ExportButton />
           <span style={{ marginLeft: "10px" }}></span>
           <PrintButton />
           <span style={{ marginLeft: "10px" }}></span>
-          {/* <CreateNewButton text={"sender"} /> */}
-        </Box>
+        </Box> */}
       </Box>
 
       {/* main contents */}
