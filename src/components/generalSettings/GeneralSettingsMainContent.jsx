@@ -154,7 +154,7 @@ const GeneralSettingsMainContent = () => {
   const [selectedImage, setSelectedImage] = useState(imageTemplate);
   const [strapiImage, setStrapiImage] = useState(null);
   // const [generalSettings, setGeneralSettings] = useState(null);
-  console.log(newTransferVisibility, newTransferFee, newTransferAmount);
+  // console.log(newTransferVisibility, newTransferFee, newTransferAmount);
   const createQuickTransfer = async () => {
     if (
       newTransferAmount === "" ||
@@ -226,7 +226,7 @@ const GeneralSettingsMainContent = () => {
     return res.data.data;
   });
 
-  console.log(quickTransfers && quickTransfers)
+  // console.log(quickTransfers && quickTransfers)
   React.useEffect(() => {
     if (quickTransfers) {
       setVisibility(quickTransfers?.[box - 1]?.attributes?.enabled);
@@ -685,7 +685,7 @@ const GeneralSettingsMainContent = () => {
                 alignItems: 'center',
                 marginTop: '20px'
               }}>
-                <p className={quickStyle.header}>Update Quick Transfers</p>
+                <p className={quickStyle.header}>Selected Quick Transfers {box}</p>
                 <button
                   style={{
                     background: 'red',

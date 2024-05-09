@@ -85,6 +85,35 @@ const TransactionMainContent = () => {
   // Check if countries is an array before calling map
   const allTransaction = Array.isArray(transactions)
     ? transactions?.map((item) => ({
+      id: item.attributes?.transfer?.data?.id,
+      senders: {
+        image:
+          item.attributes?.users_permissions_user?.data?.attributes?.image, // Replace with the actual path or URL to the user's image
+        name: item.attributes?.users_permissions_user?.data?.attributes
+          ?.username,
+      },
+      receiverName: item.attributes?.receiver_name,
+      phone: item.attributes?.users_permissions_user?.data?.attributes?.phone,
+      BaseAmount: item.attributes?.transfer_amount,
+      Totalamount: item.attributes?.amount_total,
+      TransactionFees: item.attributes?.transfer_fees,
+      Date: item.attributes?.transaction_date,
+      Currency: item.attributes?.currency,
+      // is payment complete from QuickT
+      payoutStatus:
+        item.attributes?.transfer?.data?.attributes?.payout_complete,
+      transferStatus: item.attributes?.transfer?.data?.attributes?.status,
+      transactionNumber: item.id,
+      createdAt: item.attributes?.createdAt.slice(0, 10),
+    }))
+    : [];
+  const completeCountries = Array.isArray(transactions)
+    ? transactions
+      ?.filter(
+        (item) =>
+          item.attributes?.transfer?.data?.attributes?.payout_complete == true
+      )
+      .map((item) => ({
         id: item.attributes?.transfer?.data?.id,
         senders: {
           image:
@@ -93,7 +122,8 @@ const TransactionMainContent = () => {
             ?.username,
         },
         receiverName: item.attributes?.receiver_name,
-        phone: item.attributes?.users_permissions_user?.data?.attributes?.phone,
+        phone:
+          item.attributes?.users_permissions_user?.data?.attributes?.phone,
         BaseAmount: item.attributes?.transfer_amount,
         Totalamount: item.attributes?.amount_total,
         TransactionFees: item.attributes?.transfer_fees,
@@ -107,68 +137,38 @@ const TransactionMainContent = () => {
         createdAt: item.attributes?.createdAt.slice(0, 10),
       }))
     : [];
-  const completeCountries = Array.isArray(transactions)
-    ? transactions
-        ?.filter(
-          (item) =>
-            item.attributes?.transfer?.data?.attributes?.payout_complete == true
-        )
-        .map((item) => ({
-          id: item.attributes?.transfer?.data?.id,
-          senders: {
-            image:
-              item.attributes?.users_permissions_user?.data?.attributes?.image, // Replace with the actual path or URL to the user's image
-            name: item.attributes?.users_permissions_user?.data?.attributes
-              ?.username,
-          },
-          receiverName: item.attributes?.receiver_name,
-          phone:
-            item.attributes?.users_permissions_user?.data?.attributes?.phone,
-          BaseAmount: item.attributes?.transfer_amount,
-          Totalamount: item.attributes?.amount_total,
-          TransactionFees: item.attributes?.transfer_fees,
-          Date: item.attributes?.transaction_date,
-          Currency: item.attributes?.currency,
-          // is payment complete from QuickT
-          payoutStatus:
-            item.attributes?.transfer?.data?.attributes?.payout_complete,
-          transferStatus: item.attributes?.transfer?.data?.attributes?.status,
-          transactionNumber: item.id,
-          createdAt: item.attributes?.createdAt.slice(0, 10),
-        }))
-    : [];
   // get only pending countries
   const pendingCountries = Array.isArray(transactions)
     ? transactions
-        ?.filter((item) => {
-          return (
-            item.attributes?.transfer?.data?.attributes?.payout_complete ==
-            false
-          );
-        })
-        .map((item) => ({
-          id: item.attributes?.transfer?.data?.id,
-          senders: {
-            image:
-              item.attributes?.users_permissions_user?.data?.attributes?.image, // Replace with the actual path or URL to the user's image
-            name: item.attributes?.users_permissions_user?.data?.attributes
-              ?.username,
-          },
-          receiverName: item.attributes?.receiver_name,
-          phone:
-            item.attributes?.users_permissions_user?.data?.attributes?.phone,
-          BaseAmount: item.attributes?.transfer_amount,
-          Totalamount: item.attributes?.amount_total,
-          TransactionFees: item.attributes?.transfer_fees,
-          Date: item.attributes?.transaction_date,
-          Currency: item.attributes?.currency,
-          // is payment complete from QuickT
-          payoutStatus:
-            item.attributes?.transfer?.data?.attributes?.payout_complete,
-          transferStatus: item.attributes?.transfer?.data?.attributes?.status,
-          transactionNumber: item.id,
-          createdAt: item.attributes?.createdAt.slice(0, 10),
-        }))
+      ?.filter((item) => {
+        return (
+          item.attributes?.transfer?.data?.attributes?.payout_complete ==
+          false
+        );
+      })
+      .map((item) => ({
+        id: item.attributes?.transfer?.data?.id,
+        senders: {
+          image:
+            item.attributes?.users_permissions_user?.data?.attributes?.image, // Replace with the actual path or URL to the user's image
+          name: item.attributes?.users_permissions_user?.data?.attributes
+            ?.username,
+        },
+        receiverName: item.attributes?.receiver_name,
+        phone:
+          item.attributes?.users_permissions_user?.data?.attributes?.phone,
+        BaseAmount: item.attributes?.transfer_amount,
+        Totalamount: item.attributes?.amount_total,
+        TransactionFees: item.attributes?.transfer_fees,
+        Date: item.attributes?.transaction_date,
+        Currency: item.attributes?.currency,
+        // is payment complete from QuickT
+        payoutStatus:
+          item.attributes?.transfer?.data?.attributes?.payout_complete,
+        transferStatus: item.attributes?.transfer?.data?.attributes?.status,
+        transactionNumber: item.id,
+        createdAt: item.attributes?.createdAt.slice(0, 10),
+      }))
     : [];
 
   const columns = [
@@ -185,7 +185,9 @@ const TransactionMainContent = () => {
       renderCell: (params) => (
         <div style={{ display: "flex", alignItems: "center" }}>
           <img
-            src={params.value.image} // Access the image property from the details object
+            src={params.value.image ? `https://api.quickt.com.au${params.value.image}` :
+              "https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png"
+            } // Access the image property from the details object image property from the details object
             alt="User"
             style={{
               borderRadius: "50%",
@@ -838,8 +840,7 @@ const TabPanel = styled(BaseTabPanel)(
     font-size: 0.875rem;
     padding: 20px 12px;
     // background: ${theme.palette.mode === "dark" ? grey[900] : "#fff"};
-    // border: 1px solid ${
-      theme.palette.mode === "dark" ? grey[700] : grey[200]
+    // border: 1px solid ${theme.palette.mode === "dark" ? grey[700] : grey[200]
     };
     border-radius: 12px;
     `
@@ -855,8 +856,7 @@ const TabsList = styled(BaseTabsList)(
     align-items: center;
     justify-content: center;
     align-content: space-between;
-    // box-shadow: 0px 4px 30px ${
-      theme.palette.mode === "dark" ? grey[900] : grey[200]
+    // box-shadow: 0px 4px 30px ${theme.palette.mode === "dark" ? grey[900] : grey[200]
     };
     `
 );
