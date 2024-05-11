@@ -144,6 +144,7 @@ const GeneralSettingsMainContent = () => {
   const [quickFee, setQuickFee] = React.useState("");
   const [visibility, setVisibility] = React.useState("");
   const [fee, setFee] = useState("");
+  const [platformFee, setPlatformFee] = useState("");
   const [mainTitle, setMainTitle] = useState("");
   const [mainDescription, setMainDescription] = useState("");
   const [serviceTitle, setServiceTitle] = useState("");
@@ -347,6 +348,34 @@ const GeneralSettingsMainContent = () => {
     }
   };
 
+  const handleplatformFeeUpdate = async () => {
+    if (platformFee === "") {
+      alert("Please enter platform fee");
+      return;
+    }
+    // /api/general-settings/:id
+    const res = await axios.put(
+      `https://api.quickt.com.au/api/general-settings/1`,
+      {
+        data: {
+          platform_fee: Number(fee),
+        },
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+        },
+      }
+    );
+    console.log(res.data?.data?.id);
+    if (res.data?.data?.id) {
+      setPlatformFee("");
+      alert("Fee updated successfully");
+    } else {
+      alert("Something went wrong");
+    }
+  };
+
   // update main banner
   const handleMainBannerUpdate = async () => {
     if (mainTitle === "" || mainDescription === "") {
@@ -474,6 +503,21 @@ const GeneralSettingsMainContent = () => {
                 style={{ border: "1px solid #999" }}
               />
               <button onClick={handleFeeUpdate}>Update</button>
+            </div>
+
+            {/* Platoform fee */}
+            <p className="generalSettings_TextHeading">
+              Fixed Platform fee 
+            </p>
+            <div className="generalSettings_CustomAmmount">
+              <input
+                type="number"
+                value={platformFee}
+                onChange={(e) => setPlatformFee(e.target.value)}
+                placeholder={`Enter amount (current platform fee is ${generalSettings?.platform_fee})`}
+                style={{ border: "1px solid #999" }}
+              />
+              <button onClick={handleplatformFeeUpdate}>Update</button>
             </div>
 
             <div className="generalSettings_MainBanner">
