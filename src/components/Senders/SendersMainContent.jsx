@@ -11,6 +11,7 @@ import { DataGrid } from "@mui/x-data-grid";
 import { Button, Menu, MenuItem, Modal, Typography } from "@mui/material";
 import ArrowIcon from "../../assets/img/country/arrow.svg";
 import disableIcon from "../../assets/img/country/disable.svg";
+import avatarDemo from "../../assets/img/senders/avatarDemo.png";
 import editIcon from "../../assets/img/country/edit.svg";
 import deleteIcon from "../../assets/img/country/delete.svg";
 import Dialog from "@mui/material/Dialog";
@@ -1059,7 +1060,7 @@ const SendersMainContent = () => {
                               src={
                                 fetchKyc?.image ?
                                   `https://api.quickt.com.au` + fetchKyc?.image :
-                                  disableIcon
+                                  avatarDemo
                               }
                               alt="icon"
                               style={{
@@ -1305,7 +1306,7 @@ const SendersMainContent = () => {
                             src={
                               fetchKyc?.kyc?.id_front ?
                               `https://api.quickt.com.au` +
-                              fetchKyc?.kyc?.id_front : disableIcon
+                              fetchKyc?.kyc?.id_front : avatarDemo
                             }
                             alt="icon"
                             style={{
@@ -1339,7 +1340,7 @@ const SendersMainContent = () => {
                                 src={
                                   fetchKyc?.kyc?.id_front ?
                                   `https://api.quickt.com.au` +
-                                  fetchKyc?.kyc?.id_front : disableIcon
+                                  fetchKyc?.kyc?.id_front : avatarDemo
                                 }
                                 alt="icon"
                                 style={{
@@ -1397,7 +1398,7 @@ const SendersMainContent = () => {
                             src={
                               fetchKyc?.kyc?.id_back ?
                               `https://api.quickt.com.au` +
-                              fetchKyc?.kyc?.id_back : disableIcon
+                              fetchKyc?.kyc?.id_back : avatarDemo
                             }
                             alt="icon"
                             style={{
@@ -1430,7 +1431,7 @@ const SendersMainContent = () => {
                                 src={
                                   fetchKyc?.kyc?.id_back ?
                                   `https://api.quickt.com.au` +
-                                  fetchKyc?.kyc?.id_back : disableIcon
+                                  fetchKyc?.kyc?.id_back : avatarDemo
                                 }
                                 alt="icon"
                                 style={{

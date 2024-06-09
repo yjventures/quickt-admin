@@ -20,7 +20,7 @@ import InboxIcon from '@mui/icons-material/MoveToInbox';
 import MailIcon from '@mui/icons-material/Mail';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 // logo and images
-import quicktLogo from '../../assets/img/quick-t-icon.svg';
+import quicktLogo from '../../assets/img/qt-logo.png';
 import dashboardIcon from '../../assets/img/drawer/dashboard.svg';
 import dashboardIconWhite from '../../assets/img/drawer/dashboard-white.svg';
 import generalIcon from '../../assets/img/drawer/general.svg';
@@ -190,7 +190,7 @@ export default function MiniDrawer() {
             <Drawer variant="permanent" open={open} style={{ background: '#000', position: 'relative' }}>
                 <DrawerHeader>
                     {
-                        open && <img src={quicktLogo} alt="NIR Logo" style={{ width: '100%', height: '50px', marginRight: '40px' }} />
+                        open && <img src={quicktLogo} alt="NIR Logo" style={{ width: '100%', height: '50px', marginRight: '40px', objectFit: 'cover' }} />
                     }
                 </DrawerHeader>
                 {/* here is icon and text for sidebar */}

@@ -112,7 +112,7 @@ const GeneralSettingsMainContent = () => {
         serviceBoxData,
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+             Authorization: `Bearer ${localStorage.getItem("jwt")}`,
           },
         }
       );
@@ -176,7 +176,7 @@ const GeneralSettingsMainContent = () => {
       },
       {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+           Authorization: `Bearer ${localStorage.getItem("jwt")}`,
         },
       }
     );
@@ -201,14 +201,15 @@ const GeneralSettingsMainContent = () => {
       `https://api.quickt.com.au/api/general-settings/1`,
       {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+           Authorization: `Bearer ${localStorage.getItem("jwt")}`,
         },
       }
     );
-    console.log(res.data.data.attributes)
+    // console.log(res.data)
     return res.data.data.attributes;
   });
-  // console.log(generalSettings?.transfer_percentage)
+  // console.log(generalSettings)
+  // console.log(isgeneralSettingError)
   // get quick transfers
   const {
     data: quickTransfers,
@@ -219,7 +220,7 @@ const GeneralSettingsMainContent = () => {
       `https://api.quickt.com.au/api/quick-transfers`,
       {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+           Authorization: `Bearer ${localStorage.getItem("jwt")}`,
         },
       }
     );
@@ -278,7 +279,7 @@ const GeneralSettingsMainContent = () => {
       },
       {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+           Authorization: `Bearer ${localStorage.getItem("jwt")}`,
         },
       }
     );
@@ -335,7 +336,7 @@ const GeneralSettingsMainContent = () => {
       },
       {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+           Authorization: `Bearer ${localStorage.getItem("jwt")}`,
         },
       }
     );
@@ -363,7 +364,7 @@ const GeneralSettingsMainContent = () => {
       },
       {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+           Authorization: `Bearer ${localStorage.getItem("jwt")}`,
         },
       }
     );
@@ -409,7 +410,7 @@ const GeneralSettingsMainContent = () => {
       },
       {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+           Authorization: `Bearer ${localStorage.getItem("jwt")}`,
         },
       }
     );
@@ -466,7 +467,7 @@ const GeneralSettingsMainContent = () => {
       serviceBoxData,
       {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+           Authorization: `Bearer ${localStorage.getItem("jwt")}`,
         },
       }
     );
@@ -505,16 +506,16 @@ const GeneralSettingsMainContent = () => {
               <button onClick={handleFeeUpdate}>Update</button>
             </div>
 
-            {/* Platoform fee */}
+            {/* gateway fee */}
             <p className="generalSettings_TextHeading">
-              Fixed Platform fee 
+              Fixed Gateway fee
             </p>
             <div className="generalSettings_CustomAmmount">
               <input
                 type="number"
                 value={platformFee}
                 onChange={(e) => setPlatformFee(e.target.value)}
-                placeholder={`Enter amount (current platform fee is ${generalSettings?.platform_fee})`}
+                placeholder={`Enter amount (current platform fee is ${generalSettings?.gateway_fee}%)`}
                 style={{ border: "1px solid #999" }}
               />
               <button onClick={handleplatformFeeUpdate}>Update</button>
