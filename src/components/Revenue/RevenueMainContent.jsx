@@ -64,7 +64,7 @@ const RevenueMainContent = () => {
       "http://localhost:1337/api/transactions?populate=*",
       {
         headers: {
-          Authorization: `${localStorage.getItem("jwt")}`,
+          Authorization: `Bearer ${localStorage.getItem("jwt")}`,
         },
       }
     );

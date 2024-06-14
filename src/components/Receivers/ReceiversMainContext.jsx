@@ -34,7 +34,7 @@ const ReceiversMainContent = () => {
       "http://localhost:1337/api/saved-receivers?populate=*",
       {
         headers: {
-          Authorization: `${localStorage.getItem("jwt")}`,
+          Authorization: `Bearer ${localStorage.getItem("jwt")}`,
         },
       }
     );

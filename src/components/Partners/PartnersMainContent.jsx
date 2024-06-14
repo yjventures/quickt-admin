@@ -66,12 +66,12 @@ const PartnersMainContent = () => {
 
   const fetchePartners = async () => {
     const response = await fetch(
-      "http://localhost:1337/api/partners?populate=*"
-      // {
-      //   headers: {
-      //     Authorization: `Bearer ${localStorage.getItem("jwt")}`,
-      //   },
-      // }
+      "http://localhost:1337/api/partners?populate=*",
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+        },
+      }
     );
     const data = await response.json();
     console.log("partners", data.data);

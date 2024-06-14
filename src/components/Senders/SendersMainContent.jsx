@@ -95,7 +95,7 @@ const SendersMainContent = () => {
   const fetchesSender = async () => {
     const response = await fetch("http://localhost:1337/api/users", {
       headers: {
-        Authorization: `${localStorage.getItem("jwt")}`,
+        Authorization: `Bearer ${localStorage.getItem("jwt")}`,
       },
     });
     const data = await response.json();
@@ -470,7 +470,7 @@ const SendersMainContent = () => {
           },
           {
             headers: {
-              Authorization: `${localStorage.getItem("jwt")}`,
+              Authorization: `Bearer ${localStorage.getItem("jwt")}`,
               // Add other headers if needed
             },
           }
@@ -521,7 +521,7 @@ const SendersMainContent = () => {
           },
           {
             headers: {
-              Authorization: `${localStorage.getItem("jwt")}`,
+              Authorization: `Bearer ${localStorage.getItem("jwt")}`,
               // Add other headers if needed
             },
           }
@@ -562,7 +562,7 @@ const SendersMainContent = () => {
         `http://localhost:1337/api/users/${selectedRows[selectedRows.length - 1]?.id}?populate=*`,
         {
           headers: {
-            Authorization: `${localStorage.getItem("jwt")}`,
+            Authorization: `Bearer ${localStorage.getItem("jwt")}`,
           },
         }
       )
