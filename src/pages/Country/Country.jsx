@@ -81,7 +81,7 @@ const Country = () => {
         formData.append("files", file);
 
         axios
-          .post("https://api.quickt.com.au/api/upload", formData)
+          .post("http://localhost:1337/api/upload", formData)
           .then((response) => {
             console.log("File uploaded successfully: ", response.data);
             // showSuccessAlert("Image uploaded successfully");
@@ -109,7 +109,7 @@ const Country = () => {
     };
     console.log(data);
     axios
-      .post("https://api.quickt.com.au/api/countries", data)
+      .post("http://localhost:1337/api/countries", data)
       .then((response) => {
         console.log(response);
         alert("Country created successfully");

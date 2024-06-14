@@ -108,11 +108,11 @@ const GeneralSettingsMainContent = () => {
     // Send the updated data to the server using axios.put
     try {
       const res = await axios.put(
-        `https://api.quickt.com.au/api/general-settings/1`,
+        `http://localhost:1337/api/general-settings/1`,
         serviceBoxData,
         {
           headers: {
-             Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+            Authorization: `Bearer ${localStorage.getItem("jwt")}`,
           },
         }
       );
@@ -144,7 +144,8 @@ const GeneralSettingsMainContent = () => {
   const [quickFee, setQuickFee] = React.useState("");
   const [visibility, setVisibility] = React.useState("");
   const [fee, setFee] = useState("");
-  const [platformFee, setPlatformFee] = useState("");
+  const [gatewayFee, setGatewayFee] = useState("");
+  const [currencyBuffer, setCurrencyBuffer] = useState("");
   const [mainTitle, setMainTitle] = useState("");
   const [mainDescription, setMainDescription] = useState("");
   const [serviceTitle, setServiceTitle] = useState("");
@@ -166,7 +167,7 @@ const GeneralSettingsMainContent = () => {
       return;
     }
     const res = await axios.post(
-      `https://api.quickt.com.au/api/quick-transfers`,
+      `http://localhost:1337/api/quick-transfers`,
       {
         data: {
           amount: Number(newTransferAmount),
@@ -176,7 +177,7 @@ const GeneralSettingsMainContent = () => {
       },
       {
         headers: {
-           Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+          Authorization: `Bearer ${localStorage.getItem("jwt")}`,
         },
       }
     );
@@ -198,17 +199,17 @@ const GeneralSettingsMainContent = () => {
     isError: isgeneralSettingError,
   } = useQuery("generalSettings", async () => {
     const res = await axios.get(
-      `https://api.quickt.com.au/api/general-settings/1`,
+      `http://localhost:1337/api/general-settings/1`,
       {
         headers: {
-           Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+          Authorization: `Bearer ${localStorage.getItem("jwt")}`,
         },
       }
     );
     // console.log(res.data)
     return res.data.data.attributes;
   });
-  // console.log(generalSettings)
+  console.log(generalSettings)
   // console.log(isgeneralSettingError)
   // get quick transfers
   const {
@@ -217,10 +218,10 @@ const GeneralSettingsMainContent = () => {
     isError,
   } = useQuery("quickTransfers", async () => {
     const res = await axios.get(
-      `https://api.quickt.com.au/api/quick-transfers`,
+      `http://localhost:1337/api/quick-transfers`,
       {
         headers: {
-           Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+          Authorization: `Bearer ${localStorage.getItem("jwt")}`,
         },
       }
     );
@@ -268,7 +269,7 @@ const GeneralSettingsMainContent = () => {
       return;
     }
     const res = await axios.put(
-      `https://api.quickt.com.au/api/quick-transfers/${quickTransfers?.[box - 1]?.id
+      `http://localhost:1337/api/quick-transfers/${quickTransfers?.[box - 1]?.id
       }`,
       {
         data: {
@@ -279,7 +280,7 @@ const GeneralSettingsMainContent = () => {
       },
       {
         headers: {
-           Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+          Authorization: `Bearer ${localStorage.getItem("jwt")}`,
         },
       }
     );
@@ -305,7 +306,7 @@ const GeneralSettingsMainContent = () => {
         formData.append("files", file);
 
         axios
-          .post("https://api.quickt.com.au/api/upload", formData)
+          .post("http://localhost:1337/api/upload", formData)
           .then((response) => {
             console.log("File uploaded successfully: ", response.data);
             // showSuccessAlert("Image uploaded successfully");
@@ -328,7 +329,7 @@ const GeneralSettingsMainContent = () => {
     }
     // /api/general-settings/:id
     const res = await axios.put(
-      `https://api.quickt.com.au/api/general-settings/1`,
+      `http://localhost:1337/api/general-settings/1`,
       {
         data: {
           transfer_percentage: Number(fee),
@@ -336,7 +337,7 @@ const GeneralSettingsMainContent = () => {
       },
       {
         headers: {
-           Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+          Authorization: `Bearer ${localStorage.getItem("jwt")}`,
         },
       }
     );
@@ -349,34 +350,62 @@ const GeneralSettingsMainContent = () => {
     }
   };
 
-  const handleplatformFeeUpdate = async () => {
-    if (platformFee === "") {
-      alert("Please enter platform fee");
+  const handleCurrencyBufferUpdate = async () => {
+    if (currencyBuffer === "") {
+      alert("Please enter currency buffer");
       return;
     }
     // /api/general-settings/:id
     const res = await axios.put(
-      `https://api.quickt.com.au/api/general-settings/1`,
+      `http://localhost:1337/api/general-settings/1`,
       {
         data: {
-          platform_fee: Number(fee),
+          currency_buffer: Number(currencyBuffer),
         },
       },
       {
         headers: {
-           Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+          Authorization: `Bearer ${localStorage.getItem("jwt")}`,
         },
       }
     );
     console.log(res.data?.data?.id);
     if (res.data?.data?.id) {
-      setPlatformFee("");
-      alert("Fee updated successfully");
+      setCurrencyBuffer("");
+      alert("Currency buffer updated successfully");
     } else {
       alert("Something went wrong");
     }
   };
 
+
+  const handleGatewayFeeUpdate = async () => {
+    if (gatewayFee === "") {
+      alert("Please enter gateway fee");
+      return;
+    }
+    // /api/general-settings/:id
+    const res = await axios.put(
+      `http://localhost:1337/api/general-settings/1`,
+      {
+        data: {
+          gateway_fee: Number(gatewayFee),
+        },
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+        },
+      }
+    );
+    console.log(res.data?.data?.id);
+    if (res.data?.data?.id) {
+      setGatewayFee("");
+      alert("Fee updated successfully");
+    } else {
+      alert("Something went wrong");
+    }
+  };
   // update main banner
   const handleMainBannerUpdate = async () => {
     if (mainTitle === "" || mainDescription === "") {
@@ -401,7 +430,7 @@ const GeneralSettingsMainContent = () => {
     // }
 
     const res = await axios.put(
-      `https://api.quickt.com.au/api/general-settings/1`,
+      `http://localhost:1337/api/general-settings/1`,
       {
         data: {
           main_banner_title: mainTitle,
@@ -410,7 +439,7 @@ const GeneralSettingsMainContent = () => {
       },
       {
         headers: {
-           Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+          Authorization: `Bearer ${localStorage.getItem("jwt")}`,
         },
       }
     );
@@ -463,11 +492,11 @@ const GeneralSettingsMainContent = () => {
     console.log(serviceBoxData);
     // /api/general-settings/:id
     const res = await axios.put(
-      `https://api.quickt.com.au/api/general-settings/1`,
+      `http://localhost:1337/api/general-settings/1`,
       serviceBoxData,
       {
         headers: {
-           Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+          Authorization: `Bearer ${localStorage.getItem("jwt")}`,
         },
       }
     );
@@ -513,12 +542,27 @@ const GeneralSettingsMainContent = () => {
             <div className="generalSettings_CustomAmmount">
               <input
                 type="number"
-                value={platformFee}
-                onChange={(e) => setPlatformFee(e.target.value)}
-                placeholder={`Enter amount (current platform fee is ${generalSettings?.gateway_fee}%)`}
+                value={gatewayFee}
+                onChange={(e) => setGatewayFee(e.target.value)}
+                placeholder={`Enter amount (current fee is ${generalSettings?.gateway_fee}%)`}
                 style={{ border: "1px solid #999" }}
               />
-              <button onClick={handleplatformFeeUpdate}>Update</button>
+              <button onClick={handleGatewayFeeUpdate}>Update</button>
+            </div>
+
+            {/* currency buffer */}
+            <p className="generalSettings_TextHeading">
+              Enter currency buffer
+            </p>
+            <div className="generalSettings_CustomAmmount">
+              <input
+                type="number"
+                value={currencyBuffer}
+                onChange={(e) => setCurrencyBuffer(e.target.value)}
+                placeholder={`Enter amount (current buffer is ${generalSettings?.currency_buffer}%)`}
+                style={{ border: "1px solid #999" }}
+              />
+              <button onClick={handleGatewayFeeUpdate}>Update</button>
             </div>
 
             <div className="generalSettings_MainBanner">

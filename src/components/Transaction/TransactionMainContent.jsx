@@ -59,7 +59,7 @@ const TransactionMainContent = () => {
 
   const fetchesTransaction = async () => {
     const response = await fetch(
-      "https://api.quickt.com.au/api/transactions?populate=*",
+      "http://localhost:1337/api/transactions?populate=*",
       {
         headers: {
           Authorization: `${localStorage.getItem("jwt")}`,
@@ -429,7 +429,7 @@ const TransactionMainContent = () => {
   const callDeleteApi = () => {
     const deletePromises = selectedRows.map((item) =>
       axios
-        .delete(`https://api.quickt.com.au/api/transactions/${item.id}`)
+        .delete(`http://localhost:1337/api/transactions/${item.id}`)
         .then((res) => console.log(res))
         .catch((error) => console.error(error))
     );
@@ -456,7 +456,7 @@ const TransactionMainContent = () => {
   const handleUpdateTransferStatus = () => {
     console.log("Transfer Status:", transferStatus);
     axios
-      .put(`https://api.quickt.com.au/api/transfers/${selectedRows[0].id}`, {
+      .put(`http://localhost:1337/api/transfers/${selectedRows[0].id}`, {
         data: {
           payout_complete: transferStatus,
         },
@@ -477,7 +477,7 @@ const TransactionMainContent = () => {
   const handleDeleteTransaction = () => {
     axios
       .delete(
-        `https://api.quickt.com.au/api/transactions/${selectedRows[0].id}`
+        `http://localhost:1337/api/transactions/${selectedRows[0].id}`
       )
       .then((response) => {
         // console.log(response);

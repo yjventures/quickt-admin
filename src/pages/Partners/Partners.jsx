@@ -96,7 +96,7 @@ const Partners = () => {
         formData.append("files", file);
 
         axios
-          .post("https://api.quickt.com.au/api/upload", formData)
+          .post("http://localhost:1337/api/upload", formData)
           .then((response) => {
             console.log("File uploaded successfully: ", response.data);
             // showSuccessAlert("Image uploaded successfully");
@@ -119,7 +119,7 @@ const Partners = () => {
   const handleUpdatePartner = () => {
     axios
       .post(
-        `https://api.quickt.com.au/api/partners`,
+        `http://localhost:1337/api/partners`,
         {
           data: {
             name: partnerNameRef.value,
