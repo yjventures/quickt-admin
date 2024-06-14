@@ -62,7 +62,7 @@ const TransactionMainContent = () => {
       "http://localhost:1337/api/transactions?populate=*",
       {
         headers: {
-          Authorization: `${localStorage.getItem("jwt")}`,
+          Authorization: `Bearer ${localStorage.getItem("jwt")}`,
         },
       }
     );
@@ -77,6 +77,22 @@ const TransactionMainContent = () => {
       // throw new Error('Could not fetch users')
     }
   };
+
+
+  function formatDate(isoString) {
+    const date = new Date(isoString);
+    const options = {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
+    };
+    return date.toLocaleDateString('en-US', options);
+  }
+
+
   const {
     isLoading: transactionLoading,
     error: transactionError,
@@ -97,13 +113,15 @@ const TransactionMainContent = () => {
       BaseAmount: item.attributes?.transfer_amount,
       Totalamount: item.attributes?.amount_total,
       TransactionFees: item.attributes?.transfer_fees,
+      GatewayFees: item.attributes?.gateway_fees,
+      convertedAmount: item.attributes?.converted_amount,
       Date: item.attributes?.transaction_date,
       Currency: item.attributes?.currency,
       // is payment complete from QuickT
       payoutStatus:
         item.attributes?.transfer?.data?.attributes?.payout_complete,
       transferStatus: item.attributes?.transfer?.data?.attributes?.status,
-      transactionNumber: item.id,
+      transactionNumber: item.attributes.payment_intent_id,
       createdAt: item.attributes?.createdAt.slice(0, 10),
     }))
     : [];
@@ -122,18 +140,19 @@ const TransactionMainContent = () => {
             ?.username,
         },
         receiverName: item.attributes?.receiver_name,
-        phone:
-          item.attributes?.users_permissions_user?.data?.attributes?.phone,
+        phone: item.attributes?.users_permissions_user?.data?.attributes?.phone,
         BaseAmount: item.attributes?.transfer_amount,
         Totalamount: item.attributes?.amount_total,
         TransactionFees: item.attributes?.transfer_fees,
+        GatewayFees: item.attributes?.gateway_fees,
+        convertedAmount: item.attributes?.converted_amount,
         Date: item.attributes?.transaction_date,
         Currency: item.attributes?.currency,
         // is payment complete from QuickT
         payoutStatus:
           item.attributes?.transfer?.data?.attributes?.payout_complete,
         transferStatus: item.attributes?.transfer?.data?.attributes?.status,
-        transactionNumber: item.id,
+        transactionNumber: item.attributes.payment_intent_id,
         createdAt: item.attributes?.createdAt.slice(0, 10),
       }))
     : [];
@@ -155,25 +174,26 @@ const TransactionMainContent = () => {
             ?.username,
         },
         receiverName: item.attributes?.receiver_name,
-        phone:
-          item.attributes?.users_permissions_user?.data?.attributes?.phone,
+        phone: item.attributes?.users_permissions_user?.data?.attributes?.phone,
         BaseAmount: item.attributes?.transfer_amount,
         Totalamount: item.attributes?.amount_total,
         TransactionFees: item.attributes?.transfer_fees,
+        GatewayFees: item.attributes?.gateway_fees,
+        convertedAmount: item.attributes?.converted_amount,
         Date: item.attributes?.transaction_date,
         Currency: item.attributes?.currency,
         // is payment complete from QuickT
         payoutStatus:
           item.attributes?.transfer?.data?.attributes?.payout_complete,
         transferStatus: item.attributes?.transfer?.data?.attributes?.status,
-        transactionNumber: item.id,
+        transactionNumber: item.attributes.payment_intent_id,
         createdAt: item.attributes?.createdAt.slice(0, 10),
       }))
     : [];
 
   const columns = [
     {
-      field: "id",
+      field: "payment_intent_id",
       headerName: "Transfer No",
       width: 100,
       renderCell: (params) => <p>QT-{params.row.transactionNumber}</p>,
@@ -225,22 +245,46 @@ const TransactionMainContent = () => {
       width: 100,
     },
     {
-      field: "TransactionFees",
-      headerName: "Fees",
+      field: "GatewayFees",
+      headerName: "Gateway Fees",
       width: 100,
+    },
+    {
+      field: "TransactionFees",
+      headerName: "Transaction Fees",
+      width: 100,
+    },
+    {
+      field: "convertedAmount",
+      headerName: "Converted Amount",
+      width: 150,
     },
     {
       field: "Date",
       headerName: "Date",
-      width: 100,
+      width: 200,
       renderCell: (params) => {
-        const unixTimestamp = params.value * 1000; // Convert to milliseconds
-        const localDate = new Date(unixTimestamp).toLocaleDateString();
-
-        return <div>{localDate}</div>;
+        // const unixTimestamp = params.value * 1000; // Convert to milliseconds
+        // const isoString = new Date(unixTimestamp).toISOString();
+        // const formattedDate = formatDate(isoString);
+        function formatDate(isoString) {
+          const date = new Date(isoString);
+          const options = {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true,
+          };
+          const formattedDate = date.toLocaleDateString('en-US', options).replace(',', '');
+          // const formattedTime = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+          return `${formattedDate}`;
+        }
+        const formattedDate = formatDate(params.value);
+        return <div>{formattedDate}</div>;
       },
     },
-
     {
       field: "payoutStatus",
       headerName: "Partner Payout Status",
