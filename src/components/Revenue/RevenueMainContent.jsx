@@ -41,15 +41,20 @@ const RevenueMainContent = () => {
   }, [filterRevenue]);
 
   const [selectedRows, setSelectedRows] = useState([]);
-  console.log(selectedRows);
+  // console.log(selectedRows);
   const [open, setOpen] = React.useState(false);
   const [selectedAction, setSelectedAction] = React.useState("");
   const handleClearRows = () => {
     setSelectedRows([]);
   };
   const handleClickOpen = (action) => {
+    if (selectedRows.length > 1) {
+      console.log('Multiple rows selected')
+      alert('Please use header action to perform multiple action')
+      return;
+    };
     setSelectedAction(action);
-    console.log(action);
+    // console.log(action);
     setOpen(true);
   };
 
@@ -87,6 +92,35 @@ const RevenueMainContent = () => {
   // Check if countries is an array before calling map
   const allTransaction = Array.isArray(transactions)
     ? transactions?.map((item) => ({
+      id: item.attributes?.transfer?.data?.id,
+      senders: {
+        image:
+          item.attributes?.users_permissions_user?.data?.attributes?.image, // Replace with the actual path or URL to the user's image
+        name: item.attributes?.users_permissions_user?.data?.attributes
+          ?.username,
+      },
+      receiverName: item.attributes?.receiver_name,
+      phone: item.attributes?.users_permissions_user?.data?.attributes?.phone,
+      BaseAmount: item.attributes?.transfer_amount,
+      Totalamount: item.attributes?.amount_total,
+      TransactionFees: item.attributes?.transfer_fees,
+      Date: item.attributes?.transaction_date,
+      Currency: item.attributes?.currency,
+      // is payment complete from QuickT
+      payoutStatus:
+        item.attributes?.transfer?.data?.attributes?.payout_complete,
+      transferStatus: item.attributes?.transfer?.data?.attributes?.status,
+      transactionNumber: item.id,
+      createdAt: item.attributes?.createdAt.slice(0, 10),
+    }))
+    : [];
+  const completeCountries = Array.isArray(transactions)
+    ? transactions
+      ?.filter(
+        (item) =>
+          item.attributes?.transfer?.data?.attributes?.payout_complete == true
+      )
+      .map((item) => ({
         id: item.attributes?.transfer?.data?.id,
         senders: {
           image:
@@ -95,7 +129,8 @@ const RevenueMainContent = () => {
             ?.username,
         },
         receiverName: item.attributes?.receiver_name,
-        phone: item.attributes?.users_permissions_user?.data?.attributes?.phone,
+        phone:
+          item.attributes?.users_permissions_user?.data?.attributes?.phone,
         BaseAmount: item.attributes?.transfer_amount,
         Totalamount: item.attributes?.amount_total,
         TransactionFees: item.attributes?.transfer_fees,
@@ -109,80 +144,50 @@ const RevenueMainContent = () => {
         createdAt: item.attributes?.createdAt.slice(0, 10),
       }))
     : [];
-  const completeCountries = Array.isArray(transactions)
-    ? transactions
-        ?.filter(
-          (item) =>
-            item.attributes?.transfer?.data?.attributes?.payout_complete == true
-        )
-        .map((item) => ({
-          id: item.attributes?.transfer?.data?.id,
-          senders: {
-            image:
-              item.attributes?.users_permissions_user?.data?.attributes?.image, // Replace with the actual path or URL to the user's image
-            name: item.attributes?.users_permissions_user?.data?.attributes
-              ?.username,
-          },
-          receiverName: item.attributes?.receiver_name,
-          phone:
-            item.attributes?.users_permissions_user?.data?.attributes?.phone,
-          BaseAmount: item.attributes?.transfer_amount,
-          Totalamount: item.attributes?.amount_total,
-          TransactionFees: item.attributes?.transfer_fees,
-          Date: item.attributes?.transaction_date,
-          Currency: item.attributes?.currency,
-          // is payment complete from QuickT
-          payoutStatus:
-            item.attributes?.transfer?.data?.attributes?.payout_complete,
-          transferStatus: item.attributes?.transfer?.data?.attributes?.status,
-          transactionNumber: item.id,
-          createdAt: item.attributes?.createdAt.slice(0, 10),
-        }))
-    : [];
   // get only pending countries
   const pendingCountries = Array.isArray(transactions)
     ? transactions
-        ?.filter((item) => {
-          return (
-            item.attributes?.transfer?.data?.attributes?.payout_complete ==
-            false
-          );
-        })
-        .map((item) => ({
-          id: item.attributes?.transfer?.data?.id,
-          senders: {
-            image:
-              item.attributes?.users_permissions_user?.data?.attributes?.image, // Replace with the actual path or URL to the user's image
-            name: item.attributes?.users_permissions_user?.data?.attributes
-              ?.username,
-          },
-          receiverName: item.attributes?.receiver_name,
-          phone:
-            item.attributes?.users_permissions_user?.data?.attributes?.phone,
-          BaseAmount: item.attributes?.transfer_amount,
-          Totalamount: item.attributes?.amount_total,
-          TransactionFees: item.attributes?.transfer_fees,
-          Date: item.attributes?.transaction_date,
-          Currency: item.attributes?.currency,
-          // is payment complete from QuickT
-          payoutStatus:
-            item.attributes?.transfer?.data?.attributes?.payout_complete,
-          transferStatus: item.attributes?.transfer?.data?.attributes?.status,
-          transactionNumber: item.id,
-          // partnerAmount is 1.005% of total amount
-          partnerAmount: item.attributes?.amount_total * 0.01005,
-          createdAt: item.attributes?.createdAt.slice(0, 10),
-          // quicktAmount is total amount - (2.5% of partnerAmount)
-          quicktAmount:
-            parseFloat(item.attributes?.amount_total) -
-            parseFloat(item.attributes?.amount_total) * 0.01005 * 0.025,
-          // remaining amount is total amount - (partnerAmount + quicktAmount)
-          remainingAmount:
-            item.attributes?.amount_total -
-            item.attributes?.amount_total * 0.01005 -
-            (item.attributes?.amount_total -
-              item.attributes?.amount_total * 0.01005 * 0.025),
-        }))
+      ?.filter((item) => {
+        return (
+          item.attributes?.transfer?.data?.attributes?.payout_complete ==
+          false
+        );
+      })
+      .map((item) => ({
+        id: item.attributes?.transfer?.data?.id,
+        senders: {
+          image:
+            item.attributes?.users_permissions_user?.data?.attributes?.image, // Replace with the actual path or URL to the user's image
+          name: item.attributes?.users_permissions_user?.data?.attributes
+            ?.username,
+        },
+        receiverName: item.attributes?.receiver_name,
+        phone:
+          item.attributes?.users_permissions_user?.data?.attributes?.phone,
+        BaseAmount: item.attributes?.transfer_amount,
+        Totalamount: item.attributes?.amount_total,
+        TransactionFees: item.attributes?.transfer_fees,
+        Date: item.attributes?.transaction_date,
+        Currency: item.attributes?.currency,
+        // is payment complete from QuickT
+        payoutStatus:
+          item.attributes?.transfer?.data?.attributes?.payout_complete,
+        transferStatus: item.attributes?.transfer?.data?.attributes?.status,
+        transactionNumber: item.id,
+        // partnerAmount is 1.005% of total amount
+        partnerAmount: item.attributes?.amount_total * 0.01005,
+        createdAt: item.attributes?.createdAt.slice(0, 10),
+        // quicktAmount is total amount - (2.5% of partnerAmount)
+        quicktAmount:
+          parseFloat(item.attributes?.amount_total) -
+          parseFloat(item.attributes?.amount_total) * 0.01005 * 0.025,
+        // remaining amount is total amount - (partnerAmount + quicktAmount)
+        remainingAmount:
+          item.attributes?.amount_total -
+          item.attributes?.amount_total * 0.01005 -
+          (item.attributes?.amount_total -
+            item.attributes?.amount_total * 0.01005 * 0.025),
+      }))
     : [];
 
   const columns = [
@@ -331,6 +336,7 @@ const RevenueMainContent = () => {
         const [anchorEl, setAnchorEl] = React.useState(null);
 
         const handleClick = (event) => {
+          event.stopPropagation();
           setAnchorEl(event.currentTarget);
         };
 
@@ -370,7 +376,12 @@ const RevenueMainContent = () => {
                 boxShadow: "none",
               }}
             >
-              <MenuItem onClick={() => handleClickOpen("edit")}>
+              <MenuItem onClick={(e) => {
+                e.stopPropagation();
+                handleClickOpen("edit")
+                setSelectedRows([params.row]);
+                handleClose();
+              }}>
                 <img
                   style={{ marginRight: "10px" }}
                   src={editIcon}
@@ -378,7 +389,14 @@ const RevenueMainContent = () => {
                 />
                 Update Status
               </MenuItem>
-              <MenuItem onClick={() => handleClickOpen("flag")}>
+              <MenuItem
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleClickOpen("flag")
+                  setSelectedRows([params.row]);
+                  handleClose();
+                }}
+              >
                 <img
                   style={{ marginRight: "10px" }}
                   src={deleteIcon}
@@ -438,40 +456,92 @@ const RevenueMainContent = () => {
   ////////////////////////////////////////////////////////////////
   const [transferStatus, setTransferStatus] = React.useState("true");
 
-  const handleUpdateTransferStatus = () => {
+  // make status complete
+  const handleUpdateTransferStatus = async () => {
     console.log("Transfer Status:", transferStatus);
-    axios
-      .put(`http://localhost:1337/api/transfers/${selectedRows[0].id}`, {
-        data: {
-          payout_complete: transferStatus,
-        },
-      })
-      .then((response) => {
-        console.log(response, "res");
+    console.log("selectedRows:", selectedRows);
+
+    try {
+      // Use Promise.all to send all requests concurrently
+      const updateRequests = selectedRows.map((row) =>
+        axios.put(`http://localhost:1337/api/transfers/${row.id}`, {
+          data: {
+            payout_complete: transferStatus,
+          },
+        }, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+          },
+        })
+      );
+
+      const responses = await Promise.all(updateRequests);
+
+      // Check if all responses are successful
+      if (responses.every(response => response.status === 200)) {
         queryClient.invalidateQueries("allTransaction");
         handleClose();
-      })
-      .catch((err) => {
-        console.error(err.message);
-      });
+        setSelectedRows([]);
+      }
+    } catch (error) {
+      console.error("Error updating transfer status:", error);
+    }
+  };
+
+  // make status pending
+  const handleRetriveTransferStatus = async () => {
+    console.log("Transfer Status:", transferStatus);
+    console.log("selectedRows:", selectedRows);
+
+    try {
+      // Use Promise.all to send all requests concurrently
+      const updateRequests = selectedRows.map((row) =>
+        axios.put(`http://localhost:1337/api/transfers/${row.id}`, {
+          data: {
+            payout_complete: 'false',
+          },
+        }, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+          },
+        })
+      );
+
+      const responses = await Promise.all(updateRequests);
+
+      // Check if all responses are successful
+      if (responses.every(response => response.status === 200)) {
+        queryClient.invalidateQueries("allTransaction");
+        handleClose();
+        setSelectedRows([]);
+      }
+    } catch (error) {
+      console.error("Error updating transfer status:", error);
+    }
   };
 
   ////////////////////////////////////////////////////////////////////////
   //delete integration with backend
   ////////////////////////////////////////////////////////////////////////
-  const handleDeleteTransaction = () => {
-    axios
-      .delete(
-        `http://localhost:1337/api/transactions/${selectedRows[0].id}`
-      )
-      .then((response) => {
-        // console.log(response);
-        queryClient.invalidateQueries("allTransaction");
-        handleClose();
+  const handleFlagTransaction = async () => {
+    const response = await axios.put(
+      `http://localhost:1337/api/transfers/${selectedRows[0].id}`,
+      {
+        data: {
+          flag: true,
+        },
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+        }
       })
-      .catch((err) => {
-        console.error(err.message);
-      });
+
+    if (response.status === 200) {
+      queryClient.invalidateQueries("allTransaction");
+      handleClose();
+      setSelectedRows([]);
+    }
   };
 
   const result = allTransaction.filter((item) => {
@@ -554,7 +624,6 @@ const RevenueMainContent = () => {
               color: selectedRows.length === 0 ? "#ccc" : "#1D1929",
               borderRadius: "15px",
               border: "1px solid #E9E9EA",
-              fontFamily: "Open Sans",
               fontSize: "14px",
               fontStyle: "normal",
             }}
@@ -563,6 +632,29 @@ const RevenueMainContent = () => {
             Payout complete
           </button>
 
+          <button
+            onClick={() => {
+              setTransferStatus("true")
+              handleRetriveTransferStatus();
+            }}
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "40px",
+              width: "150px",
+              cursor: selectedRows.length === 0 ? "not-allowed" : "pointer",
+              backgroundColor: selectedRows.length === 0 ? "#E9E9EA" : "#fff",
+              color: selectedRows.length === 0 ? "#ccc" : "#1D1929",
+              borderRadius: "15px",
+              border: "1px solid #E9E9EA",
+              fontSize: "14px",
+              fontStyle: "normal",
+            }}
+            disabled={selectedRows.length === 0}
+          >
+            Payout retrive
+          </button>
           <Modal
             open={deleteModalOpen}
             onClose={handleDeleteModalClose}
@@ -625,6 +717,7 @@ const RevenueMainContent = () => {
                 // by default seleted row is first row
                 onRowSelectionModelChange={(ids) => {
                   const selectedIDs = new Set(ids);
+                  console.log(selectedIDs);
                   const selectedRowData = allTransaction.filter((row) =>
                     // selectedIDs.has(row.id.toString())
                     selectedIDs.has(row.id)
@@ -648,6 +741,7 @@ const RevenueMainContent = () => {
                   }}
                   pageSizeOptions={[10, 20]}
                   checkboxSelection
+                  disableSelectionOnClick={true}
                   // by default seleted row is first row
                   onRowSelectionModelChange={(ids) => {
                     const selectedIDs = new Set(ids);
@@ -657,6 +751,7 @@ const RevenueMainContent = () => {
                     );
                     setSelectedRows(selectedRowData);
                   }}
+
                 />
               </div>
             </TabPanel>
@@ -673,6 +768,8 @@ const RevenueMainContent = () => {
                 checkboxSelection
                 onRowSelectionModelChange={(ids) => {
                   const selectedIDs = new Set(ids);
+                  console.log(selectedIDs);
+
                   const selectedRowData = completeCountries.filter((row) =>
                     // selectedIDs.has(row.id.toString())
                     selectedIDs.has(row.id)
@@ -694,6 +791,7 @@ const RevenueMainContent = () => {
                 checkboxSelection
                 onRowSelectionModelChange={(ids) => {
                   const selectedIDs = new Set(ids);
+                  console.log(selectedIDs);
                   const selectedRowData = pendingCountries.filter((row) =>
                     // selectedIDs.has(row.id.toString())
                     selectedIDs.has(row.id)
@@ -742,8 +840,8 @@ const RevenueMainContent = () => {
                   }}
                   style={{ marginBottom: "20px", marginTop: "20px" }}
                 >
-                  <option value="true">complete </option>
-                  <option value="false">pending </option>
+                  <option value="true">Complete </option>
+                  <option value="false">Pending </option>
                 </select>
                 <Box sx={{ mt: 3, mb: 3 }}>
                   <Typography
@@ -755,7 +853,7 @@ const RevenueMainContent = () => {
                     <Button
                       variant="contained"
                       color="success"
-                      onClick={()=>{
+                      onClick={() => {
                         handleUpdateTransferStatus()
                         handleClose()
                       }}
@@ -781,7 +879,7 @@ const RevenueMainContent = () => {
                   <Button
                     variant="contained"
                     color="error"
-                    onClick={handleDeleteTransaction}
+                    onClick={handleFlagTransaction}
                   >
                     Confim Flag
                   </Button>
@@ -874,8 +972,7 @@ const TabPanel = styled(BaseTabPanel)(
     font-size: 0.875rem;
     padding: 20px 12px;
     // background: ${theme.palette.mode === "dark" ? grey[900] : "#fff"};
-    // border: 1px solid ${
-      theme.palette.mode === "dark" ? grey[700] : grey[200]
+    // border: 1px solid ${theme.palette.mode === "dark" ? grey[700] : grey[200]
     };
     border-radius: 12px;
     `
@@ -891,8 +988,7 @@ const TabsList = styled(BaseTabsList)(
     align-items: center;
     justify-content: center;
     align-content: space-between;
-    // box-shadow: 0px 4px 30px ${
-      theme.palette.mode === "dark" ? grey[900] : grey[200]
+    // box-shadow: 0px 4px 30px ${theme.palette.mode === "dark" ? grey[900] : grey[200]
     };
     `
 );
