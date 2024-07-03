@@ -19,6 +19,7 @@ import Slide from "@mui/material/Slide";
 import quickStyle from "../../assets/css/quickTransfer.module.css";
 import useAuth from "../../hook/useAuth";
 import { useEffect } from "react";
+import DoneIcon from '@mui/icons-material/Done';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -123,9 +124,10 @@ const TransactionMainContent = () => {
       transferStatus: item.attributes?.transfer?.data?.attributes?.status,
       transactionNumber: item.attributes.payment_intent_id,
       createdAt: item.attributes?.createdAt.slice(0, 10),
+      flag: item.attributes?.transfer?.data?.attributes?.flag,
     }))
     : [];
-  const completeCountries = Array.isArray(transactions)
+  const completeTransactions = Array.isArray(transactions)
     ? transactions
       ?.filter(
         (item) =>
@@ -154,10 +156,11 @@ const TransactionMainContent = () => {
         transferStatus: item.attributes?.transfer?.data?.attributes?.status,
         transactionNumber: item.attributes.payment_intent_id,
         createdAt: item.attributes?.createdAt.slice(0, 10),
+        flag: item.attributes?.transfer?.data?.attributes?.flag,
       }))
     : [];
   // get only pending countries
-  const pendingCountries = Array.isArray(transactions)
+  const pendingTransactions = Array.isArray(transactions)
     ? transactions
       ?.filter((item) => {
         return (
@@ -188,9 +191,40 @@ const TransactionMainContent = () => {
         transferStatus: item.attributes?.transfer?.data?.attributes?.status,
         transactionNumber: item.attributes.payment_intent_id,
         createdAt: item.attributes?.createdAt.slice(0, 10),
+        flag: item.attributes?.transfer?.data?.attributes?.flag,
       }))
     : [];
 
+  const flaggedTransactions = Array.isArray(transactions)
+    ? transactions
+      ?.filter((item) => {
+        return (
+          item.attributes?.transfer?.data?.attributes?.flag == true
+        );
+      })
+      .map((item) => ({
+        id: item.attributes?.transfer?.data?.id,
+        senders: {
+          image: item.attributes?.users_permissions_user?.data?.attributes?.image, // Replace with the actual path or URL to the user's image
+          name: item.attributes?.users_permissions_user?.data?.attributes?.username,
+        },
+        receiverName: item.attributes?.receiver_name,
+        phone: item.attributes?.users_permissions_user?.data?.attributes?.phone,
+        BaseAmount: item.attributes?.transfer_amount,
+        Totalamount: item.attributes?.amount_total,
+        TransactionFees: item.attributes?.transfer_fees,
+        GatewayFees: item.attributes?.gateway_fees,
+        convertedAmount: item.attributes?.converted_amount,
+        Date: item.attributes?.transaction_date,
+        Currency: item.attributes?.currency,
+        // is payment complete from QuickT
+        payoutStatus: item.attributes?.transfer?.data?.attributes?.payout_complete,
+        transferStatus: item.attributes?.transfer?.data?.attributes?.status,
+        transactionNumber: item.attributes.payment_intent_id,
+        createdAt: item.attributes?.createdAt.slice(0, 10),
+        flag: item.attributes?.transfer?.data?.attributes?.flag,
+      }))
+    : [];
   const columns = [
     {
       field: "payment_intent_id",
@@ -382,6 +416,40 @@ const TransactionMainContent = () => {
       ),
     },
     {
+      field: "flag",
+      headerName: "Flag Status",
+      width: 100,
+      sortable: false,
+      renderCell: (params) => (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "25px",
+            width: "80px",
+            padding: "5px 10px",
+            backgroundColor: (() => {
+              switch (params.row.flag) {
+                case true:
+                  return "red";
+                case false:
+                  return "green";
+                default:
+                  return "#FAFDD4"; // Default color for unknown status
+              }
+            })(),
+            borderRadius: "15px",
+            color: 'white',
+            fontSize: "14px",
+            fontStyle: "normal",
+          }}
+        >
+          {params.row.flag == true ? "Flagged" : "Safe"}
+        </div>
+      ),
+    },
+    {
       field: "action",
       headerName: "Action",
       width: 150,
@@ -390,6 +458,7 @@ const TransactionMainContent = () => {
         const [anchorEl, setAnchorEl] = React.useState(null);
 
         const handleClick = (event) => {
+          event.stopPropagation();
           setAnchorEl(event.currentTarget);
         };
 
@@ -425,11 +494,16 @@ const TransactionMainContent = () => {
               open={Boolean(anchorEl)}
               onClose={handleClose}
               style={{
-                marginLeft: "-20px",
+                marginLeft: "-60px",
                 boxShadow: "none",
               }}
             >
-              <MenuItem onClick={() => handleClickOpen("edit")}>
+              <MenuItem onClick={(e) => {
+                e.stopPropagation();
+                handleClickOpen("edit")
+                setSelectedRows([params.row]);
+                handleClose();
+              }}>
                 <img
                   style={{ marginRight: "10px" }}
                   src={editIcon}
@@ -437,19 +511,39 @@ const TransactionMainContent = () => {
                 />
                 Update Status
               </MenuItem>
-              <MenuItem onClick={() => handleClickOpen("flag")}>
+              <MenuItem
+                style={{ color: "red" }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleClickOpen("flag")
+                  setSelectedRows([params.row]);
+                  handleClose();
+                }}
+              >
                 <img
                   style={{ marginRight: "10px" }}
                   src={deleteIcon}
                   alt="icon"
                 />
-                Flag
+                Mark flag
+              </MenuItem>
+              <MenuItem
+                style={{ color: "green" }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleClickOpen("unflag")
+                  setSelectedRows([params.row]);
+                  handleClose();
+                }}
+              >
+                <DoneIcon style={{ marginRight: "10px", color: 'blue', width: '16px' }} />
+                Mark as safe
               </MenuItem>
             </Menu>
           </div>
         );
       },
-    },
+    }
   ];
 
   ////////////////////////////////////////////////////////////////
@@ -497,40 +591,113 @@ const TransactionMainContent = () => {
   ////////////////////////////////////////////////////////////////
   const [transferStatus, setTransferStatus] = React.useState("true");
 
-  const handleUpdateTransferStatus = () => {
+  // make status complete
+  const handleUpdateTransferStatus = async () => {
     console.log("Transfer Status:", transferStatus);
-    axios
-      .put(`http://localhost:1337/api/transfers/${selectedRows[0].id}`, {
-        data: {
-          payout_complete: transferStatus,
-        },
-      })
-      .then((response) => {
-        console.log(response, "res");
+    console.log("selectedRows:", selectedRows);
+
+    try {
+      // Use Promise.all to send all requests concurrently
+      const updateRequests = selectedRows.map((row) =>
+        axios.put(`http://localhost:1337/api/transfers/${row.id}`, {
+          data: {
+            payout_complete: transferStatus,
+          },
+        }, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+          },
+        })
+      );
+
+      const responses = await Promise.all(updateRequests);
+
+      // Check if all responses are successful
+      if (responses.every(response => response.status === 200)) {
         queryClient.invalidateQueries("allTransaction");
         handleClose();
-      })
-      .catch((err) => {
-        console.error(err.message);
-      });
+        setSelectedRows([]);
+      }
+    } catch (error) {
+      console.error("Error updating transfer status:", error);
+    }
+  };
+
+  // make status pending
+  const handleRetriveTransferStatus = async () => {
+    console.log("Transfer Status:", transferStatus);
+    console.log("selectedRows:", selectedRows);
+
+    try {
+      // Use Promise.all to send all requests concurrently
+      const updateRequests = selectedRows.map((row) =>
+        axios.put(`http://localhost:1337/api/transfers/${row.id}`, {
+          data: {
+            payout_complete: 'false',
+          },
+        }, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+          },
+        })
+      );
+
+      const responses = await Promise.all(updateRequests);
+
+      // Check if all responses are successful
+      if (responses.every(response => response.status === 200)) {
+        queryClient.invalidateQueries("allTransaction");
+        handleClose();
+        setSelectedRows([]);
+      }
+    } catch (error) {
+      console.error("Error updating transfer status:", error);
+    }
   };
 
   ////////////////////////////////////////////////////////////////////////
-  //delete integration with backend
+  //falg integration with backend
   ////////////////////////////////////////////////////////////////////////
-  const handleDeleteTransaction = () => {
-    axios
-      .delete(
-        `http://localhost:1337/api/transactions/${selectedRows[0].id}`
-      )
-      .then((response) => {
-        // console.log(response);
-        queryClient.invalidateQueries("allTransaction");
-        handleClose();
+  const handleFlagTransaction = async () => {
+    const response = await axios.put(
+      `http://localhost:1337/api/transfers/${selectedRows[0].id}`,
+      {
+        data: {
+          flag: true,
+        },
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+        }
       })
-      .catch((err) => {
-        console.error(err.message);
-      });
+
+    if (response.status === 200) {
+      queryClient.invalidateQueries("allTransaction");
+      handleClose();
+      setSelectedRows([]);
+    }
+  };
+
+  const handleUnflagTransaction = async () => {
+    const response = await axios.put(
+      `http://localhost:1337/api/transfers/${selectedRows[0].id}`,
+      {
+        data: {
+          flag: false,
+        },
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+        }
+      })
+
+    if (response.status === 200) {
+      queryClient.invalidateQueries("allTransaction");
+      handleClose();
+      setSelectedRows([]);
+    }
   };
 
   return (
@@ -539,83 +706,15 @@ const TransactionMainContent = () => {
         <TabsList>
           <Tab value={1}>All - {allTransaction?.length}</Tab>
           {filterMood !== true && (
-            <Tab value={2}>Complete - {completeCountries?.length}</Tab>
+            <Tab value={2}>COMPLETE - {completeTransactions?.length}</Tab>
           )}
           {filterMood !== true && (
-            <Tab value={3}>Pending - {pendingCountries.length}</Tab>
+            <Tab value={3}>PENDING - {pendingTransactions.length}</Tab>
+          )}
+          {filterMood !== true && (
+            <Tab value={4}>FLAGGED - {flaggedTransactions.length}</Tab>
           )}
         </TabsList>
-        {/* {selectedRows.length > 1 && (
-          <Box
-            sx={{
-              display: "flex",
-              gap: 1,
-              position: "absolute",
-              top: "15px",
-              right: "35px",
-            }}
-          >
-            <button
-              onClick={() => {
-                handleDeleteModalOpen();
-              }}
-              style={{
-                padding: "12px 20px",
-                width: "170px",
-                border: "none",
-                borderRadius: "20px",
-                backgroundColor: "#BE3144",
-                color: "#fff",
-                fontSize: "16px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                cursor: "pointer",
-                gap: "15px",
-              }}
-            >
-              Delete Transaction
-            </button>
-            <Modal
-              open={deleteModalOpen}
-              onClose={handleDeleteModalClose}
-              aria-labelledby="modal-modal-title"
-              aria-describedby="modal-modal-description"
-            >
-              <Box sx={deleteModalStyle}>
-                <Typography id="" sx={{ fontSize: 30 }}>
-                  Are you sure you want to delete those transaction?
-                </Typography>
-                <Button
-                  variant="contained"
-                  color="success"
-                  onClick={() => {
-                    callDeleteApi();
-                    setSelectedRows([]);
-                  }}
-                  style={{
-                    padding: "10px 30px",
-                    marginTop: "20px",
-                  }}
-                >
-                  Yes
-                </Button>
-                <Button
-                  variant="contained"
-                  color="error"
-                  onClick={handleDeleteModalClose}
-                  style={{
-                    marginLeft: "20px",
-                    padding: "10px 30px",
-                    marginTop: "20px",
-                  }}
-                >
-                  No
-                </Button>
-              </Box>
-            </Modal>
-          </Box>
-        )} */}
         {filterMood == true ? (
           <TabPanel value={1} onClick={handleClearRows}>
             <div style={{ height: "auto", width: "100%" }}>
@@ -675,7 +774,7 @@ const TransactionMainContent = () => {
             </TabPanel>
             <TabPanel value={2}>
               <DataGrid
-                rows={completeCountries}
+                rows={completeTransactions}
                 columns={columns}
                 initialState={{
                   pagination: {
@@ -686,7 +785,7 @@ const TransactionMainContent = () => {
                 checkboxSelection
                 onRowSelectionModelChange={(ids) => {
                   const selectedIDs = new Set(ids);
-                  const selectedRowData = completeCountries.filter((row) =>
+                  const selectedRowData = completeTransactions.filter((row) =>
                     // selectedIDs.has(row.id.toString())
                     selectedIDs.has(row.id)
                   );
@@ -696,7 +795,7 @@ const TransactionMainContent = () => {
             </TabPanel>
             <TabPanel value={3}>
               <DataGrid
-                rows={pendingCountries}
+                rows={pendingTransactions}
                 columns={columns}
                 initialState={{
                   pagination: {
@@ -707,7 +806,28 @@ const TransactionMainContent = () => {
                 checkboxSelection
                 onRowSelectionModelChange={(ids) => {
                   const selectedIDs = new Set(ids);
-                  const selectedRowData = pendingCountries.filter((row) =>
+                  const selectedRowData = pendingTransactions.filter((row) =>
+                    // selectedIDs.has(row.id.toString())
+                    selectedIDs.has(row.id)
+                  );
+                  setSelectedRows(selectedRowData);
+                }}
+              />
+            </TabPanel>
+            <TabPanel value={4}>
+              <DataGrid
+                rows={flaggedTransactions}
+                columns={columns}
+                initialState={{
+                  pagination: {
+                    paginationModel: { page: 0, pageSize: 10 },
+                  },
+                }}
+                pageSizeOptions={[10, 20]}
+                checkboxSelection
+                onRowSelectionModelChange={(ids) => {
+                  const selectedIDs = new Set(ids);
+                  const selectedRowData = flaggedTransactions.filter((row) =>
                     // selectedIDs.has(row.id.toString())
                     selectedIDs.has(row.id)
                   );
@@ -720,7 +840,7 @@ const TransactionMainContent = () => {
       </Tabs>
       <Dialog
         maxWidth="md"
-        fullWidth={selectedAction === "edit" ? true : false}
+        fullWidth={true}
         open={open}
         onClose={handleClose}
         TransitionComponent={Transition}
@@ -755,8 +875,8 @@ const TransactionMainContent = () => {
                   }}
                   style={{ marginBottom: "20px", marginTop: "20px" }}
                 >
-                  <option value="true">complete </option>
-                  <option value="false">pending </option>
+                  <option value="true">Complete </option>
+                  <option value="false">Pending </option>
                 </select>
                 <Box sx={{ mt: 3, mb: 3 }}>
                   <Typography
@@ -768,7 +888,10 @@ const TransactionMainContent = () => {
                     <Button
                       variant="contained"
                       color="success"
-                      onClick={handleUpdateTransferStatus}
+                      onClick={() => {
+                        handleUpdateTransferStatus()
+                        handleClose()
+                      }}
                     >
                       Confim Update
                     </Button>
@@ -785,19 +908,54 @@ const TransactionMainContent = () => {
               </Box>
             )}
             {selectedAction === "flag" && (
-              <Box>
-                <h2>Are you sure you want to FLAG this transaction?</h2>
+              <Box style={{
+                textAlign: "center",
+              }}>
+                <p style={{
+                  fontSize: "1.5rem",
+                }}>ARE YOU SURE YOU WANT TO <span style={{
+                  fontWeight: 'bold'
+                }}>FLAG</span> THIS TRANSACTION?</p>
                 <Box sx={{ mt: 3 }}>
                   <Button
                     variant="contained"
                     color="error"
-                    onClick={handleDeleteTransaction}
+                    onClick={handleFlagTransaction}
                   >
                     Confim Flag
                   </Button>
                   <Button
                     variant="contained"
                     color="success"
+                    sx={{ ml: 2 }}
+                    onClick={handleClose}
+                  >
+                    Cancel
+                  </Button>
+                </Box>
+              </Box>
+            )}
+            {selectedAction === "unflag" && (
+              <Box
+                style={{
+                  textAlign: "center",
+                }}
+              >
+                <p style={{
+                  fontSize: "1.5rem",
+                }}>ARE YOU SURE YOU WANT TO <span style={{
+                  fontWeight: 'bold'
+                }}>UNFLAG</span> THIS TRANSACTION?</p>
+                <Box sx={{ mt: 3 }}>
+                  <Button
+                    variant="contained"
+                    color="success"
+                    onClick={handleUnflagTransaction}
+                  >
+                    unflag
+                  </Button>
+                  <Button
+                    variant="contained"
                     sx={{ ml: 2 }}
                     onClick={handleClose}
                   >
@@ -892,7 +1050,7 @@ const TabPanel = styled(BaseTabPanel)(
 
 const TabsList = styled(BaseTabsList)(
   ({ theme }) => `
-    max-width: 500px;
+    max-width: 600px;
     // background-color: ${blue[500]};
     border-radius: 12px;
     margin-bottom: 16px;

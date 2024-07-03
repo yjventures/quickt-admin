@@ -395,8 +395,7 @@ const RevenueMainContent = () => {
           {params.row.flag == true ? "Flagged" : "Safe"}
         </div>
       ),
-    }
-    ,
+    },
     {
       field: "action",
       headerName: "Action",
@@ -491,7 +490,7 @@ const RevenueMainContent = () => {
           </div>
         );
       },
-    },
+    }
   ];
 
   ////////////////////////////////////////////////////////////////
