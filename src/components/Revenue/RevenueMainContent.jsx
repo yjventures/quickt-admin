@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Box } from "@mui/system";
+import { Box, textAlign } from "@mui/system";
 import styles from "../../assets/css/country.module.css";
 import { styled } from "@mui/system";
 import { Tabs } from "@mui/base/Tabs";
@@ -21,7 +21,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import quickStyle from "../../assets/css/quickTransfer.module.css";
 import useAuth from "../../hook/useAuth";
 import { useEffect } from "react";
-
+import DoneIcon from '@mui/icons-material/Done';
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
@@ -89,7 +89,7 @@ const RevenueMainContent = () => {
     error: transactionError,
     data: transactions,
   } = useQuery("allTransaction", fetchesTransaction);
-  // Check if countries is an array before calling map
+  // Check if transactions is an array before calling map
   const allTransaction = Array.isArray(transactions)
     ? transactions?.map((item) => ({
       id: item.attributes?.transfer?.data?.id,
@@ -112,9 +112,10 @@ const RevenueMainContent = () => {
       transferStatus: item.attributes?.transfer?.data?.attributes?.status,
       transactionNumber: item.id,
       createdAt: item.attributes?.createdAt.slice(0, 10),
+      flag: item.attributes?.transfer?.data?.attributes?.flag,
     }))
     : [];
-  const completeCountries = Array.isArray(transactions)
+  const completeTransactions = Array.isArray(transactions)
     ? transactions
       ?.filter(
         (item) =>
@@ -142,10 +143,11 @@ const RevenueMainContent = () => {
         transferStatus: item.attributes?.transfer?.data?.attributes?.status,
         transactionNumber: item.id,
         createdAt: item.attributes?.createdAt.slice(0, 10),
+        flag: item.attributes?.transfer?.data?.attributes?.flag,
       }))
     : [];
-  // get only pending countries
-  const pendingCountries = Array.isArray(transactions)
+  // get only pending transactions
+  const pendingTransactions = Array.isArray(transactions)
     ? transactions
       ?.filter((item) => {
         return (
@@ -187,6 +189,40 @@ const RevenueMainContent = () => {
           item.attributes?.amount_total * 0.01005 -
           (item.attributes?.amount_total -
             item.attributes?.amount_total * 0.01005 * 0.025),
+        flag: item.attributes?.transfer?.data?.attributes?.flag,
+      }))
+    : [];
+  // get only flaged transactions
+  const flagedTransactions = Array.isArray(transactions)
+    ? transactions
+      ?.filter((item) => {
+        return (
+          item.attributes?.transfer?.data?.attributes?.flag == true
+        );
+      })
+      .map((item) => ({
+        id: item.attributes?.transfer?.data?.id,
+        senders: {
+          image:
+            item.attributes?.users_permissions_user?.data?.attributes?.image, // Replace with the actual path or URL to the user's image
+          name: item.attributes?.users_permissions_user?.data?.attributes
+            ?.username,
+        },
+        receiverName: item.attributes?.receiver_name,
+        phone:
+          item.attributes?.users_permissions_user?.data?.attributes?.phone,
+        BaseAmount: item.attributes?.transfer_amount,
+        Totalamount: item.attributes?.amount_total,
+        TransactionFees: item.attributes?.transfer_fees,
+        Date: item.attributes?.transaction_date,
+        Currency: item.attributes?.currency,
+        // is payment complete from QuickT
+        payoutStatus:
+          item.attributes?.transfer?.data?.attributes?.payout_complete,
+        transferStatus: item.attributes?.transfer?.data?.attributes?.status,
+        transactionNumber: item.id,
+        createdAt: item.attributes?.createdAt.slice(0, 10),
+        flag: item.attributes?.transfer?.data?.attributes?.flag,
       }))
     : [];
 
@@ -326,7 +362,41 @@ const RevenueMainContent = () => {
         </div>
       ),
     },
-
+    {
+      field: "flag",
+      headerName: "Flag Status",
+      width: 100,
+      sortable: false,
+      renderCell: (params) => (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "25px",
+            width: "80px",
+            padding: "5px 10px",
+            backgroundColor: (() => {
+              switch (params.row.flag) {
+                case true:
+                  return "red";
+                case false:
+                  return "green";
+                default:
+                  return "#FAFDD4"; // Default color for unknown status
+              }
+            })(),
+            borderRadius: "15px",
+            color: 'white',
+            fontSize: "14px",
+            fontStyle: "normal",
+          }}
+        >
+          {params.row.flag == true ? "Flagged" : "Safe"}
+        </div>
+      ),
+    }
+    ,
     {
       field: "action",
       headerName: "Action",
@@ -372,7 +442,7 @@ const RevenueMainContent = () => {
               open={Boolean(anchorEl)}
               onClose={handleClose}
               style={{
-                marginLeft: "-20px",
+                marginLeft: "-60px",
                 boxShadow: "none",
               }}
             >
@@ -390,6 +460,7 @@ const RevenueMainContent = () => {
                 Update Status
               </MenuItem>
               <MenuItem
+                style={{ color: "red" }}
                 onClick={(e) => {
                   e.stopPropagation();
                   handleClickOpen("flag")
@@ -402,7 +473,19 @@ const RevenueMainContent = () => {
                   src={deleteIcon}
                   alt="icon"
                 />
-                Flag
+                Mark flag
+              </MenuItem>
+              <MenuItem
+                style={{ color: "green" }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleClickOpen("unflag")
+                  setSelectedRows([params.row]);
+                  handleClose();
+                }}
+              >
+                <DoneIcon style={{ marginRight: "10px", color: 'blue', width: '16px' }} />
+                Mark as safe
               </MenuItem>
             </Menu>
           </div>
@@ -544,6 +627,27 @@ const RevenueMainContent = () => {
     }
   };
 
+  const handleUnflagTransaction = async () => {
+    const response = await axios.put(
+      `http://localhost:1337/api/transfers/${selectedRows[0].id}`,
+      {
+        data: {
+          flag: false,
+        },
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+        }
+      })
+
+    if (response.status === 200) {
+      queryClient.invalidateQueries("allTransaction");
+      handleClose();
+      setSelectedRows([]);
+    }
+  };
+
   const result = allTransaction.filter((item) => {
     // console.log("Item transferStatus:", item.transferStatus); // Check the case of "pending"
     // console.log("Expected isPartner:", isPartner);
@@ -565,15 +669,15 @@ const RevenueMainContent = () => {
           <Tab value={1}>All - {allTransaction?.length}</Tab>
 
           {filterMood !== true && (
-            <Tab value={2}>Complete - {completeCountries?.length}</Tab>
+            <Tab value={2}>COMPLETE - {completeTransactions?.length}</Tab>
           )}
           {filterMood !== true && (
-            <Tab value={3}>Pending - {pendingCountries.length}</Tab>
+            <Tab value={3}>PENDING - {pendingTransactions.length}</Tab>
+          )}
+          {filterMood !== true && (
+            <Tab value={4} >FLAGGED - {flagedTransactions.length}</Tab>
           )}
         </TabsList>
-        {/* {selectedRows.length > 0 && (
-          
-        )} */}
 
         <Box
           sx={{
@@ -757,7 +861,7 @@ const RevenueMainContent = () => {
             </TabPanel>
             <TabPanel value={2}>
               <DataGrid
-                rows={completeCountries}
+                rows={completeTransactions}
                 columns={columns}
                 initialState={{
                   pagination: {
@@ -770,7 +874,7 @@ const RevenueMainContent = () => {
                   const selectedIDs = new Set(ids);
                   console.log(selectedIDs);
 
-                  const selectedRowData = completeCountries.filter((row) =>
+                  const selectedRowData = completeTransactions.filter((row) =>
                     // selectedIDs.has(row.id.toString())
                     selectedIDs.has(row.id)
                   );
@@ -780,7 +884,7 @@ const RevenueMainContent = () => {
             </TabPanel>
             <TabPanel value={3}>
               <DataGrid
-                rows={pendingCountries}
+                rows={pendingTransactions}
                 columns={columns}
                 initialState={{
                   pagination: {
@@ -792,7 +896,29 @@ const RevenueMainContent = () => {
                 onRowSelectionModelChange={(ids) => {
                   const selectedIDs = new Set(ids);
                   console.log(selectedIDs);
-                  const selectedRowData = pendingCountries.filter((row) =>
+                  const selectedRowData = pendingTransactions.filter((row) =>
+                    // selectedIDs.has(row.id.toString())
+                    selectedIDs.has(row.id)
+                  );
+                  setSelectedRows(selectedRowData);
+                }}
+              />
+            </TabPanel>
+            <TabPanel value={4}>
+              <DataGrid
+                rows={flagedTransactions}
+                columns={columns}
+                initialState={{
+                  pagination: {
+                    paginationModel: { page: 0, pageSize: 10 },
+                  },
+                }}
+                pageSizeOptions={[10, 20]}
+                checkboxSelection
+                onRowSelectionModelChange={(ids) => {
+                  const selectedIDs = new Set(ids);
+                  console.log(selectedIDs);
+                  const selectedRowData = flagedTransactions.filter((row) =>
                     // selectedIDs.has(row.id.toString())
                     selectedIDs.has(row.id)
                   );
@@ -805,7 +931,7 @@ const RevenueMainContent = () => {
       </Tabs>
       <Dialog
         maxWidth="md"
-        fullWidth={selectedAction === "edit" ? true : false}
+        fullWidth={true}
         open={open}
         onClose={handleClose}
         TransitionComponent={Transition}
@@ -873,8 +999,14 @@ const RevenueMainContent = () => {
               </Box>
             )}
             {selectedAction === "flag" && (
-              <Box>
-                <h2>Are you sure you want to FLAG this transaction?</h2>
+              <Box style={{
+                textAlign: "center",
+              }}>
+                <p style={{
+                  fontSize: "1.5rem",
+                }}>ARE YOU SURE YOU WANT TO <span style={{
+                  fontWeight: 'bold'
+                }}>FLAG</span> THIS TRANSACTION?</p>
                 <Box sx={{ mt: 3 }}>
                   <Button
                     variant="contained"
@@ -886,6 +1018,35 @@ const RevenueMainContent = () => {
                   <Button
                     variant="contained"
                     color="success"
+                    sx={{ ml: 2 }}
+                    onClick={handleClose}
+                  >
+                    Cancel
+                  </Button>
+                </Box>
+              </Box>
+            )}
+            {selectedAction === "unflag" && (
+              <Box
+                style={{
+                  textAlign: "center",
+                }}
+              >
+                <p style={{
+                  fontSize: "1.5rem",
+                }}>ARE YOU SURE YOU WANT TO <span style={{
+                  fontWeight: 'bold'
+                }}>UNFLAG</span> THIS TRANSACTION?</p>
+                <Box sx={{ mt: 3 }}>
+                  <Button
+                    variant="contained"
+                    color="success"
+                    onClick={handleUnflagTransaction}
+                  >
+                    unflag
+                  </Button>
+                  <Button
+                    variant="contained"
                     sx={{ ml: 2 }}
                     onClick={handleClose}
                   >
@@ -980,7 +1141,7 @@ const TabPanel = styled(BaseTabPanel)(
 
 const TabsList = styled(BaseTabsList)(
   ({ theme }) => `
-    max-width: 500px;
+    max-width: 600px;
     // background-color: ${blue[500]};
     border-radius: 12px;
     margin-bottom: 16px;
