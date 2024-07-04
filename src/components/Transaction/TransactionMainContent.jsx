@@ -250,6 +250,7 @@ const TransactionMainContent = () => {
               marginRight: "8px",
               width: "30px",
               height: "30px",
+              objectFit: 'cover'
             }}
           />
           <div>

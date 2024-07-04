@@ -58,19 +58,19 @@ const ReceiversMainContent = () => {
   console.log();
   const allReceivers = Array.isArray(receivers)
     ? receivers?.map((item) => ({
-        id: item.id,
-        firstName: item.attributes?.first_name,
-        lastName: item.attributes?.last_name,
-        phone: item.attributes?.phone,
-        address: item.attributes?.street_address + " " + item.attributes?.city,
-        details: {
-          image:
-            item.attributes?.users_permissions_user?.data?.attributes?.image, // Replace with the actual path or URL to the user's image
-          name: item.attributes?.users_permissions_user?.data?.attributes
-            ?.username,
-        },
-        createdAt: item.attributes?.createdAt.slice(0, 10),
-      }))
+      id: item.id,
+      firstName: item.attributes?.first_name,
+      lastName: item.attributes?.last_name,
+      phone: item.attributes?.phone,
+      address: item.attributes?.street_address + " " + item.attributes?.city,
+      details: {
+        image:
+          item.attributes?.users_permissions_user?.data?.attributes?.image, // Replace with the actual path or URL to the user's image
+        name: item.attributes?.users_permissions_user?.data?.attributes
+          ?.username,
+      },
+      createdAt: item.attributes?.createdAt.slice(0, 10),
+    }))
     : [];
 
   const columns = [
@@ -102,15 +102,16 @@ const ReceiversMainContent = () => {
       renderCell: (params) => (
         <div style={{ display: "flex", alignItems: "center" }}>
           <img
-            src={params.value.image ? `https://api.quickt.com.au${params.value.image}` : 
-            "https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png"
-          } // Access the image property from the details object
+            src={params.value.image ? `https://api.quickt.com.au${params.value.image}` :
+              "https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png"
+            } // Access the image property from the details object
             alt="User"
             style={{
               borderRadius: "50%",
               marginRight: "8px",
               width: "30px",
               height: "30px",
+              objectFit: 'cover'
             }}
           />
           <div>
@@ -242,7 +243,7 @@ const ReceiversMainContent = () => {
             </Modal>
           </Box>
         )}
-        
+
         {filterMood == true ? (
           <TabPanel value={1} onClick={handleClearRows}>
             <div style={{ height: "auto", width: "100%" }}>
@@ -376,8 +377,7 @@ const TabPanel = styled(BaseTabPanel)(
     font-size: 0.875rem;
     padding: 20px 12px;
     // background: ${theme.palette.mode === "dark" ? grey[900] : "#fff"};
-    // border: 1px solid ${
-      theme.palette.mode === "dark" ? grey[700] : grey[200]
+    // border: 1px solid ${theme.palette.mode === "dark" ? grey[700] : grey[200]
     };
     border-radius: 12px;
     `
@@ -393,8 +393,7 @@ const TabsList = styled(BaseTabsList)(
     align-items: center;
     justify-content: center;
     align-content: space-between;
-    // box-shadow: 0px 4px 30px ${
-      theme.palette.mode === "dark" ? grey[900] : grey[200]
+    // box-shadow: 0px 4px 30px ${theme.palette.mode === "dark" ? grey[900] : grey[200]
     };
     `
 );

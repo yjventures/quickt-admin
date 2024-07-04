@@ -44,7 +44,7 @@ const RevenueMainContent = () => {
   }, [filterRevenue]);
 
   const [selectedRows, setSelectedRows] = useState([]);
-  // console.log(selectedRows);
+  console.log(selectedRows);
   const [open, setOpen] = React.useState(false);
   const [selectedAction, setSelectedAction] = React.useState("");
   const handleClearRows = () => {
@@ -251,36 +251,18 @@ const RevenueMainContent = () => {
     },
     {
       field: "TransactionFees",
-      headerName: "Transaction Fees",
+      headerName: "Transfer Fees",
       width: 130,
     },
     {
       field: "GatewayFees",
-      headerName: "Gateway Fees",
+      headerName: "Platform Fees",
       width: 130,
     },
     {
       field: "Totalamount",
       headerName: "Total Amount",
       width: 120,
-    },
-    {
-      field: "partnerAmount",
-      headerName: "Partner Amount",
-      width: 140,
-      renderCell: (params) => <p>{params.row.Totalamount * 0.01005}</p>,
-    },
-    {
-      field: "quicktAmount",
-      headerName: "QuickT Amount",
-      width: 140,
-      renderCell: (params) => {
-        const partnerAmount = params.row.Totalamount * 0.01005;
-        const totalAmount = params.row.Totalamount;
-
-        const quickAmount = totalAmount - partnerAmount * 0.025;
-        return <p>{quickAmount}</p>;
-      },
     },
     {
       field: "transferStatus",

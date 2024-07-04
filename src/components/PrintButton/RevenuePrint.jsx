@@ -1,4 +1,5 @@
 import React from 'react'
+import printIcon from '../../assets/img/country/printer.svg'
 
 export const RevenuePrint = ({ allData, completedData, pendingData, flaggedData }) => {
     const [showMenu, setShowMenu] = React.useState(false);
@@ -84,7 +85,9 @@ export const RevenuePrint = ({ allData, completedData, pendingData, flaggedData 
                     fontStyle: 'normal',
                 }}>
                 Print
+                <img src={printIcon} alt="printIcon" style={{ marginLeft: '5px' }} />
             </button>
+
             {
                 showMenu && <div style={{
                     position: "absolute",

@@ -164,10 +164,11 @@ const PartnersMainContent = () => {
               marginRight: "8px",
               width: "35px",
               height: "35px",
+              objectFit: 'cover'
             }}
           />
           <div>
-            <p style={{ marginTop: "20px" }}>{params.value.name ? params.value.name: 'None'}</p>
+            <p style={{ marginTop: "20px" }}>{params.value.name ? params.value.name : 'None'}</p>
             <br />
             {/* Add other details as needed */}
           </div>
@@ -573,7 +574,7 @@ const PartnersMainContent = () => {
                         `https://api.quickt.com.au${selectedImage}`
                         }`}
                       style={{
-                        
+
                         width: "270px",
                         height: "180px",
                         cursor: "pointer",
