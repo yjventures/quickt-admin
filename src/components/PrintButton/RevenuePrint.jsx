@@ -1,5 +1,4 @@
 import React from 'react'
-import printIcon from '../../assets/img/country/printer.svg'
 
 export const RevenuePrint = ({ allData, completedData, pendingData, flaggedData }) => {
     const [showMenu, setShowMenu] = React.useState(false);
@@ -9,21 +8,21 @@ export const RevenuePrint = ({ allData, completedData, pendingData, flaggedData 
         const tableHeader = `
             <tr>
                 <th>id</th>
-                <th>sender name</th>
-                <th>receiver name</th>
-                <th>phone</th>
+                <th>Sender name</th>
+                <th>Receiver name</th>
+                <th>Phone</th>
                 <th>Base amount</th>
                 <th>Total amount</th>
                 <th>Transaction fees</th>
                 <th>Gateway fees</th>
-                <th>converted amount</th>
+                <th>Converted amount</th>
                 <th>Date</th>
                 <th>Currency</th>
-                <th>payout status</th>
-                <th>transfer status</th>
-                <th>transaction number</th>
-                <th>created At</th>
-                <th>flag</th>
+                <th>Payout status</th>
+                <th>Transfer status</th>
+                <th>Transaction number</th>
+                <th>Created At</th>
+                <th>Flag</th>
             </tr>`;
 
         const tableRows = data.map(transaction => `
@@ -49,6 +48,8 @@ export const RevenuePrint = ({ allData, completedData, pendingData, flaggedData 
         const printWindow = window.open('', '', 'height=600,width=800');
         printWindow.document.write('<html><head><title>Transaction Data</title></head><body>');
         printWindow.document.write('<table border="1">' + tableHeader + tableRows + '</table>');
+        printWindow.document.write('<table border="1">');
+        printWindow.document.write('<style>table {border-collapse: collapse; width: 100%;} th, td {text-align: left; padding: 8px;} tr:nth-child(even) {background-color: #f2f2f2;}</style>');
         printWindow.document.write('</body></html>');
         printWindow.document.close();
         printWindow.print();

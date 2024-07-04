@@ -20,6 +20,8 @@ import quickStyle from "../../assets/css/quickTransfer.module.css";
 import useAuth from "../../hook/useAuth";
 import { useEffect } from "react";
 import DoneIcon from '@mui/icons-material/Done';
+import RevenueExport from "../ExportButton/RevenueExport";
+import { RevenuePrint } from "../PrintButton/RevenuePrint";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -702,6 +704,14 @@ const TransactionMainContent = () => {
 
   return (
     <div className={styles.parent} style={{ position: "relative" }}>
+      <Box sx={{ display: "flex", alignItems: "center", position: 'absolute', right: '0', top: '-60px' }}>
+        <RevenueExport allData={allTransaction} completedData={completeTransactions} pendingData={pendingTransactions} flaggedData={flaggedTransactions} />
+        <span style={{ marginLeft: "10px" }}></span>
+        {/* <PrintButton data={allTransaction} /> */}
+        <RevenuePrint allData={allTransaction} completedData={completeTransactions} pendingData={pendingTransactions} flaggedData={flaggedTransactions} />
+        <span style={{ marginLeft: "10px" }}></span>
+      </Box>
+
       <Tabs defaultValue={1}>
         <TabsList>
           <Tab value={1}>All - {allTransaction?.length}</Tab>

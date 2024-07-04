@@ -675,7 +675,7 @@ const RevenueMainContent = () => {
     );
   });
 
-  console.log(result);
+  // console.log(result);
 
   return (
     <div className={styles.parent} style={{ position: "relative" }}>
