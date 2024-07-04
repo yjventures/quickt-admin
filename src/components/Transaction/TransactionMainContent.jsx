@@ -274,11 +274,6 @@ const TransactionMainContent = () => {
       width: 100,
     },
     {
-      field: "Totalamount",
-      headerName: "Total amount",
-      width: 100,
-    },
-    {
       field: "GatewayFees",
       headerName: "Gateway Fees",
       width: 100,
@@ -286,6 +281,11 @@ const TransactionMainContent = () => {
     {
       field: "TransactionFees",
       headerName: "Transaction Fees",
+      width: 100,
+    },
+    {
+      field: "Totalamount",
+      headerName: "Total amount",
       width: 100,
     },
     {

@@ -22,6 +22,9 @@ import quickStyle from "../../assets/css/quickTransfer.module.css";
 import useAuth from "../../hook/useAuth";
 import { useEffect } from "react";
 import DoneIcon from '@mui/icons-material/Done';
+import RevenueExport from "../ExportButton/RevenueExport";
+import PrintButton from "../PrintButton/PrintButton";
+import { RevenuePrint } from "../PrintButton/RevenuePrint";
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
@@ -104,6 +107,8 @@ const RevenueMainContent = () => {
       BaseAmount: item.attributes?.transfer_amount,
       Totalamount: item.attributes?.amount_total,
       TransactionFees: item.attributes?.transfer_fees,
+      GatewayFees: item.attributes?.gateway_fees,
+      convertedAmount: item.attributes?.converted_amount,
       Date: item.attributes?.transaction_date,
       Currency: item.attributes?.currency,
       // is payment complete from QuickT
@@ -135,6 +140,8 @@ const RevenueMainContent = () => {
         BaseAmount: item.attributes?.transfer_amount,
         Totalamount: item.attributes?.amount_total,
         TransactionFees: item.attributes?.transfer_fees,
+        GatewayFees: item.attributes?.gateway_fees,
+        convertedAmount: item.attributes?.converted_amount,
         Date: item.attributes?.transaction_date,
         Currency: item.attributes?.currency,
         // is payment complete from QuickT
@@ -169,6 +176,8 @@ const RevenueMainContent = () => {
         BaseAmount: item.attributes?.transfer_amount,
         Totalamount: item.attributes?.amount_total,
         TransactionFees: item.attributes?.transfer_fees,
+        GatewayFees: item.attributes?.gateway_fees,
+        convertedAmount: item.attributes?.converted_amount,
         Date: item.attributes?.transaction_date,
         Currency: item.attributes?.currency,
         // is payment complete from QuickT
@@ -214,6 +223,8 @@ const RevenueMainContent = () => {
         BaseAmount: item.attributes?.transfer_amount,
         Totalamount: item.attributes?.amount_total,
         TransactionFees: item.attributes?.transfer_fees,
+        GatewayFees: item.attributes?.gateway_fees,
+        convertedAmount: item.attributes?.converted_amount,
         Date: item.attributes?.transaction_date,
         Currency: item.attributes?.currency,
         // is payment complete from QuickT
@@ -241,6 +252,11 @@ const RevenueMainContent = () => {
     {
       field: "TransactionFees",
       headerName: "Transaction Fees",
+      width: 130,
+    },
+    {
+      field: "GatewayFees",
+      headerName: "Gateway Fees",
       width: 130,
     },
     {
@@ -663,6 +679,13 @@ const RevenueMainContent = () => {
 
   return (
     <div className={styles.parent} style={{ position: "relative" }}>
+      <Box sx={{ display: "flex", alignItems: "center", position: 'absolute', right: '0', top: '-60px' }}>
+        <RevenueExport allData={allTransaction} completedData={completeTransactions} pendingData={pendingTransactions} flaggedData={flagedTransactions} />
+        <span style={{ marginLeft: "10px" }}></span>
+        {/* <PrintButton data={allTransaction} /> */}
+        <RevenuePrint allData={allTransaction} completedData={completeTransactions} pendingData={pendingTransactions} flaggedData={flagedTransactions} />
+        <span style={{ marginLeft: "10px" }}></span>
+      </Box>
       <Tabs defaultValue={1}>
         <TabsList>
           <Tab value={1}>All - {allTransaction?.length}</Tab>
