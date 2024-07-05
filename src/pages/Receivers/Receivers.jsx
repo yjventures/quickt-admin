@@ -134,13 +134,7 @@ const Receivers = () => {
             Remove Filter
           </button>
         )}
-        <Box sx={{ display: "flex", alignItems: "center" }}>
-          <ExportButton />
-          <span style={{ marginLeft: "10px" }}></span>
-          <PrintButton />
-          <span style={{ marginLeft: "10px" }}></span>
-          {/* <CreateNewButton text={"Country"} /> */}
-        </Box>
+       
       </Box>
       <Modal
         open={filterOpen}

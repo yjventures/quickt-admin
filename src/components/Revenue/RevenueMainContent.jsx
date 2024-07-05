@@ -821,7 +821,7 @@ const RevenueMainContent = () => {
                   },
                 }}
                 pageSizeOptions={[10, 20]}
-                checkboxSelection
+                checkboxSelection disableRowSelectionOnClick
                 // by default seleted row is first row
                 onRowSelectionModelChange={(ids) => {
                   const selectedIDs = new Set(ids);
@@ -848,8 +848,7 @@ const RevenueMainContent = () => {
                     },
                   }}
                   pageSizeOptions={[10, 20]}
-                  checkboxSelection
-                  disableSelectionOnClick={true}
+                  checkboxSelection disableRowSelectionOnClick
                   // by default seleted row is first row
                   onRowSelectionModelChange={(ids) => {
                     const selectedIDs = new Set(ids);
@@ -873,7 +872,7 @@ const RevenueMainContent = () => {
                   },
                 }}
                 pageSizeOptions={[10, 20]}
-                checkboxSelection
+                checkboxSelection disableRowSelectionOnClick
                 onRowSelectionModelChange={(ids) => {
                   const selectedIDs = new Set(ids);
                   console.log(selectedIDs);
@@ -896,7 +895,7 @@ const RevenueMainContent = () => {
                   },
                 }}
                 pageSizeOptions={[10, 20]}
-                checkboxSelection
+                checkboxSelection disableRowSelectionOnClick
                 onRowSelectionModelChange={(ids) => {
                   const selectedIDs = new Set(ids);
                   console.log(selectedIDs);
@@ -918,7 +917,7 @@ const RevenueMainContent = () => {
                   },
                 }}
                 pageSizeOptions={[10, 20]}
-                checkboxSelection
+                checkboxSelection disableRowSelectionOnClick
                 onRowSelectionModelChange={(ids) => {
                   const selectedIDs = new Set(ids);
                   console.log(selectedIDs);

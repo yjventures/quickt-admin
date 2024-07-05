@@ -14,6 +14,8 @@ import axios from "axios";
 import { useQueryClient } from "react-query";
 import useAuth from "../../hook/useAuth";
 import { useEffect } from "react";
+import { ReceiverPrint } from "../PrintButton/ReceiverPrint";
+import { ReceiverExport } from "../ExportButton/ReceiverExport";
 
 const ReceiversMainContent = () => {
   const queryClient = useQueryClient();
@@ -166,6 +168,13 @@ const ReceiversMainContent = () => {
 
   return (
     <div className={styles.parent} style={{ position: "relative" }}>
+      <Box sx={{ display: "flex", alignItems: "center", position: 'absolute', right: '0', top: '-60px' }}>
+        <ReceiverExport data={allReceivers} />
+        <span style={{ marginLeft: "10px" }}></span>
+        {/* <PrintButton data={allTransaction} /> */}
+        <ReceiverPrint allData={allReceivers} />
+        <span style={{ marginLeft: "10px" }}></span>
+      </Box>
       <Tabs defaultValue={1}>
         <TabsList>
           <Tab value={1}>All - {allReceivers?.length}</Tab>

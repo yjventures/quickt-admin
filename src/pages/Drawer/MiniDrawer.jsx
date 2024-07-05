@@ -200,8 +200,9 @@ export default function MiniDrawer() {
                     <CustomList icon={usersIcon} whiteIcon={usersIconWhite} text="Senders" link="senders" pathText={pathText} />
                     <CustomList icon={pendingIcon} whiteIcon={pendingIconWhite} text="Receivers" link="receivers" pathText={pathText} />
                     <CustomList icon={revenueIcon} whiteIcon={revenueIconWhite} text="Revenue" link="revenue" pathText={pathText} />
-                    <CustomList icon={partnershipIcon} whiteIcon={partnershipIconWhite} text="Partners" link="partners" pathText={pathText} />
-                    <CustomList icon={transactionIcon} whiteIcon={transactionIconWhite} text="Transactions" link="transections" pathText={pathText} />
+                    {/* we have fixed customer */}
+                    {/* <CustomList icon={partnershipIcon} whiteIcon={partnershipIconWhite} text="Partners" link="partners" pathText={pathText} /> */}
+                    <CustomList icon={transactionIcon} whiteIcon={transactionIconWhite} text="Transactions" link="transactions" pathText={pathText} />
                 </List>
                 {/* logout button */}
                 <List sx={{ position: 'absolute', bottom: 0, left: 10, width: '100%' }}>

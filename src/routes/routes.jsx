@@ -57,7 +57,7 @@ const routes = createBrowserRouter([
                 errorElement: <ErrorPage />,
             },
             {
-                path: 'transections',
+                path: 'transactions',
                 element: <Transaction />,
                 errorElement: <ErrorPage />,
             },

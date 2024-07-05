@@ -277,14 +277,14 @@ const TransactionMainContent = () => {
       width: 100,
     },
     {
-      field: "GatewayFees",
-      headerName: "Gateway Fees",
-      width: 100,
+      field: "TransactionFees",
+      headerName: "Transfer Fees",
+      width: 130,
     },
     {
-      field: "TransactionFees",
-      headerName: "Transaction Fees",
-      width: 100,
+      field: "GatewayFees",
+      headerName: "Platform Fees",
+      width: 130,
     },
     {
       field: "Totalamount",
@@ -744,7 +744,7 @@ const TransactionMainContent = () => {
                   },
                 }}
                 pageSizeOptions={[10, 20]}
-                checkboxSelection
+                checkboxSelection disableRowSelectionOnClick
                 // by default seleted row is first row
                 onRowSelectionModelChange={(ids) => {
                   const selectedIDs = new Set(ids);
@@ -770,7 +770,7 @@ const TransactionMainContent = () => {
                     },
                   }}
                   pageSizeOptions={[10, 20]}
-                  checkboxSelection
+                  checkboxSelection disableRowSelectionOnClick
                   // by default seleted row is first row
                   onRowSelectionModelChange={(ids) => {
                     const selectedIDs = new Set(ids);
@@ -793,7 +793,7 @@ const TransactionMainContent = () => {
                   },
                 }}
                 pageSizeOptions={[10, 20]}
-                checkboxSelection
+                checkboxSelection disableRowSelectionOnClick
                 onRowSelectionModelChange={(ids) => {
                   const selectedIDs = new Set(ids);
                   const selectedRowData = completeTransactions.filter((row) =>
@@ -814,7 +814,7 @@ const TransactionMainContent = () => {
                   },
                 }}
                 pageSizeOptions={[10, 20]}
-                checkboxSelection
+                checkboxSelection disableRowSelectionOnClick
                 onRowSelectionModelChange={(ids) => {
                   const selectedIDs = new Set(ids);
                   const selectedRowData = pendingTransactions.filter((row) =>
@@ -835,7 +835,7 @@ const TransactionMainContent = () => {
                   },
                 }}
                 pageSizeOptions={[10, 20]}
-                checkboxSelection
+                checkboxSelection disableRowSelectionOnClick
                 onRowSelectionModelChange={(ids) => {
                   const selectedIDs = new Set(ids);
                   const selectedRowData = flaggedTransactions.filter((row) =>
