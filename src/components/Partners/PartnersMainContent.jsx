@@ -66,7 +66,7 @@ const PartnersMainContent = () => {
 
   const fetchePartners = async () => {
     const response = await fetch(
-      "http://localhost:1337/api/partners?populate=*",
+      "https://api.quickt.com.au/api/partners?populate=*",
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("jwt")}`,
@@ -268,7 +268,7 @@ const PartnersMainContent = () => {
   const callDeleteApi = () => {
     const deletePromises = selectedRows.map((item) =>
       axios
-        .delete(`http://localhost:1337/api/partners/${item.id}`)
+        .delete(`https://api.quickt.com.au/api/partners/${item.id}`)
         .then((res) => console.log(res))
         .catch((error) => console.error(error))
     );
@@ -292,7 +292,7 @@ const PartnersMainContent = () => {
   ////////////////////////////////////////////////////////////////////////////
   const handleDeleteApi = () => {
     axios
-      .delete(`http://localhost:1337/api/partners/${selectedRows[0].id}`)
+      .delete(`https://api.quickt.com.au/api/partners/${selectedRows[0].id}`)
       .then((res) => {
         console.log(res);
         queryClient.invalidateQueries("allPartners");
@@ -310,7 +310,7 @@ const PartnersMainContent = () => {
   let updatePercentageRef = useRef(null);
   useEffect(() => {
     axios
-      .get(`http://localhost:1337/api/partners/${selectedRows[0]?.id}`, {
+      .get(`https://api.quickt.com.au/api/partners/${selectedRows[0]?.id}`, {
         headers: {
           Authorization: `${localStorage.getItem("jwt")}`,
         },
@@ -340,7 +340,7 @@ const PartnersMainContent = () => {
         formData.append("files", file);
 
         axios
-          .post("http://localhost:1337/api/upload", formData)
+          .post("https://api.quickt.com.au/api/upload", formData)
           .then((response) => {
             console.log("File uploaded successfully: ", response.data);
             // showSuccessAlert("Image uploaded successfully");
@@ -388,7 +388,7 @@ const PartnersMainContent = () => {
 
     axios
       .put(
-        `http://localhost:1337/api/partners/${selectedRows[0]?.id}`,
+        `https://api.quickt.com.au/api/partners/${selectedRows[0]?.id}`,
         { data: updatedData },
         {
           headers: {
