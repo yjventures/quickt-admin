@@ -101,10 +101,13 @@ const TransactionMainContent = () => {
     error: transactionError,
     data: transactions,
   } = useQuery("allTransaction", fetchesTransaction);
+  // console.log(transactions)
+  // console all transfer data by mapping transactions
+  // console.log(transactions?.map((item) => item?.attributes?.transfer?.data?.id));
   // Check if countries is an array before calling map
   const allTransaction = Array.isArray(transactions)
     ? transactions?.map((item) => ({
-      id: item.attributes?.transfer?.data?.id,
+      id: item?.attributes?.transfer?.data?.id,
       senders: {
         image:
           item.attributes?.users_permissions_user?.data?.attributes?.image, // Replace with the actual path or URL to the user's image
@@ -136,7 +139,7 @@ const TransactionMainContent = () => {
           item.attributes?.transfer?.data?.attributes?.payout_complete == true
       )
       .map((item) => ({
-        id: item.attributes?.transfer?.data?.id,
+        id: item?.attributes?.transfer?.data?.id,
         senders: {
           image:
             item.attributes?.users_permissions_user?.data?.attributes?.image, // Replace with the actual path or URL to the user's image
@@ -171,7 +174,7 @@ const TransactionMainContent = () => {
         );
       })
       .map((item) => ({
-        id: item.attributes?.transfer?.data?.id,
+        id: item?.attributes?.transfer?.data?.id,
         senders: {
           image:
             item.attributes?.users_permissions_user?.data?.attributes?.image, // Replace with the actual path or URL to the user's image
@@ -205,7 +208,7 @@ const TransactionMainContent = () => {
         );
       })
       .map((item) => ({
-        id: item.attributes?.transfer?.data?.id,
+        id: item?.attributes?.transfer?.data?.id,
         senders: {
           image: item.attributes?.users_permissions_user?.data?.attributes?.image, // Replace with the actual path or URL to the user's image
           name: item.attributes?.users_permissions_user?.data?.attributes?.username,
