@@ -14,8 +14,9 @@ export const RevenuePrint = ({ allData, completedData, pendingData, flaggedData 
                 <th>Phone</th>
                 <th>Base amount</th>
                 <th>Total amount</th>
-                <th>Transaction fees</th>
+                <th>QuickT fees</th>
                 <th>Gateway fees</th>
+                <th>Whish fees</th>
                 <th>Converted amount</th>
                 <th>Date</th>
                 <th>Currency</th>
@@ -36,6 +37,7 @@ export const RevenuePrint = ({ allData, completedData, pendingData, flaggedData 
                 <td>${transaction.Totalamount}</td>
                 <td>${transaction.TransactionFees}</td>
                 <td>${transaction.GatewayFees}</td>
+                <td>${transaction.WhishFees}</td>
                 <td>${transaction.convertedAmount}</td>
                 <td>${new Date(transaction.Date).toLocaleString()}</td>
                 <td>${transaction.Currency}</td>

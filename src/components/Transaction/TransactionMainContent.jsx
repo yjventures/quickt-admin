@@ -62,7 +62,7 @@ const TransactionMainContent = () => {
 
   const fetchesTransaction = async () => {
     const response = await fetch(
-      "https://api.quickt.com.au/api/transactions?populate=*",
+      "http://localhost:1337/api/transactions?populate=*",
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("jwt")}`,
@@ -101,7 +101,7 @@ const TransactionMainContent = () => {
     error: transactionError,
     data: transactions,
   } = useQuery("allTransaction", fetchesTransaction);
-  // console.log(transactions)
+  console.log(transactions)
   // console all transfer data by mapping transactions
   // console.log(transactions?.map((item) => item?.attributes?.transfer?.data?.id));
   // Check if countries is an array before calling map
@@ -120,6 +120,7 @@ const TransactionMainContent = () => {
       Totalamount: item.attributes?.amount_total,
       TransactionFees: item.attributes?.transfer_fees,
       GatewayFees: item.attributes?.gateway_fees,
+      WhishFees: item.attributes?.whish_fees,
       convertedAmount: item.attributes?.converted_amount,
       Date: item.attributes?.transaction_date,
       Currency: item.attributes?.currency,
@@ -128,6 +129,7 @@ const TransactionMainContent = () => {
         item.attributes?.transfer?.data?.attributes?.payout_complete,
       transferStatus: item.attributes?.transfer?.data?.attributes?.status,
       transactionNumber: item.attributes.payment_intent_id,
+      transactionPassword: item.attributes.transaction_password,
       createdAt: item.attributes?.createdAt.slice(0, 10),
       flag: item.attributes?.transfer?.data?.attributes?.flag,
     }))
@@ -152,6 +154,7 @@ const TransactionMainContent = () => {
         Totalamount: item.attributes?.amount_total,
         TransactionFees: item.attributes?.transfer_fees,
         GatewayFees: item.attributes?.gateway_fees,
+        WhishFees: item.attributes?.whish_fees,
         convertedAmount: item.attributes?.converted_amount,
         Date: item.attributes?.transaction_date,
         Currency: item.attributes?.currency,
@@ -160,6 +163,7 @@ const TransactionMainContent = () => {
           item.attributes?.transfer?.data?.attributes?.payout_complete,
         transferStatus: item.attributes?.transfer?.data?.attributes?.status,
         transactionNumber: item.attributes.payment_intent_id,
+        transactionPassword: item.attributes.transaction_password,
         createdAt: item.attributes?.createdAt.slice(0, 10),
         flag: item.attributes?.transfer?.data?.attributes?.flag,
       }))
@@ -187,6 +191,7 @@ const TransactionMainContent = () => {
         Totalamount: item.attributes?.amount_total,
         TransactionFees: item.attributes?.transfer_fees,
         GatewayFees: item.attributes?.gateway_fees,
+        WhishFees: item.attributes?.whish_fees,
         convertedAmount: item.attributes?.converted_amount,
         Date: item.attributes?.transaction_date,
         Currency: item.attributes?.currency,
@@ -195,6 +200,7 @@ const TransactionMainContent = () => {
           item.attributes?.transfer?.data?.attributes?.payout_complete,
         transferStatus: item.attributes?.transfer?.data?.attributes?.status,
         transactionNumber: item.attributes.payment_intent_id,
+        transactionPassword: item.attributes.transaction_password,
         createdAt: item.attributes?.createdAt.slice(0, 10),
         flag: item.attributes?.transfer?.data?.attributes?.flag,
       }))
@@ -219,6 +225,7 @@ const TransactionMainContent = () => {
         Totalamount: item.attributes?.amount_total,
         TransactionFees: item.attributes?.transfer_fees,
         GatewayFees: item.attributes?.gateway_fees,
+        WhishFees: item.attributes?.whish_fees,
         convertedAmount: item.attributes?.converted_amount,
         Date: item.attributes?.transaction_date,
         Currency: item.attributes?.currency,
@@ -226,6 +233,7 @@ const TransactionMainContent = () => {
         payoutStatus: item.attributes?.transfer?.data?.attributes?.payout_complete,
         transferStatus: item.attributes?.transfer?.data?.attributes?.status,
         transactionNumber: item.attributes.payment_intent_id,
+        transactionPassword: item.attributes.transaction_password,
         createdAt: item.attributes?.createdAt.slice(0, 10),
         flag: item.attributes?.transfer?.data?.attributes?.flag,
       }))
@@ -272,21 +280,26 @@ const TransactionMainContent = () => {
     {
       field: "receiverName",
       headerName: "Receiver Name",
-      width: 160,
+      width: 200,
     },
     {
       field: "BaseAmount",
       headerName: "Base Amount",
-      width: 100,
+      width: 130,
     },
     {
       field: "TransactionFees",
-      headerName: "Transfer Fees",
+      headerName: "QuickT Fees",
       width: 130,
     },
     {
       field: "GatewayFees",
-      headerName: "Platform Fees",
+      headerName: "Gateway Fees",
+      width: 130,
+    },
+    {
+      field: "WhishFees",
+      headerName: "Whish Fees",
       width: 130,
     },
     {
@@ -302,7 +315,7 @@ const TransactionMainContent = () => {
     {
       field: "Date",
       headerName: "Date",
-      width: 200,
+      width: 180,
       renderCell: (params) => {
         // const unixTimestamp = params.value * 1000; // Convert to milliseconds
         // const isoString = new Date(unixTimestamp).toISOString();
@@ -371,7 +384,7 @@ const TransactionMainContent = () => {
     },
     {
       field: "transferStatus",
-      headerName: "Transfer Status",
+      headerName: "Whish Status",
       width: 130,
       sortable: false,
       renderCell: (params) => (
@@ -415,11 +428,16 @@ const TransactionMainContent = () => {
               case "pending":
                 return "Pending";
               default:
-                return "Pending";
+                return params.row.transferStatus;
             }
           })()}
         </div>
       ),
+    },
+    {
+      field: "transactionPassword",
+      headerName: "Password",
+      width: 150,
     },
     {
       field: "flag",
@@ -573,7 +591,7 @@ const TransactionMainContent = () => {
   const callDeleteApi = () => {
     const deletePromises = selectedRows.map((item) =>
       axios
-        .delete(`https://api.quickt.com.au/api/transactions/${item.id}`)
+        .delete(`http://localhost:1337/api/transactions/${item.id}`)
         .then((res) => console.log(res))
         .catch((error) => console.error(error))
     );
@@ -605,7 +623,7 @@ const TransactionMainContent = () => {
     try {
       // Use Promise.all to send all requests concurrently
       const updateRequests = selectedRows.map((row) =>
-        axios.put(`https://api.quickt.com.au/api/transfers/${row.id}`, {
+        axios.put(`http://localhost:1337/api/transfers/${row.id}`, {
           data: {
             payout_complete: transferStatus,
           },
@@ -637,7 +655,7 @@ const TransactionMainContent = () => {
     try {
       // Use Promise.all to send all requests concurrently
       const updateRequests = selectedRows.map((row) =>
-        axios.put(`https://api.quickt.com.au/api/transfers/${row.id}`, {
+        axios.put(`http://localhost:1337/api/transfers/${row.id}`, {
           data: {
             payout_complete: 'false',
           },
@@ -666,7 +684,7 @@ const TransactionMainContent = () => {
   ////////////////////////////////////////////////////////////////////////
   const handleFlagTransaction = async () => {
     const response = await axios.put(
-      `https://api.quickt.com.au/api/transfers/${selectedRows[0].id}`,
+      `http://localhost:1337/api/transfers/${selectedRows[0].id}`,
       {
         data: {
           flag: true,
@@ -687,7 +705,7 @@ const TransactionMainContent = () => {
 
   const handleUnflagTransaction = async () => {
     const response = await axios.put(
-      `https://api.quickt.com.au/api/transfers/${selectedRows[0].id}`,
+      `http://localhost:1337/api/transfers/${selectedRows[0].id}`,
       {
         data: {
           flag: false,

@@ -69,7 +69,7 @@ const RevenueMainContent = () => {
 
   const fetchesTransaction = async () => {
     const response = await fetch(
-      "https://api.quickt.com.au/api/transactions?populate=*",
+      "http://localhost:1337/api/transactions?populate=*",
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("jwt")}`,
@@ -108,6 +108,7 @@ const RevenueMainContent = () => {
       Totalamount: item.attributes?.amount_total,
       TransactionFees: item.attributes?.transfer_fees,
       GatewayFees: item.attributes?.gateway_fees,
+      WhishFees: item.attributes?.whish_fees,
       convertedAmount: item.attributes?.converted_amount,
       Date: item.attributes?.transaction_date,
       Currency: item.attributes?.currency,
@@ -115,7 +116,7 @@ const RevenueMainContent = () => {
       payoutStatus:
         item.attributes?.transfer?.data?.attributes?.payout_complete,
       transferStatus: item.attributes?.transfer?.data?.attributes?.status,
-      transactionNumber: item.id,
+      transactionNumber: item.attributes.payment_intent_id,
       createdAt: item.attributes?.createdAt.slice(0, 10),
       flag: item.attributes?.transfer?.data?.attributes?.flag,
     }))
@@ -141,6 +142,7 @@ const RevenueMainContent = () => {
         Totalamount: item.attributes?.amount_total,
         TransactionFees: item.attributes?.transfer_fees,
         GatewayFees: item.attributes?.gateway_fees,
+        WhishFees: item.attributes?.whish_fees,
         convertedAmount: item.attributes?.converted_amount,
         Date: item.attributes?.transaction_date,
         Currency: item.attributes?.currency,
@@ -148,7 +150,7 @@ const RevenueMainContent = () => {
         payoutStatus:
           item.attributes?.transfer?.data?.attributes?.payout_complete,
         transferStatus: item.attributes?.transfer?.data?.attributes?.status,
-        transactionNumber: item.id,
+        transactionNumber: item.attributes.payment_intent_id,
         createdAt: item.attributes?.createdAt.slice(0, 10),
         flag: item.attributes?.transfer?.data?.attributes?.flag,
       }))
@@ -177,6 +179,7 @@ const RevenueMainContent = () => {
         Totalamount: item.attributes?.amount_total,
         TransactionFees: item.attributes?.transfer_fees,
         GatewayFees: item.attributes?.gateway_fees,
+        WhishFees: item.attributes?.whish_fees,
         convertedAmount: item.attributes?.converted_amount,
         Date: item.attributes?.transaction_date,
         Currency: item.attributes?.currency,
@@ -184,7 +187,7 @@ const RevenueMainContent = () => {
         payoutStatus:
           item.attributes?.transfer?.data?.attributes?.payout_complete,
         transferStatus: item.attributes?.transfer?.data?.attributes?.status,
-        transactionNumber: item.id,
+        transactionNumber: item.attributes.payment_intent_id,
         // partnerAmount is 1.005% of total amount
         partnerAmount: item.attributes?.amount_total * 0.01005,
         createdAt: item.attributes?.createdAt.slice(0, 10),
@@ -224,6 +227,7 @@ const RevenueMainContent = () => {
         Totalamount: item.attributes?.amount_total,
         TransactionFees: item.attributes?.transfer_fees,
         GatewayFees: item.attributes?.gateway_fees,
+        WhishFees: item.attributes?.whish_fees,
         convertedAmount: item.attributes?.converted_amount,
         Date: item.attributes?.transaction_date,
         Currency: item.attributes?.currency,
@@ -231,7 +235,7 @@ const RevenueMainContent = () => {
         payoutStatus:
           item.attributes?.transfer?.data?.attributes?.payout_complete,
         transferStatus: item.attributes?.transfer?.data?.attributes?.status,
-        transactionNumber: item.id,
+        transactionNumber: item.attributes.payment_intent_id,
         createdAt: item.attributes?.createdAt.slice(0, 10),
         flag: item.attributes?.transfer?.data?.attributes?.flag,
       }))
@@ -251,12 +255,17 @@ const RevenueMainContent = () => {
     },
     {
       field: "TransactionFees",
-      headerName: "Transfer Fees",
+      headerName: "QuickT Fees",
       width: 130,
     },
     {
       field: "GatewayFees",
-      headerName: "Platform Fees",
+      headerName: "Gateway Fees",
+      width: 130,
+    },
+    {
+      field: "WhishFees",
+      headerName: "Whish Fees",
       width: 130,
     },
     {
@@ -310,7 +319,7 @@ const RevenueMainContent = () => {
               case "pending":
                 return "Pending";
               default:
-                return "Pending";
+                return params.row.transferStatus;
             }
           })()}
         </div>
@@ -512,7 +521,7 @@ const RevenueMainContent = () => {
   const callDeleteApi = () => {
     const deletePromises = selectedRows.map((item) =>
       axios
-        .delete(`https://api.quickt.com.au/api/transactions/${item.id}`)
+        .delete(`http://localhost:1337/api/transactions/${item.id}`)
         .then((res) => console.log(res))
         .catch((error) => console.error(error))
     );
@@ -540,11 +549,11 @@ const RevenueMainContent = () => {
   const handleUpdateTransferStatus = async () => {
     console.log("Transfer Status:", transferStatus);
     console.log("selectedRows:", selectedRows);
-
+    
     try {
       // Use Promise.all to send all requests concurrently
       const updateRequests = selectedRows.map((row) =>
-        axios.put(`https://api.quickt.com.au/api/transfers/${row.id}`, {
+        axios.put(`http://localhost:1337/api/transfers/${row.id}`, {
           data: {
             payout_complete: transferStatus,
           },
@@ -563,6 +572,73 @@ const RevenueMainContent = () => {
         handleClose();
         setSelectedRows([]);
       }
+
+      // Create CSV data for the selected rows
+      const csvData = selectedRows.map((row) => ({
+        "Sender Name": row.senders.name,
+        "Receiver Name": row.receiverName,
+        "Transaction No": row.transactionNumber,
+        "Base Amount": row.BaseAmount,
+        "QuickT Fees": row.TransactionFees,
+        "Gateway Fees": row.GatewayFees,
+        "Whish Fees": row.WhishFees,
+        "Total Amount": row.Totalamount,
+        "Whish Status": row.transferStatus,
+        "Partner Payout Status": row.payoutStatus ? 'true' : 'false',
+        "Flag Status": row.flag ? 'true' : 'false',
+        "Payout Print Date": new Date().toLocaleString('en-US')
+      }));
+
+      // Convert the CSV data to a string
+      const csvContent = [
+        [
+          'Sender Name',
+          'Receiver Name',
+          'Transaction No',
+          'Base Amount',
+          'QuickT Fees',
+          'Gateway Fees',
+          'Whish Fees',
+          'Total Amount',
+          'Whish Status',
+          'Partner Payout Status',
+          'Flag Status',
+          'Payout Print Date'
+        ]
+      ].concat(
+        csvData.map(row => [
+          row["Sender Name"],
+          row["Receiver Name"],
+          row["Transaction No"],
+          row["Base Amount"],
+          row["QuickT Fees"],
+          row["Gateway Fees"],
+          row["Whish Fees"],
+          row["Total Amount"],
+          row["Whish Status"],
+          row["Partner Payout Status"],
+          row["Flag Status"],
+          row["Payout Print Date"]
+        ])
+      );
+
+      const csvString = csvContent.map(row => row.join(',')).join('\n');
+
+      // Create a Blob containing the CSV data
+      const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+
+      // Create a download link and trigger a click to download the file
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      link.href = url;
+      link.setAttribute('download', 'payout_transactions.csv');
+      document.body.appendChild(link);
+      link.click();
+
+      // Clean up
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
     } catch (error) {
       console.error("Error updating transfer status:", error);
     }
@@ -576,7 +652,7 @@ const RevenueMainContent = () => {
     try {
       // Use Promise.all to send all requests concurrently
       const updateRequests = selectedRows.map((row) =>
-        axios.put(`https://api.quickt.com.au/api/transfers/${row.id}`, {
+        axios.put(`http://localhost:1337/api/transfers/${row.id}`, {
           data: {
             payout_complete: 'false',
           },
@@ -595,6 +671,73 @@ const RevenueMainContent = () => {
         handleClose();
         setSelectedRows([]);
       }
+
+      // Create CSV data for the selected rows
+      const csvData = selectedRows.map((row) => ({
+        "Sender Name": row.senders.name,
+        "Receiver Name": row.receiverName,
+        "Transaction No": row.transactionNumber,
+        "Base Amount": row.BaseAmount,
+        "QuickT Fees": row.TransactionFees,
+        "Gateway Fees": row.GatewayFees,
+        "Whish Fees": row.WhishFees,
+        "Total Amount": row.Totalamount,
+        "Whish Status": row.transferStatus,
+        "Partner Payout Status": row.payoutStatus ? 'true' : 'false',
+        "Flag Status": row.flag ? 'true' : 'false',
+        "Payout Print Date": new Date().toLocaleString('en-US')
+      }));
+
+      // Convert the CSV data to a string
+      const csvContent = [
+        [
+          'Sender Name',
+          'Receiver Name',
+          'Transaction No',
+          'Base Amount',
+          'QuickT Fees',
+          'Gateway Fees',
+          'Whish Fees',
+          'Total Amount',
+          'Whish Status',
+          'Partner Payout Status',
+          'Flag Status',
+          'Payout Print Date'
+        ]
+      ].concat(
+        csvData.map(row => [
+          row["Sender Name"],
+          row["Receiver Name"],
+          row["Transaction No"],
+          row["Base Amount"],
+          row["QuickT Fees"],
+          row["Gateway Fees"],
+          row["Whish Fees"],
+          row["Total Amount"],
+          row["Whish Status"],
+          row["Partner Payout Status"],
+          row["Flag Status"],
+          row["Payout Print Date"]
+        ])
+      );
+
+      const csvString = csvContent.map(row => row.join(',')).join('\n');
+
+      // Create a Blob containing the CSV data
+      const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+
+      // Create a download link and trigger a click to download the file
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      link.href = url;
+      link.setAttribute('download', 'retrived_transactions.csv');
+      document.body.appendChild(link);
+      link.click();
+
+      // Clean up
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
     } catch (error) {
       console.error("Error updating transfer status:", error);
     }
@@ -605,7 +748,7 @@ const RevenueMainContent = () => {
   ////////////////////////////////////////////////////////////////////////
   const handleFlagTransaction = async () => {
     const response = await axios.put(
-      `https://api.quickt.com.au/api/transfers/${selectedRows[0].id}`,
+      `http://localhost:1337/api/transfers/${selectedRows[0].id}`,
       {
         data: {
           flag: true,
@@ -626,7 +769,7 @@ const RevenueMainContent = () => {
 
   const handleUnflagTransaction = async () => {
     const response = await axios.put(
-      `https://api.quickt.com.au/api/transfers/${selectedRows[0].id}`,
+      `http://localhost:1337/api/transfers/${selectedRows[0].id}`,
       {
         data: {
           flag: false,
@@ -712,8 +855,9 @@ const RevenueMainContent = () => {
           >
             <p>Total selected: {selectedRows.length}</p> |
             <p>
-              Total amount:{" "}
-              {selectedRows.reduce((a, b) => a + b.Totalamount * 0.01005, 0)}
+              Total amount:
+              {/* {selectedRows.reduce((a, b) => a + b.Totalamount * 0.01005, 0)} */}
+              {selectedRows.reduce((a, b) => a + b.GatewayFees, 0)}
             </p>
           </div>
           <button

@@ -8,7 +8,7 @@ const RevenueExport = ({ allData, completedData, pendingData, flaggedData }) => 
 
         // Convert data to CSV string
         const csvContent = [
-            ['id', 'senderName', 'receiverName', 'phone', 'BaseAmount', 'TotalAmount', 'TransactionFees', 'GatewayFees', 'convertedAmount', 'Date', 'Currency', 'payoutStatus', 'transferStatus', 'transactionNumber', 'createdAt', 'flag']
+            ['id', 'Sender Name', 'Receiver Name', 'Phone', 'Base Amount', 'Total Amount', 'QuickT Fees', 'Gateway Fees', 'Whish Fees', 'Converted Amount', 'Date', 'Currency', 'Payout Status', 'Transfer Status', 'Transaction Number', 'createdAt', 'Flag']
         ].concat(
             data.map(transaction => [
                 transaction.id,
@@ -19,6 +19,7 @@ const RevenueExport = ({ allData, completedData, pendingData, flaggedData }) => 
                 transaction.Totalamount,
                 transaction.TransactionFees,
                 transaction.GatewayFees,
+                transaction.WhishFees,
                 transaction.convertedAmount,
                 new Date(transaction.Date).toISOString(),
                 transaction.Currency,
