@@ -152,7 +152,7 @@ const GeneralSettingsMainContent = () => {
   const [serviceDescription, setServiceDescription] = useState("");
   const [newTransferAmount, setNewTransferAmount] = useState("");
   const [newTransferFee, setNewTransferFee] = useState("");
-  const [newTransferVisibility, setNewTransferVisibility] = useState("");
+  const [newTransferVisibility, setNewTransferVisibility] = useState("true");
   const [selectedImage, setSelectedImage] = useState(imageTemplate);
   const [strapiImage, setStrapiImage] = useState(null);
   // const [generalSettings, setGeneralSettings] = useState(null);
@@ -164,8 +164,11 @@ const GeneralSettingsMainContent = () => {
       newTransferVisibility === ""
     ) {
       alert("Please enter amount, fee and visibility");
+      // console.log(newTransferAmount, newTransferFee, newTransferVisibility);
       return;
     }
+    // console.log(newTransferAmount, newTransferFee, newTransferVisibility);
+
     const res = await axios.post(
       `https://api.quickt.com.au/api/quick-transfers`,
       {
@@ -729,7 +732,7 @@ const GeneralSettingsMainContent = () => {
               <TableBody>
                 {quickTransfers && quickTransfers
                   ?.slice() // Create a shallow copy to avoid mutating the original array
-                  ?.sort((a, b) => a.id - b.id)
+                  // ?.sort((a, b) => a.id - b.id)
                   ?.map((transfer, index) => (
                     <TableRow key={transfer.id}>
                       <TableCell>{index + 1}</TableCell>
