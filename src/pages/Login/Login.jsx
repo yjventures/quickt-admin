@@ -7,7 +7,6 @@ import LoginForm from '../../components/LoginForm/LoginForm';
 
 const Login = () => {
   const theme = useTheme();
-  // console.log(theme.palette?.mode)
   return (
     <div className={styles.parent}>
       <img src={logo} alt="logo"
