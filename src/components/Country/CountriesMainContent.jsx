@@ -68,7 +68,7 @@ const CountriesMainContent = () => {
   };
 
   const fetchCounties = async () => {
-    const response = await fetch("https://api.quickt.com.au/api/countries", {
+    const response = await fetch("http://localhost:1337/api/countries", {
       headers: {
         Authorization: `${localStorage.getItem("jwt")}`,
       },
@@ -151,7 +151,7 @@ const CountriesMainContent = () => {
         formData.append("files", file);
 
         axios
-          .post("https://api.quickt.com.au/api/upload", formData)
+          .post("http://localhost:1337/api/upload", formData)
           .then((response) => {
             // console.log("File uploaded successfully: ", response.data);
             // showSuccessAlert("Image uploaded successfully");
@@ -181,7 +181,7 @@ const CountriesMainContent = () => {
     };
 
     // console.log(data);
-    axios.put(`https://api.quickt.com.au/api/countries/${selectedRows[0]?.id}`, data, {
+    axios.put(`http://localhost:1337/api/countries/${selectedRows[0]?.id}`, data, {
       headers: {
         Authorization: `${localStorage.getItem("jwt")}`,
       },
@@ -375,7 +375,7 @@ const CountriesMainContent = () => {
   const callDeleteApi = () => {
     const deletePromises = selectedRows.map((item) =>
       axios
-        .delete(`https://api.quickt.com.au/api/countries/${item.id}`)
+        .delete(`http://localhost:1337/api/countries/${item.id}`)
         .then((res) => console.log(res))
         .catch((error) => console.error(error))
     );
@@ -417,7 +417,7 @@ const CountriesMainContent = () => {
     const disablePromises = selectedRows.map((item) =>
       axios
         .put(
-          `https://api.quickt.com.au/api/countries/${item.id}`,
+          `http://localhost:1337/api/countries/${item.id}`,
           {
             data: {
               enabled: false,
@@ -457,7 +457,7 @@ const CountriesMainContent = () => {
     const enablePromises = selectedRows.map((item) =>
       axios
         .put(
-          `https://api.quickt.com.au/api/countries/${item.id}`,
+          `http://localhost:1337/api/countries/${item.id}`,
           {
             data: {
               enabled: true,

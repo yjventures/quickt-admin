@@ -26,7 +26,7 @@ const AuthProvider = ({ children }) => {
   const fetchUserData = async (token, userId) => {
     try {
       const response = await axios.get(
-        `https://api.quickt.com.au/api/users/me`,
+        `http://localhost:1337/api/users/me`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -47,7 +47,7 @@ const AuthProvider = ({ children }) => {
     setLoading(true);
     try {
       const response = await axios.post(
-        "https://api.quickt.com.au/api/auth/local",
+        "http://localhost:1337/api/auth/local",
         {
           identifier: email,
           password: password,

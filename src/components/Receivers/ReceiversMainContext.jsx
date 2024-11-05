@@ -33,7 +33,7 @@ const ReceiversMainContent = () => {
 
   const fetchesReceivers = async () => {
     const response = await fetch(
-      "https://api.quickt.com.au/api/saved-receivers?populate=*",
+      "http://localhost:1337/api/saved-receivers?populate=*",
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("jwt")}`,
@@ -147,7 +147,7 @@ const ReceiversMainContent = () => {
   const callDeleteApi = () => {
     const deletePromises = selectedRows.map((item) =>
       axios
-        .delete(`https://api.quickt.com.au/api/saved-receivers/${item.id}`)
+        .delete(`http://localhost:1337/api/saved-receivers/${item.id}`)
         .then((res) => console.log(res))
         .catch((error) => console.error(error))
     );

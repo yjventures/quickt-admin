@@ -108,7 +108,7 @@ const GeneralSettingsMainContent = () => {
     // Send the updated data to the server using axios.put
     try {
       const res = await axios.put(
-        `https://api.quickt.com.au/api/general-settings/1`,
+        `http://localhost:1337/api/general-settings/1`,
         serviceBoxData,
         {
           headers: {
@@ -170,7 +170,7 @@ const GeneralSettingsMainContent = () => {
     // console.log(newTransferAmount, newTransferFee, newTransferVisibility);
 
     const res = await axios.post(
-      `https://api.quickt.com.au/api/quick-transfers`,
+      `http://localhost:1337/api/quick-transfers`,
       {
         data: {
           amount: Number(newTransferAmount),
@@ -202,7 +202,7 @@ const GeneralSettingsMainContent = () => {
     isError: isgeneralSettingError,
   } = useQuery("generalSettings", async () => {
     const res = await axios.get(
-      `https://api.quickt.com.au/api/general-settings/1`,
+      `http://localhost:1337/api/general-settings/1`,
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("jwt")}`,
@@ -221,7 +221,7 @@ const GeneralSettingsMainContent = () => {
     isError,
   } = useQuery("quickTransfers", async () => {
     const res = await axios.get(
-      `https://api.quickt.com.au/api/quick-transfers`,
+      `http://localhost:1337/api/quick-transfers`,
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("jwt")}`,
@@ -272,7 +272,7 @@ const GeneralSettingsMainContent = () => {
       return;
     }
     const res = await axios.put(
-      `https://api.quickt.com.au/api/quick-transfers/${quickTransfers?.[box - 1]?.id
+      `http://localhost:1337/api/quick-transfers/${quickTransfers?.[box - 1]?.id
       }`,
       {
         data: {
@@ -309,7 +309,7 @@ const GeneralSettingsMainContent = () => {
         formData.append("files", file);
 
         axios
-          .post("https://api.quickt.com.au/api/upload", formData)
+          .post("http://localhost:1337/api/upload", formData)
           .then((response) => {
             console.log("File uploaded successfully: ", response.data);
             // showSuccessAlert("Image uploaded successfully");
@@ -332,7 +332,7 @@ const GeneralSettingsMainContent = () => {
     }
     // /api/general-settings/:id
     const res = await axios.put(
-      `https://api.quickt.com.au/api/general-settings/1`,
+      `http://localhost:1337/api/general-settings/1`,
       {
         data: {
           transfer_percentage: Number(fee),
@@ -360,7 +360,7 @@ const GeneralSettingsMainContent = () => {
     }
     // /api/general-settings/:id
     const res = await axios.put(
-      `https://api.quickt.com.au/api/general-settings/1`,
+      `http://localhost:1337/api/general-settings/1`,
       {
         data: {
           currency_buffer: Number(currencyBuffer),
@@ -389,7 +389,7 @@ const GeneralSettingsMainContent = () => {
     }
     // /api/general-settings/:id
     const res = await axios.put(
-      `https://api.quickt.com.au/api/general-settings/1`,
+      `http://localhost:1337/api/general-settings/1`,
       {
         data: {
           gateway_fee: Number(gatewayFee),
@@ -433,7 +433,7 @@ const GeneralSettingsMainContent = () => {
     // }
 
     const res = await axios.put(
-      `https://api.quickt.com.au/api/general-settings/1`,
+      `http://localhost:1337/api/general-settings/1`,
       {
         data: {
           main_banner_title: mainTitle,
@@ -495,7 +495,7 @@ const GeneralSettingsMainContent = () => {
     console.log(serviceBoxData);
     // /api/general-settings/:id
     const res = await axios.put(
-      `https://api.quickt.com.au/api/general-settings/1`,
+      `http://localhost:1337/api/general-settings/1`,
       serviceBoxData,
       {
         headers: {

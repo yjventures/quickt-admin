@@ -69,7 +69,7 @@ const RevenueMainContent = () => {
 
   const fetchesTransaction = async () => {
     const response = await fetch(
-      "https://api.quickt.com.au/api/transactions?populate=*",
+      "http://localhost:1337/api/transactions?populate=*",
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("jwt")}`,
@@ -521,7 +521,7 @@ const RevenueMainContent = () => {
   const callDeleteApi = () => {
     const deletePromises = selectedRows.map((item) =>
       axios
-        .delete(`https://api.quickt.com.au/api/transactions/${item.id}`)
+        .delete(`http://localhost:1337/api/transactions/${item.id}`)
         .then((res) => console.log(res))
         .catch((error) => console.error(error))
     );
@@ -553,7 +553,7 @@ const RevenueMainContent = () => {
     try {
       // Use Promise.all to send all requests concurrently
       const updateRequests = selectedRows.map((row) =>
-        axios.put(`https://api.quickt.com.au/api/transfers/${row.id}`, {
+        axios.put(`http://localhost:1337/api/transfers/${row.id}`, {
           data: {
             payout_complete: transferStatus,
           },
@@ -652,7 +652,7 @@ const RevenueMainContent = () => {
     try {
       // Use Promise.all to send all requests concurrently
       const updateRequests = selectedRows.map((row) =>
-        axios.put(`https://api.quickt.com.au/api/transfers/${row.id}`, {
+        axios.put(`http://localhost:1337/api/transfers/${row.id}`, {
           data: {
             payout_complete: 'false',
           },
@@ -748,7 +748,7 @@ const RevenueMainContent = () => {
   ////////////////////////////////////////////////////////////////////////
   const handleFlagTransaction = async () => {
     const response = await axios.put(
-      `https://api.quickt.com.au/api/transfers/${selectedRows[0].id}`,
+      `http://localhost:1337/api/transfers/${selectedRows[0].id}`,
       {
         data: {
           flag: true,
@@ -769,7 +769,7 @@ const RevenueMainContent = () => {
 
   const handleUnflagTransaction = async () => {
     const response = await axios.put(
-      `https://api.quickt.com.au/api/transfers/${selectedRows[0].id}`,
+      `http://localhost:1337/api/transfers/${selectedRows[0].id}`,
       {
         data: {
           flag: false,
