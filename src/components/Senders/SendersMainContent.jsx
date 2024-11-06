@@ -93,7 +93,7 @@ const SendersMainContent = () => {
   //fatches the senders info from the server
   ////////////////////////////////////////////////////////////////////////
   const fetchesSender = async () => {
-    const response = await fetch("http://localhost:1337/api/users", {
+    const response = await fetch("https://api.quickt.com.au/api/users", {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("jwt")}`,
       },
@@ -424,7 +424,7 @@ const SendersMainContent = () => {
   const callDeleteApi = () => {
     const deletePromises = selectedRows.map((item) =>
       axios
-        .delete(`http://localhost:1337/api/users/${item.id}`)
+        .delete(`https://api.quickt.com.au/api/users/${item.id}`)
         .then((res) => console.log(res))
         .catch((error) => console.error(error))
     );
@@ -464,7 +464,7 @@ const SendersMainContent = () => {
     const disablePromises = selectedRows.map((item) =>
       axios
         .put(
-          `http://localhost:1337/api/users/${item.id}`,
+          `https://api.quickt.com.au/api/users/${item.id}`,
           {
             blocked: true,
           },
@@ -515,7 +515,7 @@ const SendersMainContent = () => {
     const disablePromises = selectedRows.map((item) =>
       axios
         .put(
-          `http://localhost:1337/api/users/${item.id}`,
+          `https://api.quickt.com.au/api/users/${item.id}`,
           {
             blocked: false,
           },
@@ -559,7 +559,7 @@ const SendersMainContent = () => {
     console.log(firstClick)
     axios
       .get(
-        `http://localhost:1337/api/users/${selectedRows[selectedRows.length - 1]?.id}?populate=*`,
+        `https://api.quickt.com.au/api/users/${selectedRows[selectedRows.length - 1]?.id}?populate=*`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("jwt")}`,
@@ -576,7 +576,7 @@ const SendersMainContent = () => {
   //approve kyc
   const approveKyc = () => {
     axios
-      .put(`http://localhost:1337/api/users/${selectedRows[0]?.id}`, {
+      .put(`https://api.quickt.com.au/api/users/${selectedRows[0]?.id}`, {
         kyc_approved: true,
       })
       .then((res) => {
@@ -589,7 +589,7 @@ const SendersMainContent = () => {
   //approve kyc
   // const declineKyc = () => {
   //   axios
-  //     .put(`http://localhost:1337/api/users/${selectedRows[0]?.id}`, {
+  //     .put(`https://api.quickt.com.au/api/users/${selectedRows[0]?.id}`, {
   //       kyc_approved: false,
   //     })
   //     .then((res) => {
