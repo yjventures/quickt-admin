@@ -58,7 +58,7 @@ const Partners = () => {
     setChecked(isChecked);
   };
 
-  const { handleFilterPartner, filterPartner } = useAuth();
+  const { handleFilterPartner, filterPartner, handleFilteredName } = useAuth();
 
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
@@ -187,6 +187,9 @@ const Partners = () => {
           <input
             type="text"
             placeholder="Search"
+            onChange={(e) => {
+              handleFilteredName(e.target.value)
+            }}
             style={{
               height: "40px",
               width: "500px",

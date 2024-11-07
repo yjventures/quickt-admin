@@ -24,7 +24,7 @@ const FilterStyle = {
 };
 const TotalRevenue = () => {
   const path = window.location.pathname.split("/")[2].toUpperCase();
-  const { handleFilterRevenue, filterRevenue } = useAuth();
+  const { handleFilterRevenue, filterRevenue, handleFilteredName } = useAuth();
 
   //handle filter popup open
   const [filterOpen, setFilterOpen] = useState(false);
@@ -86,6 +86,9 @@ const TotalRevenue = () => {
           <input
             type="text"
             placeholder="Search"
+            onChange={(e) => {
+              handleFilteredName(e.target.value)
+            }}
             style={{
               height: "40px",
               width: "500px",

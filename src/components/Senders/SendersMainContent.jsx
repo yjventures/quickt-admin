@@ -32,7 +32,10 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 const SendersMainContent = () => {
   const queryClient = useQueryClient();
 
-  const { filterSender } = useAuth();
+  const { filterSender, filteredName } = useAuth();
+  // console.log(filteredName)
+
+
   const [isStatus, setIsStatus] = useState(null);
   const [isKyc, setIsKyc] = useState(null);
   const [filterMood, setFilterMood] = useState(false);
@@ -548,43 +551,43 @@ const SendersMainContent = () => {
   ////////////////////////////////
   //fetching kyc value
   ////////////////////////////////
-  const [fetchKyc, setFetchKyc] = useState(null);
+  // const [fetchKyc, setFetchKyc] = useState(null);
 
-  useEffect(() => {
-    console.log(selectedRows)
-    console.log(selectedRows.length)
-    // if(selectedRows.length < 1){
+  // useEffect(() => {
+  //   console.log(selectedRows)
+  //   console.log(selectedRows.length)
+  //   // if(selectedRows.length < 1){
 
-    // }
-    console.log(firstClick)
-    axios
-      .get(
-        `https://api.quickt.com.au/api/users/${selectedRows[selectedRows.length - 1]?.id}?populate=*`,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("jwt")}`,
-          },
-        }
-      )
-      .then((res) => {
-        console.log(res.data);
-        // console.log(res.data.image);
-        setFetchKyc(res.data);
-      });
-  }, [selectedRows]);
+  //   // }
+  //   console.log(firstClick)
+  //   axios
+  //     .get(
+  //       `https://api.quickt.com.au/api/users/${selectedRows[selectedRows.length - 1]?.id}?populate=*`,
+  //       {
+  //         headers: {
+  //           Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+  //         },
+  //       }
+  //     )
+  //     .then((res) => {
+  //       console.log(res.data);
+  //       // console.log(res.data.image);
+  //       setFetchKyc(res.data);
+  //     });
+  // }, [selectedRows]);
 
   //approve kyc
-  const approveKyc = () => {
-    axios
-      .put(`https://api.quickt.com.au/api/users/${selectedRows[0]?.id}`, {
-        kyc_approved: true,
-      })
-      .then((res) => {
-        // console.log(res)
-        queryClient.invalidateQueries("allSenders");
-        handleClose();
-      });
-  };
+  // const approveKyc = () => {
+  //   axios
+  //     .put(`https://api.quickt.com.au/api/users/${selectedRows[0]?.id}`, {
+  //       kyc_approved: true,
+  //     })
+  //     .then((res) => {
+  //       // console.log(res)
+  //       queryClient.invalidateQueries("allSenders");
+  //       handleClose();
+  //     });
+  // };
 
   //approve kyc
   // const declineKyc = () => {
@@ -620,12 +623,12 @@ const SendersMainContent = () => {
   return (
     <div className={styles.parent} style={{ position: "relative" }}>
       <Box sx={{ display: "flex", alignItems: "center", position: 'absolute', right: '0', top: '-55px' }}>
-          <ExportButton data={senders} />
-          <span style={{ marginLeft: "10px" }}></span>
-          <PrintButton data={senders} />
-          <span style={{ marginLeft: "10px" }}></span>
-          {/* <CreateNewButton text={"sender"} /> */}
-        </Box>
+        <ExportButton data={senders} />
+        <span style={{ marginLeft: "10px" }}></span>
+        <PrintButton data={senders} />
+        <span style={{ marginLeft: "10px" }}></span>
+        {/* <CreateNewButton text={"sender"} /> */}
+      </Box>
       <Tabs defaultValue={1}>
         <TabsList>
           <Tab value={1} onClick={handleClearRows}>
@@ -875,7 +878,11 @@ const SendersMainContent = () => {
             <TabPanel value={1}>
               <div style={{ height: "auto", width: "100%" }}>
                 <DataGrid
-                  rows={allSenders}
+                  rows={
+                    filteredName === ''
+                      ? allSenders
+                      : allSenders.filter(sender => sender.firstName.includes(filteredName))
+                  }
                   columns={columns}
                   initialState={{
                     pagination: {
@@ -898,7 +905,11 @@ const SendersMainContent = () => {
             </TabPanel>
             <TabPanel value={2}>
               <DataGrid
-                rows={enabledSender}
+                rows={
+                  filteredName === ''
+                    ? enabledSender
+                    : enabledSender.filter(sender => sender.firstName.includes(filteredName))
+                }
                 columns={columns}
                 initialState={{
                   pagination: {
@@ -919,7 +930,11 @@ const SendersMainContent = () => {
             </TabPanel>
             <TabPanel value={3}>
               <DataGrid
-                rows={disabledSender}
+                rows={
+                  filteredName === ''
+                    ? disabledSender
+                    : disabledSender.filter(sender => sender.firstName.includes(filteredName))
+                }
                 columns={columns}
                 initialState={{
                   pagination: {
@@ -940,7 +955,11 @@ const SendersMainContent = () => {
             </TabPanel>
             <TabPanel value={4}>
               <DataGrid
-                rows={pendingKycSender}
+                rows={
+                  filteredName === ''
+                    ? pendingKycSender
+                    : pendingKycSender.filter(sender => sender.firstName.includes(filteredName))
+                }
                 columns={columns}
                 initialState={{
                   pagination: {

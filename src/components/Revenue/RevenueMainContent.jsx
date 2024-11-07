@@ -31,7 +31,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 
 const RevenueMainContent = () => {
   const queryClient = useQueryClient();
-  const { filterRevenue } = useAuth();
+  const { filterRevenue, filteredName } = useAuth();
   const [isWhish, setIsWhish] = useState(null);
   const [isPartner, setIsPartner] = useState(null);
   const [filterMood, setFilterMood] = useState(false);
@@ -549,7 +549,7 @@ const RevenueMainContent = () => {
   const handleUpdateTransferStatus = async () => {
     console.log("Transfer Status:", transferStatus);
     console.log("selectedRows:", selectedRows);
-    
+
     try {
       // Use Promise.all to send all requests concurrently
       const updateRequests = selectedRows.map((row) =>
@@ -984,7 +984,11 @@ const RevenueMainContent = () => {
             <TabPanel value={1} onClick={handleClearRows}>
               <div style={{ height: "auto", width: "100%" }}>
                 <DataGrid
-                  rows={allTransaction}
+                  rows={
+                    filteredName === ''
+                      ? allTransaction
+                      : allTransaction.filter(sender => sender.firstName.includes(filteredName))
+                  }
                   columns={columns}
                   initialState={{
                     pagination: {
@@ -1008,7 +1012,11 @@ const RevenueMainContent = () => {
             </TabPanel>
             <TabPanel value={2}>
               <DataGrid
-                rows={completeTransactions}
+                rows={
+                  filteredName === ''
+                    ? completeTransactions
+                    : completeTransactions.filter(sender => sender.firstName.includes(filteredName))
+                }
                 columns={columns}
                 initialState={{
                   pagination: {
@@ -1031,7 +1039,11 @@ const RevenueMainContent = () => {
             </TabPanel>
             <TabPanel value={3}>
               <DataGrid
-                rows={pendingTransactions}
+                rows={
+                  filteredName === ''
+                    ? pendingTransactions
+                    : pendingTransactions.filter(sender => sender.firstName.includes(filteredName))
+                }
                 columns={columns}
                 initialState={{
                   pagination: {
@@ -1053,7 +1065,11 @@ const RevenueMainContent = () => {
             </TabPanel>
             <TabPanel value={4}>
               <DataGrid
-                rows={flagedTransactions}
+                rows={
+                  filteredName === ''
+                    ? flagedTransactions
+                    : flagedTransactions.filter(sender => sender.firstName.includes(filteredName))
+                }
                 columns={columns}
                 initialState={{
                   pagination: {

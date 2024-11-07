@@ -12,7 +12,7 @@ import useAuth from "../../hook/useAuth";
 const Senders = () => {
   const path = window.location.pathname.split("/")[2].toUpperCase();
 
-  const { handleFilterSender, filterSender } = useAuth();
+  const { handleFilterSender, filterSender, handleFilteredName } = useAuth();
   ////////////////////////////////
   //handle filter popup open
   ////////////////////////////////
@@ -91,6 +91,9 @@ const Senders = () => {
           <input
             type="text"
             placeholder="Search"
+            onChange={(e) => {
+              handleFilteredName(e.target.value)
+            }}
             style={{
               height: "40px",
               width: "500px",

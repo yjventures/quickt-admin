@@ -25,7 +25,7 @@ const FilterStyle = {
 };
 const Transaction = () => {
   const path = window.location.pathname.split("/")[2].toUpperCase();
-  const { handleFilterTransaction, filterTransaction } = useAuth();
+  const { handleFilterTransaction, filterTransaction, handleFilteredName } = useAuth();
 
   //handle filter popup open
   const [filterOpen, setFilterOpen] = useState(false);
@@ -89,6 +89,9 @@ const Transaction = () => {
           <input
             type="text"
             placeholder="Search"
+            onChange={(e) => {
+              handleFilteredName(e.target.value)
+            }}
             style={{
               height: "40px",
               width: "500px",

@@ -19,7 +19,7 @@ import { ReceiverExport } from "../ExportButton/ReceiverExport";
 
 const ReceiversMainContent = () => {
   const queryClient = useQueryClient();
-  const { filterReceiver } = useAuth();
+  const { filterReceiver, filteredName } = useAuth();
   const [filterMood, setFilterMood] = useState(false);
   // if filter country is not empty
   useEffect(() => {
@@ -287,7 +287,11 @@ const ReceiversMainContent = () => {
             <TabPanel value={1} onClick={handleClearRows}>
               <div style={{ height: "auto", width: "100%" }}>
                 <DataGrid
-                  rows={allReceivers}
+                  rows={
+                    filteredName === ''
+                      ? allReceivers
+                      : allReceivers.filter(receiver => receiver.firstName.includes(filteredName))
+                  }
                   columns={columns}
                   initialState={{
                     pagination: {

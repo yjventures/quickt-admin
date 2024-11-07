@@ -29,7 +29,7 @@ const Receivers = () => {
   const [filterOpen, setFilterOpen] = useState(false);
   const handleFilterOpen = () => setFilterOpen(true);
   const handleFilterClose = () => setFilterOpen(false);
-  const { handleFilterReceiver, filterReceiver } = useAuth();
+  const { handleFilterReceiver, filterReceiver, handleFilteredName } = useAuth();
 
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
@@ -82,6 +82,9 @@ const Receivers = () => {
           <input
             type="text"
             placeholder="Search"
+            onChange={(e) => {
+              handleFilteredName(e.target.value)
+            }}
             style={{
               height: "40px",
               width: "500px",
@@ -134,7 +137,7 @@ const Receivers = () => {
             Remove Filter
           </button>
         )}
-       
+
       </Box>
       <Modal
         open={filterOpen}

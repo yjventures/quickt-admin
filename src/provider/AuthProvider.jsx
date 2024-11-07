@@ -14,6 +14,8 @@ const AuthProvider = ({ children }) => {
   const [filterRevenue, setFilterRevenue] = useState({});
   const [filterTransaction, setFilterTransaction] = useState({});
   const [filterPartner, setFilterPartner] = useState({});
+  const [filteredName, setFilteredName] = useState('')
+
 
   useEffect(() => {
     if (token && userId) {
@@ -129,6 +131,10 @@ const AuthProvider = ({ children }) => {
       to: text.to,
     });
   };
+
+  const handleFilteredName = (text) => {
+    setFilteredName(text)
+  }
   const authInfo = {
     user,
     loading,
@@ -145,6 +151,8 @@ const AuthProvider = ({ children }) => {
     filterTransaction,
     handleFilterPartner,
     filterPartner,
+    handleFilteredName,
+    filteredName
   };
 
   return (

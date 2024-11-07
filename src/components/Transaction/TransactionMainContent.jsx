@@ -29,7 +29,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 
 const TransactionMainContent = () => {
   const queryClient = useQueryClient();
-  const { filterTransaction } = useAuth();
+  const { filterTransaction, filteredName } = useAuth();
   const [isPayoutStatus, setIsPayoutStatus] = useState(null);
   const [isTransferStatus, setIsTransferStatus] = useState(null);
   const [filterMood, setFilterMood] = useState(false);
@@ -783,7 +783,12 @@ const TransactionMainContent = () => {
             <TabPanel value={1} onClick={handleClearRows}>
               <div style={{ height: "auto", width: "100%" }}>
                 <DataGrid
-                  rows={allTransaction}
+                  rows={
+                    filteredName === ''
+                      ? allTransaction
+                      : allTransaction.filter(sender => sender.firstName.includes(filteredName))
+
+                  }
                   columns={columns}
                   initialState={{
                     pagination: {
@@ -806,7 +811,11 @@ const TransactionMainContent = () => {
             </TabPanel>
             <TabPanel value={2}>
               <DataGrid
-                rows={completeTransactions}
+                rows={
+                  filteredName === ''
+                    ? completeTransactions
+                    : completeTransactions.filter(sender => sender.firstName.includes(filteredName))
+                }
                 columns={columns}
                 initialState={{
                   pagination: {
@@ -827,7 +836,11 @@ const TransactionMainContent = () => {
             </TabPanel>
             <TabPanel value={3}>
               <DataGrid
-                rows={pendingTransactions}
+                rows={
+                  filteredName === ''
+                    ? pendingTransactions
+                    : pendingTransactions.filter(sender => sender.firstName.includes(filteredName))
+                }
                 columns={columns}
                 initialState={{
                   pagination: {
@@ -848,7 +861,11 @@ const TransactionMainContent = () => {
             </TabPanel>
             <TabPanel value={4}>
               <DataGrid
-                rows={flaggedTransactions}
+                rows={
+                  filteredName === ''
+                    ? flaggedTransactions
+                    : flaggedTransactions.filter(sender => sender.firstName.includes(filteredName))
+                }
                 columns={columns}
                 initialState={{
                   pagination: {
